@@ -1,0 +1,35 @@
+<!-- <app-loading *ngIf="loading"></app-loading> -->
+<!-- <div *ngIf="!loading">
+</div> -->
+<div class="container">
+  <div class="menu">
+    <div class="group">
+      <input type="text" [(ngModel)]="H">
+      <span class="highlight"></span>
+      <span class="bar"></span>
+      <label>H:</label>
+    </div>
+    <div class="group">
+      <input type="text" [(ngModel)]="OMEGA">
+      <span class="highlight"></span>
+      <span class="bar"></span>
+      <label>OMEGA:</label>
+    </div>
+    <div class="group">
+      <input type="text" [(ngModel)]="SIZE">
+      <span class="highlight"></span>
+      <span class="bar"></span>
+      <label>SIZE:</label>
+    </div>
+    <div class="group">
+      <input type="text" [(ngModel)]="ITERATIONS">
+      <span class="highlight"></span>
+      <span class="bar"></span>
+      <label>ITERATIONS:</label>
+    </div>
+    <div><button (click)="start()">Start</button></div>
+  </div>
+  <div class="plotly-container">
+    <plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
+  </div>
+</div>
