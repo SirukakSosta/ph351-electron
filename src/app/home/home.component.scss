@@ -8,7 +8,10 @@
     background: #e3e3e3;
   }
 }
-
+.energies {
+  height: 200px;
+  overflow-y: scroll;
+}
 .group {
   position: relative;
   margin-bottom: 45px;
@@ -42,11 +45,11 @@ label {
 }
 
 /* active state */
-input:focus~label,
-input:valid~label {
+input:focus ~ label,
+input:valid ~ label {
   top: -20px;
   font-size: 14px;
-  color: #5264AE;
+  color: #5264ae;
 }
 
 /* BOTTOM BARS ================================= */
@@ -58,12 +61,12 @@ input:valid~label {
 
 .bar:before,
 .bar:after {
-  content: '';
+  content: "";
   height: 2px;
   width: 0;
   bottom: 1px;
   position: absolute;
-  background: #5264AE;
+  background: #5264ae;
   transition: 0.2s ease all;
   -moz-transition: 0.2s ease all;
   -webkit-transition: 0.2s ease all;
@@ -78,8 +81,8 @@ input:valid~label {
 }
 
 /* active state */
-input:focus~.bar:before,
-input:focus~.bar:after {
+input:focus ~ .bar:before,
+input:focus ~ .bar:after {
   width: 50%;
 }
 
@@ -95,7 +98,7 @@ input:focus~.bar:after {
 }
 
 /* active state */
-input:focus~.highlight {
+input:focus ~ .highlight {
   -webkit-animation: inputHighlighter 0.3s ease;
   -moz-animation: inputHighlighter 0.3s ease;
   animation: inputHighlighter 0.3s ease;
@@ -104,7 +107,7 @@ input:focus~.highlight {
 /* ANIMATIONS ================ */
 @-webkit-keyframes inputHighlighter {
   from {
-    background: #5264AE;
+    background: #5264ae;
   }
 
   to {
@@ -115,7 +118,7 @@ input:focus~.highlight {
 
 @-moz-keyframes inputHighlighter {
   from {
-    background: #5264AE;
+    background: #5264ae;
   }
 
   to {
@@ -126,7 +129,7 @@ input:focus~.highlight {
 
 @keyframes inputHighlighter {
   from {
-    background: #5264AE;
+    background: #5264ae;
   }
 
   to {
