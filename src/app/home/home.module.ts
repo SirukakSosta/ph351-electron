@@ -7,9 +7,10 @@ import { HomeRoutingModule } from "./home-routing.module";
 import { HomeComponent } from "./home.component";
 import { SharedModule } from "../shared/shared.module";
 import { LoadingComponent } from "../components/loading/loading.component";
+import { ThreeDSurfaceComponent } from './three-d-surface/three-d-surface.component';
 
 @NgModule({
-  declarations: [HomeComponent, LoadingComponent],
+  declarations: [HomeComponent, LoadingComponent, ThreeDSurfaceComponent],
   imports: [CommonModule, SharedModule, PlotlyModule, HomeRoutingModule]
 })
 export class HomeModule {}

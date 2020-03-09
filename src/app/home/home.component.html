@@ -35,6 +35,15 @@
     </div>
   </div>
   <div class="plotly-container">
-    <plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
+    <div class="graph-btns" *ngIf="ready">
+      <button (click)="action = '3D'">3D Potential</button>
+    </div>
+    <ngContainer *ngIf="action === '3D'">
+      <app-three-d-surface
+        [potentialMatrix]="voltageMatrix"
+        [axis]="axis"
+        [title]="'3d potential'"
+      ></app-three-d-surface>
+    </ngContainer>
   </div>
 </div>

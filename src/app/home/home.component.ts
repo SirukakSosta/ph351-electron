@@ -11,28 +11,9 @@ export class HomeComponent implements OnInit {
   SIZE: number = 10;
   H = 1 / (this.SIZE - 1);
   ITERATIONS: number = 20;
-  loading: boolean;
+  ready: boolean = false;
   energies = [];
-  public graph = {
-    data: [
-      {
-        z: [],
-        x: [],
-        y: [],
-        type: "surface",
-        contours: {
-          z: {
-            show: true,
-            usecolormap: true,
-            highlightcolor: "#42f462",
-            project: { z: true }
-          }
-        }
-      }
-    ],
-    layout: { width: 1200, height: 800, title: "Poisson" }
-  };
-
+  action: string;
   voltageMatrix: number[][];
   chargeMatrix: number[][];
   axis: number[] = [];
@@ -47,6 +28,7 @@ export class HomeComponent implements OnInit {
     this.startIteration();
   }
   private startIteration() {
+    this.ready = false;
     this.initializeMatrices();
     for (let k = 0; k < this.ITERATIONS; k++) {
       for (let i = 0; i < this.SIZE; i++) {
@@ -60,10 +42,7 @@ export class HomeComponent implements OnInit {
       console.log(k);
       this.energies.push(this.calculateTotalEnergy(this.voltageMatrix));
     }
-    this.graph.data[0].z = this.voltageMatrix;
-    this.graph.data[0].x = this.axis;
-    this.graph.data[0].y = this.axis;
-    this.loading = false;
+    this.ready = true;
   }
   private getRealXY(i: number) {
     return i / (this.SIZE - 1);
@@ -153,7 +132,7 @@ export class HomeComponent implements OnInit {
     const x = this.getRealXY(i);
     const y = this.getRealXY(j);
     const result =
-      -1.0 * this.H * Math.pow(this.H, 2) * (2.0 * ((x - 1) * x + (y - 1) * y));
+      this.H * Math.pow(this.H, 2) * (2.0 * ((1 - x) * x + (1 - y) * y));
     return result;
   }
   private getRandomValues(): number {
@@ -176,16 +155,3 @@ export class HomeComponent implements OnInit {
     return false;
   }
 }
-// const f1 = mathjs.subtract(mathjs.bignumber(1.0), mathjs.bignumber(this.OMEGA));
-// const f2 = mathjs.bignumber(this.voltageMatrix[i][j]);
-// const f3 = mathjs.divide(mathjs.bignumber(this.OMEGA), mathjs.bignumber(4.0));
-// const f4 = mathjs.bignumber(this.voltageMatrix[i + 1][j]);
-// const f5 = mathjs.bignumber(this.voltageMatrix[i - 1][j]);
-// const f6 = mathjs.bignumber(this.voltageMatrix[i][j + 1]);
-// const f7 = mathjs.bignumber(this.voltageMatrix[i][j - 1]);
-// const f8 = mathjs.bignumber(this.chargeMatrix[i][j]);
-// const sum1 = mathjs.add(f4, f5);
-// const sum2 = mathjs.add(f6, f7);
-// // const sum3 = mathjs.add(sum2, f8);
-// let sumFinal = mathjs.add(sum1, sum2);
-// const mult = mathjs.multiply(f1, f2);
