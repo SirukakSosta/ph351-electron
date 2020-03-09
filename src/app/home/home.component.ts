@@ -9,8 +9,8 @@ import * as mathjs from "mathjs";
 export class HomeComponent implements OnInit {
   H = 1;
   OMEGA = 1.2;
-  SIZE = 50;
-  ITERATIONS = 1000;
+  SIZE: number = 10;
+  ITERATIONS: number = 20;
   loading: boolean;
   energies = [];
   public graph = {
@@ -40,6 +40,10 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {}
   public start() {
+    this.SIZE = Number(this.SIZE);
+    this.ITERATIONS = Number(this.ITERATIONS);
+    this.H = Number(this.H);
+    this.OMEGA = Number(this.OMEGA);
     this.startIteration();
   }
   private startIteration() {
@@ -61,9 +65,12 @@ export class HomeComponent implements OnInit {
     this.graph.data[0].y = this.axis;
     this.loading = false;
   }
+  private getRealXY(i: number) {
+    return i / (this.SIZE - 1);
+  }
   private initializeMatrices(): void {
     for (let i = 0; i < this.SIZE; i++) {
-      this.axis.push(i);
+      this.axis.push(this.getRealXY(i));
       for (let j = 0; j < this.SIZE; j++) {
         this.voltageMatrix = new Array(this.SIZE)
           .fill(0)
@@ -76,15 +83,21 @@ export class HomeComponent implements OnInit {
 
     this.initialiseVoltageMatrixWithRandomValues();
     this.fillChargeMatrixWithValues();
+    // console.log(this.voltageMatrix);
+    // console.log(this.chargeMatrix);
   }
   private initialiseVoltageMatrixWithRandomValues(): void {
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
+        console.log(i, j);
         const atBounds = this.isAtBoundaries(i, j);
         if (atBounds) {
+          console.log("at bounds");
           this.voltageMatrix[i][j] = 0.0;
         } else {
-          this.voltageMatrix[i][j] = this.getRandomValues();
+          console.log("no bounds");
+          const random = this.getRandomValues();
+          this.voltageMatrix[i][j] = random;
         }
       }
     }
@@ -137,10 +150,15 @@ export class HomeComponent implements OnInit {
     return p;
   }
   private chargeEquation(i: number, j: number): number {
-    return Math.pow(this.H, 2) * (2.0 * ((i - 1) * i + (j - 1) * j));
+    const x = this.getRealXY(i);
+    const y = this.getRealXY(j);
+    const result =
+      -1.0 * Math.pow(this.H, 2) * (2.0 * ((x - 1) * x + (y - 1) * y));
+    return Number(result.toFixed(3));
   }
   private getRandomValues(): number {
-    return Math.floor(Math.random() * (1000 - 100) + 100) / 10;
+    const random = Math.floor(Math.random() * (1000 - 100) + 100) / 10000;
+    return Number(random.toFixed(3));
   }
   private isAtBoundaries(i: number, j: number): boolean {
     if (
