@@ -7,12 +7,13 @@ import BigNumber from "bignumber.js";
   styleUrls: ["./home.component.scss"]
 })
 export class HomeComponent implements OnInit {
-  OMEGA = new BigNumber(1.2);
-  SIZE = 10;
+  OMEGA = new BigNumber(0.3);
+  SIZE = 50;
   H = new BigNumber(1).div(this.SIZE - 1);
-  ITERATIONS: number = 20;
-  loading: boolean;
+  ITERATIONS: number = 500;
+  action: string = "3D";
   energies = [];
+  ready: boolean;
   public graph = {
     data: [
       {
@@ -42,23 +43,30 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {}
 
   public start() {
-    this.OMEGA = new BigNumber(this.OMEGA);
-    this.H = new BigNumber(1).div(this.SIZE - 1);
-    this.axis = [];
-    this.energies = [];
-    this.voltageMatrix = new Array(this.SIZE)
-      .fill(0)
-      .map(() => new Array(this.SIZE).fill(0));
+    this.ready = false;
+    setTimeout(() => {
+      this.OMEGA = new BigNumber(this.OMEGA);
+      this.H = new BigNumber(1).div(this.SIZE - 1);
+      this.axis = [];
+      this.energies = [];
+      this.voltageMatrix = new Array(this.SIZE)
+        .fill(0)
+        .map(() => new Array(this.SIZE).fill(0));
 
-    this.chargeMatrix = new Array(this.SIZE)
-      .fill(0)
-      .map(() => new Array(this.SIZE).fill(0));
+      this.chargeMatrix = new Array(this.SIZE)
+        .fill(0)
+        .map(() => new Array(this.SIZE).fill(0));
 
-    this.startIteration();
+      this.initializeMatrices();
+      this.initialiseVoltageMatrixWithRandomValues();
+      this.fillChargeMatrixWithValues();
+      this.startIteration();
+      this.ready = true;
+    }, 500);
   }
 
   private startIteration() {
-    this.initializeMatrices();
+    // console.log("H", this.H);
     for (let k = 0; k < this.ITERATIONS; k++) {
       for (let i = 0; i < this.SIZE; i++) {
         for (let j = 0; j < this.SIZE; j++) {
@@ -68,16 +76,9 @@ export class HomeComponent implements OnInit {
         }
       }
 
-      console.log(k);
+      // console.log(k);
       this.energies.push(this.calculateTotalEnergy());
     }
-
-    this.graph.data[0].z = this.voltageMatrix.map(arr =>
-      arr.map(val => val.toString())
-    );
-    this.graph.data[0].x = this.axis.map(val => val.toString());
-    this.graph.data[0].y = this.axis.map(val => val.toString());
-    this.loading = false;
   }
 
   private getRealXY(i: number) {
@@ -88,25 +89,18 @@ export class HomeComponent implements OnInit {
     for (let i = 0; i < this.SIZE; i++) {
       this.axis.push(this.getRealXY(i));
     }
-
-    this.initialiseVoltageMatrixWithRandomValues();
-    this.fillChargeMatrixWithValues();
-    // console.log(this.voltageMatrix);
-    // console.log(this.chargeMatrix);
   }
 
   private initialiseVoltageMatrixWithRandomValues(): void {
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
-        console.log(i, j);
-        console.log(this.voltageMatrix);
         const atBounds = this.isAtBoundaries(i, j);
 
         if (atBounds) {
-          console.log("at bounds");
+          // console.log("at bounds");
           this.voltageMatrix[i][j] = new BigNumber(0);
         } else {
-          console.log("no bounds");
+          // console.log("no bounds");
           this.voltageMatrix[i][j] = this.getRandomValues();
         }
       }
@@ -206,16 +200,3 @@ export class HomeComponent implements OnInit {
     return false;
   }
 }
-// const f1 = mathjs.subtract(mathjs.bignumber(1.0), mathjs.bignumber(this.OMEGA));
-// const f2 = mathjs.bignumber(this.voltageMatrix[i][j]);
-// const f3 = mathjs.divide(mathjs.bignumber(this.OMEGA), mathjs.bignumber(4.0));
-// const f4 = mathjs.bignumber(this.voltageMatrix[i + 1][j]);
-// const f5 = mathjs.bignumber(this.voltageMatrix[i - 1][j]);
-// const f6 = mathjs.bignumber(this.voltageMatrix[i][j + 1]);
-// const f7 = mathjs.bignumber(this.voltageMatrix[i][j - 1]);
-// const f8 = mathjs.bignumber(this.chargeMatrix[i][j]);
-// const sum1 = mathjs.add(f4, f5);
-// const sum2 = mathjs.add(f6, f7);
-// // const sum3 = mathjs.add(sum2, f8);
-// let sumFinal = mathjs.add(sum1, sum2);
-// const mult = mathjs.multiply(f1, f2);

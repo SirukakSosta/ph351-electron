@@ -27,14 +27,34 @@
       <span class="bar"></span>
       <label>ITERATIONS:</label>
     </div>
-    <div><button (click)="start()">Start</button></div>
+    <div><button (click)="start(); action = '3D'">Start</button></div>
     <div class="energies">
       <div class="energy" *ngFor="let e of energies; let i = index">
         {{ i }} <strong> {{ e.toFixed(5) }}</strong>
       </div>
     </div>
+
+    ready: {{ ready }}
   </div>
   <div class="plotly-container">
-    <plotly-plot [data]="graph.data" [layout]="graph.layout"></plotly-plot>
+    <div class="graph-btns" *ngIf="ready">
+      <button (click)="action = '3D'">3D Potential</button>
+      <button (click)="action = 'LINE'">Line</button>
+    </div>
+    <ng-container *ngIf="action === '3D' && ready">
+      <app-three-d-surface
+        [potentialMatrix]="voltageMatrix"
+        [axis]="axis"
+        [title]="'3d potential'"
+      ></app-three-d-surface>
+    </ng-container>
+
+    <ng-container *ngIf="action === 'LINE' && ready">
+      <app-line
+        [potentialMatrix]="voltageMatrix"
+        [axis]="axis"
+        [title]="'Line potential - x constant'"
+      ></app-line>
+    </ng-container>
   </div>
 </div>
