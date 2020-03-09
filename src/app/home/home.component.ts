@@ -8,9 +8,9 @@ import * as mathjs from "mathjs";
 })
 export class HomeComponent implements OnInit {
   OMEGA = 0.3;
-  SIZE: number = 20;
+  SIZE: number = 50;
   H = 1 / this.SIZE;
-  ITERATIONS: number = 200;
+  ITERATIONS: number = 500;
   ready: boolean = false;
   energies = new Array(this.SIZE).fill(0);
   action: string;
