@@ -7,9 +7,9 @@ import * as mathjs from "mathjs";
   styleUrls: ["./home.component.scss"]
 })
 export class HomeComponent implements OnInit {
-  H = 1;
   OMEGA = 1.2;
   SIZE: number = 10;
+  H = 1 / (this.SIZE - 1);
   ITERATIONS: number = 20;
   loading: boolean;
   energies = [];
@@ -153,12 +153,12 @@ export class HomeComponent implements OnInit {
     const x = this.getRealXY(i);
     const y = this.getRealXY(j);
     const result =
-      -1.0 * Math.pow(this.H, 2) * (2.0 * ((x - 1) * x + (y - 1) * y));
-    return Number(result.toFixed(3));
+      -1.0 * this.H * Math.pow(this.H, 2) * (2.0 * ((x - 1) * x + (y - 1) * y));
+    return result;
   }
   private getRandomValues(): number {
     const random = Math.floor(Math.random() * (1000 - 100) + 100) / 10000;
-    return Number(random.toFixed(3));
+    return random;
   }
   private isAtBoundaries(i: number, j: number): boolean {
     if (
