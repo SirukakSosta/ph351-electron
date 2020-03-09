@@ -40,21 +40,19 @@
     <div class="graph-btns" *ngIf="ready">
       <button (click)="action = '3D'">3D Potential</button>
       <button (click)="action = 'LINE'">Line</button>
+      <button (click)="action = 'ENERGY'">Energy</button>
     </div>
     <ng-container *ngIf="action === '3D' && ready">
-      <app-three-d-surface
-        [potentialMatrix]="voltageMatrix"
-        [axis]="axis"
-        [title]="'3d potential'"
-      ></app-three-d-surface>
+      <app-three-d-surface [potentialMatrix]="voltageMatrix" [axis]="axis" [title]="'3d potential'">
+      </app-three-d-surface>
     </ng-container>
 
     <ng-container *ngIf="action === 'LINE' && ready">
-      <app-line
-        [potentialMatrix]="voltageMatrix"
-        [axis]="axis"
-        [title]="'Line potential - x constant'"
-      ></app-line>
+      <app-line [potentialMatrix]="voltageMatrix" [axis]="axis" [title]="'Line potential - x constant'"></app-line>
+    </ng-container>
+    <ng-container *ngIf="action === 'ENERGY' && ready">
+      <app-line [potentialMatrix]="derivativesMatrix" [type]="'ENERGY'" [axis]="axis"
+        [title]="'Line potential - x constant'"></app-line>
     </ng-container>
   </div>
 </div>

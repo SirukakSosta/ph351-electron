@@ -9,6 +9,7 @@ export class LineComponent implements OnInit {
   @Input() potentialMatrix: any;
   @Input() axis: any;
   @Input() title: any;
+  @Input() type: any;
   cX = 0;
   public graph = {
     layout: {
@@ -26,8 +27,17 @@ export class LineComponent implements OnInit {
     console.log("AXIS", this.axis);
     this.cX = this.axis.length / 2;
     let y = [];
-    for (let i = 0; i < this.axis.length; i++) {
-      y.push(this.potentialMatrix[this.cX][i]);
+    if (this.type === "ENERGY") {
+      for (let i = 0; i < this.axis.length; i++) {
+        y.push(
+          Math.round((this.potentialMatrix[i] + Number.EPSILON) * 100) / 100
+        );
+      }
+      console.log("DEr", y);
+    } else {
+      for (let i = 0; i < this.axis.length; i++) {
+        y.push(this.potentialMatrix[this.cX][i]);
+      }
     }
     var trace1 = {
       x: this.axis,

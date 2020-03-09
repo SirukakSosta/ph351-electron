@@ -38,7 +38,8 @@ export class HomeComponent implements OnInit {
       // return;
       this.startIteration();
       this.derivativesMatrix = this.calculateDerivative(this.voltageMatrix);
-      console.log("DEr", this.derivativesMatrix);
+
+      console.log("this.potentialMatrix[i]", this.voltageMatrix);
       this.ready = true;
     }, 500);
   }
@@ -113,17 +114,16 @@ export class HomeComponent implements OnInit {
     let temp = [];
     let derivatives = [];
     const _H = this.H;
-
     for (let i = 0; i < matrix.length; i++) {
       temp.push(matrix[matrix.length / 2][i]);
     }
     for (let i = 0; i < temp.length; i++) {
-      if (i === 0 || i === temp.length) {
-        derivatives.push(0);
-      } else if (i === 1) {
+      if (i === 0) {
         derivatives.push(frontDerivative(i));
       } else if (i === temp.length - 1) {
         derivatives.push(backDerivative(i));
+      } else if (i === 1) {
+        derivatives.push(frontDerivative(i));
       } else {
         derivatives.push(commonDerivative(i));
       }
@@ -131,7 +131,7 @@ export class HomeComponent implements OnInit {
     return derivatives;
 
     function commonDerivative(i: number) {
-      let value = (temp[i + 1] - temp[i + 1]) / (2 * _H);
+      let value = (temp[i + 1] - temp[i - 1]) / (2 * _H);
       return value;
     }
     function frontDerivative(i: number) {
@@ -139,7 +139,7 @@ export class HomeComponent implements OnInit {
       return value;
     }
     function backDerivative(i: number) {
-      let value = (temp[i - 1] - temp[i]) / _H;
+      let value = (temp[i] - temp[i - 1]) / _H;
       return value;
     }
   }
