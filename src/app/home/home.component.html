@@ -16,7 +16,7 @@
       <label>OMEGA:</label>
     </div>
     <div class="group">
-      <input type="text" [(ngModel)]="SIZE" />
+      <input type="number" [(ngModel)]="SIZE" />
       <span class="highlight"></span>
       <span class="bar"></span>
       <label>SIZE:</label>
@@ -30,7 +30,7 @@
     <div><button (click)="start()">Start</button></div>
     <div class="energies">
       <div class="energy" *ngFor="let e of energies; let i = index">
-        {{ i }} <strong> {{ e }}</strong>
+        {{ i }} <strong> {{ e.toFixed(5) }}</strong>
       </div>
     </div>
   </div>

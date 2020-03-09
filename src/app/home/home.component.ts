@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import * as mathjs from "mathjs";
+import BigNumber from "bignumber.js";
 // constants
 @Component({
   selector: "app-home",
@@ -7,9 +7,9 @@ import * as mathjs from "mathjs";
   styleUrls: ["./home.component.scss"]
 })
 export class HomeComponent implements OnInit {
-  OMEGA = 1.2;
-  SIZE: number = 10;
-  H = 1 / (this.SIZE - 1);
+  OMEGA = new BigNumber(1.2);
+  SIZE = 10;
+  H = new BigNumber(1).div(this.SIZE - 1);
   ITERATIONS: number = 20;
   loading: boolean;
   energies = [];
@@ -33,19 +33,30 @@ export class HomeComponent implements OnInit {
     layout: { width: 1200, height: 800, title: "Poisson" }
   };
 
-  voltageMatrix: number[][];
-  chargeMatrix: number[][];
-  axis: number[] = [];
+  voltageMatrix: BigNumber[][];
+  chargeMatrix: BigNumber[][];
+  axis: BigNumber[] = [];
+
   constructor() {}
 
   ngOnInit(): void {}
+
   public start() {
-    this.SIZE = Number(this.SIZE);
-    this.ITERATIONS = Number(this.ITERATIONS);
-    this.H = Number(this.H);
-    this.OMEGA = Number(this.OMEGA);
+    this.OMEGA = new BigNumber(this.OMEGA);
+    this.H = new BigNumber(1).div(this.SIZE - 1);
+    this.axis = [];
+    this.energies = [];
+    this.voltageMatrix = new Array(this.SIZE)
+      .fill(0)
+      .map(() => new Array(this.SIZE).fill(0));
+
+    this.chargeMatrix = new Array(this.SIZE)
+      .fill(0)
+      .map(() => new Array(this.SIZE).fill(0));
+
     this.startIteration();
   }
+
   private startIteration() {
     this.initializeMatrices();
     for (let k = 0; k < this.ITERATIONS; k++) {
@@ -56,29 +67,26 @@ export class HomeComponent implements OnInit {
           this.voltageMatrix[i][j] = prevVoltageValue;
         }
       }
-      ///fml
+
       console.log(k);
-      this.energies.push(this.calculateTotalEnergy(this.voltageMatrix));
+      this.energies.push(this.calculateTotalEnergy());
     }
-    this.graph.data[0].z = this.voltageMatrix;
-    this.graph.data[0].x = this.axis;
-    this.graph.data[0].y = this.axis;
+
+    this.graph.data[0].z = this.voltageMatrix.map(arr =>
+      arr.map(val => val.toString())
+    );
+    this.graph.data[0].x = this.axis.map(val => val.toString());
+    this.graph.data[0].y = this.axis.map(val => val.toString());
     this.loading = false;
   }
+
   private getRealXY(i: number) {
-    return i / (this.SIZE - 1);
+    return new BigNumber(i).div(this.SIZE - 1);
   }
+
   private initializeMatrices(): void {
     for (let i = 0; i < this.SIZE; i++) {
       this.axis.push(this.getRealXY(i));
-      for (let j = 0; j < this.SIZE; j++) {
-        this.voltageMatrix = new Array(this.SIZE)
-          .fill(0)
-          .map(() => new Array(this.SIZE).fill(0));
-        this.chargeMatrix = new Array(this.SIZE)
-          .fill(0)
-          .map(() => new Array(this.SIZE).fill(0));
-      }
     }
 
     this.initialiseVoltageMatrixWithRandomValues();
@@ -86,50 +94,58 @@ export class HomeComponent implements OnInit {
     // console.log(this.voltageMatrix);
     // console.log(this.chargeMatrix);
   }
+
   private initialiseVoltageMatrixWithRandomValues(): void {
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
         console.log(i, j);
+        console.log(this.voltageMatrix);
         const atBounds = this.isAtBoundaries(i, j);
+
         if (atBounds) {
           console.log("at bounds");
-          this.voltageMatrix[i][j] = 0.0;
+          this.voltageMatrix[i][j] = new BigNumber(0);
         } else {
           console.log("no bounds");
-          const random = this.getRandomValues();
-          this.voltageMatrix[i][j] = random;
+          this.voltageMatrix[i][j] = this.getRandomValues();
         }
       }
     }
   }
-  private calculateTotalEnergy(a: any): number {
-    let sumOne = 0.0;
-    let sumTwo = 0.0;
+
+  private calculateTotalEnergy(): BigNumber {
+    let sumOne = new BigNumber(0);
+    let sumTwo = new BigNumber(0);
+
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
-        let firstTerm = Math.pow(
-          this.getVoltage(i, j) - this.getVoltage(i - 1, j),
-          2
-        );
-        let secondTerm = Math.pow(
-          this.getVoltage(i, j) - this.getVoltage(i, j - 1),
-          2
-        );
-        let thirdTerm = this.chargeMatrix[i][j] * this.voltageMatrix[i][j];
-        sumOne += firstTerm + secondTerm;
+        const firstTerm = this.getVoltage(i, j)
+          .minus(this.getVoltage(i - 1, j))
+          .pow(2);
+
+        const secondTerm = this.getVoltage(i, j)
+          .minus(this.getVoltage(i, j - 1))
+          .pow(2);
+
+        const thirdTerm = this.chargeMatrix[i][j].pow(2);
+
+        sumOne = sumOne.plus(firstTerm).plus(secondTerm);
+
         if (i < this.SIZE - 2 || i < this.SIZE - 2) {
-          sumTwo += thirdTerm;
+          sumTwo = sumTwo.plus(thirdTerm);
         }
       }
     }
-    let final = (1.0 / 2.0) * sumOne - Math.pow(this.H, 2) * sumTwo;
-    return final;
+
+    return sumOne.div(2).minus(this.H.pow(2).times(sumTwo));
   }
-  private getVoltage(i: number, j: number) {
+
+  private getVoltage(i: number, j: number): BigNumber {
     const isBound = this.isAtBoundaries(i, j);
-    if (isBound) return 0.0;
+    if (isBound) return new BigNumber(0);
     return this.voltageMatrix[i][j];
   }
+
   private fillChargeMatrixWithValues(): void {
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
@@ -137,29 +153,43 @@ export class HomeComponent implements OnInit {
       }
     }
   }
-  private calculatePotential(i: number, j: number): number {
-    if (this.isAtBoundaries(i, j)) return 0.0;
-    let p =
-      (1 - this.OMEGA) * this.voltageMatrix[i][j] +
-      (this.OMEGA / 4.0) *
-        (this.voltageMatrix[i + 1][j] +
-          this.voltageMatrix[i - 1][j] +
-          this.voltageMatrix[i][j + 1] +
-          this.voltageMatrix[i][j - 1] +
-          this.chargeMatrix[i][j]);
-    return p;
+
+  private calculatePotential(i: number, j: number): BigNumber {
+    if (this.isAtBoundaries(i, j)) return new BigNumber(0);
+    // Equation below: (1 - OMEGA) * matrix[i][j] + (OMEGA / 4) * (matrix[i + 1][j] + matrix[i - 1][j] + matrix[i][j + 1] + matrix[i][j - 1] + chargeMatrix[i][j])
+    return this.OMEGA.negated()
+      .plus(1)
+      .times(this.voltageMatrix[i][j])
+      .plus(
+        this.OMEGA.div(4).times(
+          this.voltageMatrix[i + 1][j]
+            .plus(this.voltageMatrix[i - 1][j])
+            .plus(this.voltageMatrix[i][j + 1])
+            .plus(this.voltageMatrix[i][j - 1])
+            .plus(this.chargeMatrix[i][j])
+        )
+      );
   }
-  private chargeEquation(i: number, j: number): number {
+
+  private chargeEquation(i: number, j: number): BigNumber {
     const x = this.getRealXY(i);
     const y = this.getRealXY(j);
-    const result =
-      -1.0 * this.H * Math.pow(this.H, 2) * (2.0 * ((x - 1) * x + (y - 1) * y));
-    return result;
+    // Equation Below: H^2 * 2((x - 1) * x + (y - 1) * y);
+    return this.H.pow(2).times(
+      x
+        .times(x.minus(1))
+        .plus(y.times(y.minus(1)))
+        .times(2)
+    );
   }
-  private getRandomValues(): number {
-    const random = Math.floor(Math.random() * (1000 - 100) + 100) / 10000;
-    return random;
+
+  // Random in the range (0...1], random() returns [0...1) multiplied by -1 (-1...0] plus 1 (0...1]
+  private getRandomValues(): BigNumber {
+    return BigNumber.random()
+      .negated()
+      .plus(1);
   }
+
   private isAtBoundaries(i: number, j: number): boolean {
     if (
       i == 0 ||
