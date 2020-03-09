@@ -11,7 +11,14 @@ export class LineComponent implements OnInit {
   @Input() title: any;
   cX = 0;
   public graph = {
-    layout: { width: 1200, height: 800, title: "hi" }
+    layout: {
+      width: 1200,
+      height: 800,
+      title: "hi",
+      xaxis: {
+        title: "Y - Distance units"
+      }
+    }
   };
   constructor() {}
 
@@ -31,5 +38,8 @@ export class LineComponent implements OnInit {
 
     var data = [trace1];
     this.graph["data"] = data;
+    this.graph.layout["yaxis"] = {
+      title: `Potential - Φ(${this.cX / this.axis.length}, y)`
+    };
   }
 }

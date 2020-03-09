@@ -17,6 +17,7 @@ export class ThreeDSurfaceComponent implements OnInit {
         x: [],
         y: [],
         type: "surface",
+        name: `Φxy`,
         contours: {
           z: {
             show: true,
@@ -27,7 +28,16 @@ export class ThreeDSurfaceComponent implements OnInit {
         }
       }
     ],
-    layout: { width: 1200, height: 800, title: this.title }
+    layout: {
+      width: 1200,
+      height: 800,
+      title: this.title,
+      scene: {
+        xaxis: { title: "X - Distance unit" },
+        yaxis: { title: "Y - Distance unit" },
+        zaxis: { title: "Potential - Φ(x,y)" }
+      }
+    }
   };
   constructor() {}
 
