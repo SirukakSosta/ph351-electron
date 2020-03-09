@@ -7,12 +7,12 @@ import * as mathjs from "mathjs";
   styleUrls: ["./home.component.scss"]
 })
 export class HomeComponent implements OnInit {
-  OMEGA = 1.2;
-  SIZE: number = 10;
-  H = 1 / (this.SIZE - 1);
-  ITERATIONS: number = 20;
+  OMEGA = 0.3;
+  SIZE: number = 20;
+  H = 1 / this.SIZE;
+  ITERATIONS: number = 200;
   ready: boolean = false;
-  energies = [];
+  energies = new Array(this.SIZE).fill(0);
   action: string;
   voltageMatrix: number[][];
   chargeMatrix: number[][];
@@ -21,15 +21,26 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {}
   public start() {
-    this.SIZE = Number(this.SIZE);
-    this.ITERATIONS = Number(this.ITERATIONS);
-    this.H = Number(this.H);
-    this.OMEGA = Number(this.OMEGA);
-    this.startIteration();
+    this.ready = false;
+    setTimeout(() => {
+      this.SIZE = Number(this.SIZE);
+      this.ITERATIONS = Number(this.ITERATIONS);
+      this.H = Number(1 / this.SIZE);
+      this.OMEGA = Number(this.OMEGA);
+
+      this.initializeMatrices();
+      this.emptyMainArrays();
+      this.initialiseVoltageMatrixWithRandomValues();
+      this.fillChargeMatrixWithValues();
+      // console.log(this.voltageMatrix);
+      // console.log(this.chargeMatrix);
+      // return;
+      this.startIteration();
+      this.ready = true;
+    }, 500);
   }
   private startIteration() {
-    this.ready = false;
-    this.initializeMatrices();
+    console.log("H", this.H);
     for (let k = 0; k < this.ITERATIONS; k++) {
       for (let i = 0; i < this.SIZE; i++) {
         for (let j = 0; j < this.SIZE; j++) {
@@ -39,10 +50,9 @@ export class HomeComponent implements OnInit {
         }
       }
       ///fml
-      console.log(k);
-      this.energies.push(this.calculateTotalEnergy(this.voltageMatrix));
+      // console.log(k);
+      this.energies[k] = this.calculateTotalEnergy(this.voltageMatrix);
     }
-    this.ready = true;
   }
   private getRealXY(i: number) {
     return i / (this.SIZE - 1);
@@ -59,22 +69,14 @@ export class HomeComponent implements OnInit {
           .map(() => new Array(this.SIZE).fill(0));
       }
     }
-
-    this.initialiseVoltageMatrixWithRandomValues();
-    this.fillChargeMatrixWithValues();
-    // console.log(this.voltageMatrix);
-    // console.log(this.chargeMatrix);
   }
   private initialiseVoltageMatrixWithRandomValues(): void {
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
-        console.log(i, j);
         const atBounds = this.isAtBoundaries(i, j);
         if (atBounds) {
-          console.log("at bounds");
           this.voltageMatrix[i][j] = 0.0;
         } else {
-          console.log("no bounds");
           const random = this.getRandomValues();
           this.voltageMatrix[i][j] = random;
         }
@@ -138,6 +140,15 @@ export class HomeComponent implements OnInit {
   private getRandomValues(): number {
     const random = Math.floor(Math.random() * (1000 - 100) + 100) / 10000;
     return random;
+  }
+  private emptyMainArrays(): void {
+    for (let i = 0; i < this.SIZE; i++) {
+      this.energies[i] = 0;
+      for (let j = 0; j < this.SIZE; j++) {
+        this.chargeMatrix[i][j] = 0;
+        this.voltageMatrix[i][j] = 0;
+      }
+    }
   }
   private isAtBoundaries(i: number, j: number): boolean {
     if (
