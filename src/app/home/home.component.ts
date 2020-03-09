@@ -17,6 +17,7 @@ export class HomeComponent implements OnInit {
   voltageMatrix: number[][];
   chargeMatrix: number[][];
   axis: number[] = [];
+  derivativesMatrix = [];
   constructor() {}
 
   ngOnInit(): void {}
@@ -36,6 +37,8 @@ export class HomeComponent implements OnInit {
       // console.log(this.chargeMatrix);
       // return;
       this.startIteration();
+      this.derivativesMatrix = this.calculateDerivative(this.voltageMatrix);
+      console.log("DEr", this.derivativesMatrix);
       this.ready = true;
     }, 500);
   }
@@ -106,6 +109,40 @@ export class HomeComponent implements OnInit {
     let final = (1.0 / 2.0) * sumOne - Math.pow(this.H, 2) * sumTwo;
     return final;
   }
+  private calculateDerivative(matrix: any): Array<number> {
+    let temp = [];
+    let derivatives = [];
+    const _H = this.H;
+
+    for (let i = 0; i < matrix.length; i++) {
+      temp.push(matrix[matrix.length / 2][i]);
+    }
+    for (let i = 0; i < temp.length; i++) {
+      if (i === 0 || i === temp.length) {
+        derivatives.push(0);
+      } else if (i === 1) {
+        derivatives.push(frontDerivative(i));
+      } else if (i === temp.length - 1) {
+        derivatives.push(backDerivative(i));
+      } else {
+        derivatives.push(commonDerivative(i));
+      }
+    }
+    return derivatives;
+
+    function commonDerivative(i: number) {
+      let value = (temp[i + 1] - temp[i + 1]) / (2 * _H);
+      return value;
+    }
+    function frontDerivative(i: number) {
+      let value = (temp[i + 1] - temp[i]) / _H;
+      return value;
+    }
+    function backDerivative(i: number) {
+      let value = (temp[i - 1] - temp[i]) / _H;
+      return value;
+    }
+  }
   private getVoltage(i: number, j: number) {
     const isBound = this.isAtBoundaries(i, j);
     if (isBound) return 0.0;
@@ -133,8 +170,7 @@ export class HomeComponent implements OnInit {
   private chargeEquation(i: number, j: number): number {
     const x = this.getRealXY(i);
     const y = this.getRealXY(j);
-    const result =
-      this.H * Math.pow(this.H, 2) * (2.0 * ((1 - x) * x + (1 - y) * y));
+    const result = Math.pow(this.H, 2) * (2.0 * ((1 - x) * x + (1 - y) * y));
     return result;
   }
   private getRandomValues(): number {
