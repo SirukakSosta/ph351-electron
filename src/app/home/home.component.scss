@@ -4,17 +4,72 @@
   height: 100vh;
 
   .menu {
-    padding: 2rem;
     background: #e3e3e3;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .form {
+      padding: 2rem;
+    }
+
+    .energy {
+      width: 100%;
+      text-align: center;
+      padding: 1rem 0;
+      background: black;
+      color: white;
+    }
+    .eqations {
+      padding: 2rem;
+      text-align: center;
+    }
   }
 }
+
 .energies {
   height: 200px;
   overflow-y: scroll;
 }
+
+.plotly-container {
+  width: 100%;
+
+  .graph-btns {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-around;
+    flex-basis: 31%;
+  }
+}
+
+.btn {
+  cursor: pointer;
+  color: white;
+  background: green;
+  padding: 1rem 0;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.3s ease-in-out background;
+  width: 100%;
+  border: 1px solid white;
+
+  &:hover {
+    background: #02a902;
+  }
+}
+
 .group {
   position: relative;
   margin-bottom: 45px;
+}
+
+app-loading {
+  width: 100%;
+  position: absolute;
+  z-index: 5;
+  background: rgba(6, 1, 1, 0.82);
 }
 
 input {

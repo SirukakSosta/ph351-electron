@@ -49,7 +49,7 @@ export class LineComponent implements OnInit {
     var data = [trace1];
     this.graph["data"] = data;
     this.graph.layout["yaxis"] = {
-      title: `Potential - Φ(${this.cX / this.axis.length}, y)`
+      title: `${this.title} - Φ(${this.cX / this.axis.length}, y)`
     };
   }
 }

@@ -2,45 +2,51 @@
 <!-- <div *ngIf="!loading">
 </div> -->
 <div class="container">
+  <app-loading *ngIf="loading"></app-loading>
   <div class="menu">
-    <div class="group">
-      <input type="text" [(ngModel)]="H" />
-      <span class="highlight"></span>
-      <span class="bar"></span>
-      <label>H:</label>
-    </div>
-    <div class="group">
-      <input type="text" [(ngModel)]="OMEGA" />
-      <span class="highlight"></span>
-      <span class="bar"></span>
-      <label>OMEGA:</label>
-    </div>
-    <div class="group">
-      <input type="text" [(ngModel)]="SIZE" />
-      <span class="highlight"></span>
-      <span class="bar"></span>
-      <label>SIZE:</label>
-    </div>
-    <div class="group">
-      <input type="number" [(ngModel)]="ITERATIONS" />
-      <span class="highlight"></span>
-      <span class="bar"></span>
-      <label>ITERATIONS:</label>
-    </div>
-    <div><button (click)="start(); action = '3D'">Start</button></div>
-    <div class="energies">
-      <div class="energy" *ngFor="let e of energies; let i = index">
-        {{ i }} <strong> {{ e }}</strong>
+    <div class="form">
+      <div class="group">
+        <input type="text" [(ngModel)]="H" />
+        <span class="highlight"></span>
+        <span class="bar"></span>
+        <label>H:</label>
       </div>
+      <div class="group">
+        <input type="text" [(ngModel)]="OMEGA" />
+        <span class="highlight"></span>
+        <span class="bar"></span>
+        <label>OMEGA:</label>
+      </div>
+      <div class="group">
+        <input type="text" [(ngModel)]="SIZE" />
+        <span class="highlight"></span>
+        <span class="bar"></span>
+        <label>SIZE:</label>
+      </div>
+      <div class="group">
+        <input type="number" [(ngModel)]="ITERATIONS" />
+        <span class="highlight"></span>
+        <span class="bar"></span>
+        <label>ITERATIONS:</label>
+      </div>
+      <div class="btn" (click)="start(); action = '3D'">Start</div>
+    </div>
+    <div class="eqations">
+      <p>Relaxation method for <strong>Poisson equation</strong></p>
+      <div [MathJax]="poissonEquation">{{poissonEquation}}</div>
+      <p>And <strong>charge density</strong></p>
+      <div [MathJax]="chargeEquationLatex">{{chargeEquationLatex}}</div>
+    </div>
+    <div class="energy">
+      <strong>Energy: </strong>{{energy}}
     </div>
 
-    ready: {{ ready }}
   </div>
   <div class="plotly-container">
     <div class="graph-btns" *ngIf="ready">
-      <button (click)="action = '3D'">3D Potential</button>
-      <button (click)="action = 'LINE'">Line</button>
-      <button (click)="action = 'ENERGY'">Energy</button>
+      <div class="btn" (click)="action = '3D'">3D Potential</div>
+      <div class="btn" (click)="action = 'LINE'">2D Potential</div>
+      <div class="btn" (click)="action = 'ENERGY'">2D Electric field</div>
     </div>
     <ng-container *ngIf="action === '3D' && ready">
       <app-three-d-surface [potentialMatrix]="voltageMatrix" [axis]="axis" [title]="'3d potential'">
@@ -48,11 +54,11 @@
     </ng-container>
 
     <ng-container *ngIf="action === 'LINE' && ready">
-      <app-line [potentialMatrix]="voltageMatrix" [axis]="axis" [title]="'Line potential - x constant'"></app-line>
+      <app-line [potentialMatrix]="voltageMatrix" [axis]="axis" [title]="'Potential'"></app-line>
     </ng-container>
     <ng-container *ngIf="action === 'ENERGY' && ready">
-      <app-line [potentialMatrix]="derivativesMatrix" [type]="'ENERGY'" [axis]="axis"
-        [title]="'Line potential - x constant'"></app-line>
+      <app-line [potentialMatrix]="derivativesMatrix" [type]="'ENERGY'" [axis]="axis" [title]="'Electric field'">
+      </app-line>
     </ng-container>
   </div>
 </div>

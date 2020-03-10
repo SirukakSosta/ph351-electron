@@ -12,17 +12,21 @@ export class HomeComponent implements OnInit {
   H = 1 / this.SIZE;
   ITERATIONS: number = 500;
   ready: boolean = false;
-  energies = new Array(this.SIZE).fill(0);
+  energy = 0;
   action: string;
   voltageMatrix: number[][];
   chargeMatrix: number[][];
   axis: number[] = [];
   derivativesMatrix = [];
+  loading = false;
+  poissonEquation: string = "$-\\nabla^2\\Phi(x,y) = S(x,y)$";
+  chargeEquationLatex = "$S(x,y) = x(1-x)y(1-y)$";
   constructor() {}
 
   ngOnInit(): void {}
   public start() {
     this.ready = false;
+    this.loading = true;
     setTimeout(() => {
       this.SIZE = Number(this.SIZE);
       this.ITERATIONS = Number(this.ITERATIONS);
@@ -41,7 +45,8 @@ export class HomeComponent implements OnInit {
 
       console.log("this.potentialMatrix[i]", this.voltageMatrix);
       this.ready = true;
-    }, 500);
+      this.loading = false;
+    }, 4000);
   }
   private startIteration() {
     console.log("H", this.H);
@@ -55,8 +60,12 @@ export class HomeComponent implements OnInit {
       }
       ///fml
       // console.log(k);
-      this.energies[k] = this.calculateTotalEnergy(this.voltageMatrix);
     }
+
+    this.energy =
+      Math.round(
+        (this.calculateTotalEnergy(this.voltageMatrix) + Number.EPSILON) * 10000
+      ) / 10000;
   }
   private getRealXY(i: number) {
     return i / (this.SIZE - 1);
@@ -179,7 +188,7 @@ export class HomeComponent implements OnInit {
   }
   private emptyMainArrays(): void {
     for (let i = 0; i < this.SIZE; i++) {
-      this.energies[i] = 0;
+      this.energy = 0;
       for (let j = 0; j < this.SIZE; j++) {
         this.chargeMatrix[i][j] = 0;
         this.voltageMatrix[i][j] = 0;
