@@ -98,6 +98,7 @@
     "highcharts": "8.0.4",
     "mathjax": "3.0.1",
     "mathjs": "6.6.1",
+    "ng-katex": "2.0.3",
     "plotly.js": "1.52.3"
   }
 }

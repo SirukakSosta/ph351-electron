@@ -19,49 +19,53 @@ export class HomeComponent implements OnInit {
   yDerivativesMatrix: number[][]; /**oritontio */
   xDerivativesMatrix: number[][]; /** katheto */
   loading = false;
-  poissonEquation: string = "$-\\nabla^2\\Phi(x,y) = S(x,y)$";
-  chargeEquationLatex = "$S(x,y) = x(1-x)y(1-y)$";
+  poissonEquation: string = "\\nabla^2\\Phi(x,y) = S(x,y)";
+  chargeEquationLatex = "S(x,y) = x(1-x)y(1-y)";
   constantY = 0;
   derivtionForPlot = [];
-  constructor() { }
+  constructor() {}
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    let test = [0, 1, 2, 1, 3, 2, 2, 2, 3, 0];
+    this.H = 1 / 10;
+    const lk = this.calculateDerivative(test);
+    console.log(test);
+    console.log(lk);
+  }
   public start() {
     this.ready = false;
     this.loading = true;
     setTimeout(() => {
       this.SIZE = Number(this.SIZE);
       this.ITERATIONS = Number(this.ITERATIONS);
-      this.H = Number(1 / this.SIZE);
+      this.H = Number(1 / (this.SIZE - 1));
       this.OMEGA = Number(this.OMEGA);
       this.constantY = this.SIZE / 2;
       this.initializeMatrices();
       this.emptyMainArrays();
       this.initialiseVoltageMatrixWithRandomValues();
       this.fillChargeMatrixWithValues();
-      // 
-      // 
+      //
+      //
       // return;
       this.startIteration();
       // this.derivativesMatrix = this.calculateDerivative(this.voltageMatrix);
-
 
       this.ready = true;
       this.loading = false;
     }, 4000);
   }
   private startIteration() {
-
     for (let k = 0; k < this.ITERATIONS; k++) {
       for (let i = 0; i < this.SIZE; i++) {
         for (let j = 0; j < this.SIZE; j++) {
           const prevVoltageValue = this.calculatePotential(i, j);
-          //   
+          //
           this.voltageMatrix[i][j] = prevVoltageValue;
         }
       }
       ///fml
-      // 
+      //
     }
 
     this.energy =
@@ -70,12 +74,11 @@ export class HomeComponent implements OnInit {
       ) / 10000;
 
     this.calculateDerivativeMatrices();
-    console.log(this.xDerivativesMatrix)
-    console.log(this.yDerivativesMatrix)
-    this.createElectricFieldData()
-    console.log(this.derivtionForPlot)
-
-
+    console.log("voltage", this.voltageMatrix);
+    console.log("difx", this.xDerivativesMatrix);
+    console.log("dify", this.yDerivativesMatrix);
+    this.createElectricFieldData();
+    console.log(this.derivtionForPlot);
   }
   private getRealXY(i: number) {
     return i / (this.SIZE - 1);
@@ -116,7 +119,6 @@ export class HomeComponent implements OnInit {
     // Start Calculate y derivative
     let tempY = [];
     for (let i = 0; i < this.SIZE; i++) {
-
       tempY = [];
       for (let j = 0; j < this.SIZE; j++) {
         tempY.push(this.voltageMatrix[i][j]);
@@ -124,7 +126,6 @@ export class HomeComponent implements OnInit {
       let calculatedDerivativeY = this.calculateDerivative(tempY);
 
       for (let k = 0; k < this.SIZE; k++) {
-
         this.xDerivativesMatrix[i][k] = calculatedDerivativeY[k];
       }
     }
@@ -133,7 +134,6 @@ export class HomeComponent implements OnInit {
 
     let tempX = [];
     for (let j = 0; j < this.SIZE; j++) {
-
       tempX = [];
       for (let i = 0; i < this.SIZE; i++) {
         tempX.push(this.voltageMatrix[i][j]);
@@ -156,14 +156,14 @@ export class HomeComponent implements OnInit {
     }
 
     function magnitude(i, j) {
-      const sum = Math.pow(i, 2) + Math.pow(j, 2)
-      return Math.sqrt(sum)
+      const sum = Math.pow(i, 2) + Math.pow(j, 2);
+      return Math.sqrt(sum);
     }
     function radians(i, j) {
       if (j == 0) {
         return 0;
       } else {
-        return Math.atan((j / i));
+        return Math.atan(j / i);
       }
     }
   }
@@ -191,18 +191,13 @@ export class HomeComponent implements OnInit {
     return final;
   }
   private calculateDerivative(matrix: any): Array<number> {
-
-    let temp = [];
+    let temp = matrix;
     let derivatives = [];
     const _H = this.H;
-    for (let i = 0; i < matrix.length; i++) {
-      temp.push(matrix[i]);
-    }
     for (let i = 0; i < temp.length; i++) {
       if (i === 0 || i === temp.length - 1) {
         derivatives.push(0);
-      }
-      else if (i === temp.length - 2) {
+      } else if (i === temp.length - 2) {
         derivatives.push(backDerivative(i));
       } else if (i === 1) {
         derivatives.push(frontDerivative(i));
@@ -215,7 +210,6 @@ export class HomeComponent implements OnInit {
 
     function commonDerivative(i: number) {
       let value = (temp[i + 1] - temp[i - 1]) / (2 * _H);
-
 
       return value;
     }
@@ -245,11 +239,11 @@ export class HomeComponent implements OnInit {
     let p =
       (1 - this.OMEGA) * this.voltageMatrix[i][j] +
       (this.OMEGA / 4.0) *
-      (this.voltageMatrix[i + 1][j] +
-        this.voltageMatrix[i - 1][j] +
-        this.voltageMatrix[i][j + 1] +
-        this.voltageMatrix[i][j - 1] +
-        this.chargeMatrix[i][j]);
+        (this.voltageMatrix[i + 1][j] +
+          this.voltageMatrix[i - 1][j] +
+          this.voltageMatrix[i][j + 1] +
+          this.voltageMatrix[i][j - 1] +
+          this.chargeMatrix[i][j]);
     return p;
   }
   private chargeEquation(i: number, j: number): number {

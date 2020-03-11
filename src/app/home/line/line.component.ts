@@ -19,7 +19,8 @@ export class LineComponent implements OnInit {
       xaxis: {
         title: "Y - Distance units"
       }
-    }
+    },
+    data: {}
   };
   constructor() {}
 

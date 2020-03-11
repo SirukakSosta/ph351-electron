@@ -10,6 +10,7 @@ import { LoadingComponent } from "../components/loading/loading.component";
 import { ThreeDSurfaceComponent } from "./three-d-surface/three-d-surface.component";
 import { LineComponent } from "./line/line.component";
 import { VectorPlotComponent } from "./vector-plot/vector-plot.component";
+import { KatexModule } from "ng-katex";
 import {
   HighchartsConfig,
   HighchartsModule
@@ -38,7 +39,8 @@ const config: HighchartsConfig = {
     SharedModule,
     PlotlyModule,
     HomeRoutingModule,
-    HighchartsModule
+    HighchartsModule,
+    KatexModule
   ],
   providers: [{ provide: HighchartsConfig, useValue: config }]
 })

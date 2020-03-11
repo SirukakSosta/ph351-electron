@@ -33,9 +33,9 @@
     </div>
     <div class="eqations">
       <p>Relaxation method for <strong>Poisson equation</strong></p>
-      <div [MathJax]="poissonEquation">{{poissonEquation}}</div>
+      <ng-katex [equation]="poissonEquation"></ng-katex>
       <p>And <strong>charge density</strong></p>
-      <div [MathJax]="chargeEquationLatex">{{chargeEquationLatex}}</div>
+      <ng-katex [equation]="chargeEquationLatex"></ng-katex>
     </div>
     <div class="energy">
       <strong>Energy: </strong>{{energy}}
