@@ -59,7 +59,7 @@
     <ng-container *ngIf="action === 'ENERGY' && ready">
       <!-- <app-line [potentialMatrix]="derivativesMatrix" [type]="'ENERGY'" [axis]="axis" [title]="'Electric field'">
       </app-line> -->
+      <app-vector-plot [vectorData]="derivtionForPlot"></app-vector-plot>
     </ng-container>
-    <app-vector-plot></app-vector-plot>
   </div>
 </div>
