@@ -1,24 +1,24 @@
-import "reflect-metadata";
-import "../polyfills";
-import * as PlotlyJS from "plotly.js/dist/plotly.js";
-import { PlotlyModule } from "angular-plotly.js";
-import { BrowserModule } from "@angular/platform-browser";
+import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { HttpClientModule, HttpClient } from "@angular/common/http";
+import { BrowserModule } from "@angular/platform-browser";
+// NG Translate 
+import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
+import { TranslateHttpLoader } from "@ngx-translate/http-loader";
+import { PlotlyModule } from "angular-plotly.js";
+import * as PlotlyJS from "plotly.js/dist/plotly.js";
+import "reflect-metadata";
+import "../polyfills";
+import { AppComponent } from "./app.component";
 import { CoreModule } from "./core/core.module";
+import { HomeModule } from "./home/home.module";
+import { LayoutModule } from "./layout/layout.module";
+import { AppRoutingModule } from "./routing/routing.module";
 import { SharedModule } from "./shared/shared.module";
 
-import { AppRoutingModule } from "./routing/routing.module";
 
-// NG Translate 
-import { TranslateModule, TranslateLoader } from "@ngx-translate/core";
-import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 
-import { HomeModule } from "./home/home.module";
 
-import { AppComponent } from "./app.component";
-import { LayoutModule } from "./layout/layout.module";
 PlotlyModule.plotlyjs = PlotlyJS;
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -33,8 +33,8 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     HttpClientModule,
     CoreModule,
     SharedModule,
-    HomeModule,
     AppRoutingModule,
+    HomeModule,
     PlotlyModule,
     TranslateModule.forRoot({
       loader: {

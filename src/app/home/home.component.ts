@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { getColumnFrom2dArray } from "./method";
 // constants
 @Component({
   selector: "app-home",
@@ -23,7 +24,7 @@ export class HomeComponent implements OnInit {
   chargeEquationLatex = "S(x,y) = x(1-x)y(1-y)";
   constantY = 0;
   derivtionForPlot = [];
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
     let test = [0, 1, 2, 1, 3, 2, 2, 2, 3, 0];
@@ -120,10 +121,11 @@ export class HomeComponent implements OnInit {
     // Start Calculate y derivative
     let tempY = [];
     for (let i = 0; i < this.SIZE; i++) {
-      tempY = [];
-      for (let j = 0; j < this.SIZE; j++) {
-        tempY.push(this.voltageMatrix[i][j]);
-      }
+      // tempY = [];
+      // for (let j = 0; j < this.SIZE; j++) {
+      //   tempY.push(this.voltageMatrix[i][j]);
+      // }
+      tempY = getColumnFrom2dArray(this.voltageMatrix, i);
       let calculatedDerivativeY = this.calculateDerivative(tempY);
 
       for (let k = 0; k < this.SIZE; k++) {
@@ -262,11 +264,11 @@ export class HomeComponent implements OnInit {
     let p =
       (1 - this.OMEGA) * this.voltageMatrix[i][j] +
       (this.OMEGA / 4.0) *
-        (this.voltageMatrix[i + 1][j] +
-          this.voltageMatrix[i - 1][j] +
-          this.voltageMatrix[i][j + 1] +
-          this.voltageMatrix[i][j - 1] +
-          this.chargeMatrix[i][j]);
+      (this.voltageMatrix[i + 1][j] +
+        this.voltageMatrix[i - 1][j] +
+        this.voltageMatrix[i][j + 1] +
+        this.voltageMatrix[i][j - 1] +
+        this.chargeMatrix[i][j]);
     return p;
   }
   private chargeEquation(i: number, j: number): number {
