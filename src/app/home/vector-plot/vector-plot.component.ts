@@ -34,13 +34,13 @@ export class VectorPlotComponent implements OnInit {
     },
     xAxis: {
       title: {
-        text: "y"
+        text: "x"
         //align: 'center'
       }
     },
     yAxis: {
       title: {
-        text: "x"
+        text: "y"
         //align: 'center'
       }
     },
@@ -61,7 +61,9 @@ export class VectorPlotComponent implements OnInit {
   };
 
   public chart: Chart;
-  ngOnInit() {}
+  ngOnInit() {
+    console.log("data to plot");
+  }
   public onLoad(evt) {
     this.chart = evt.chart;
     this.chart.addSeries({
@@ -69,5 +71,23 @@ export class VectorPlotComponent implements OnInit {
       name: "Electric vector field",
       data: this.vectorData
     });
+    // function generateData() {
+    //   var data = [],
+    //     x,
+    //     y,
+    //     length,
+    //     direction;
+
+    //   for (x = 5; x < 100; x += 5) {
+    //     for (y = 5; y < 100; y += 5) {
+    //       length = Math.round(200 - (x + y));
+    //       direction = Math.round(((x + y) / 200) * 360);
+    //       data.push([x, y, length, direction].join(", "));
+    //     }
+    //   }
+    //   console.log("[\n    [" + data.join("],\n    [") + "]\n]");
+    // }
+    // generateData();
+    console.log("data to plot", this.chart);
   }
 }
