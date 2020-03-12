@@ -7,9 +7,9 @@ import { Component, OnInit } from "@angular/core";
 })
 export class HomeComponent implements OnInit {
   OMEGA = 0.3;
-  SIZE: number = 50;
-  H = 1 / this.SIZE;
-  ITERATIONS: number = 500;
+  SIZE: number = 30;
+  H = 1 / (this.SIZE - 1);
+  ITERATIONS: number = 3000;
   ready: boolean = false;
   energy = 0;
   action: string;
@@ -39,7 +39,7 @@ export class HomeComponent implements OnInit {
       this.SIZE = Number(this.SIZE);
       this.ITERATIONS = Number(this.ITERATIONS);
       this.H = Number(1 / (this.SIZE - 1));
-      console.log("Size - 1");
+      console.log("Size - 1", this.H);
       this.OMEGA = Number(this.OMEGA);
       this.constantY = this.SIZE / 2;
       this.initializeMatrices();
@@ -153,35 +153,40 @@ export class HomeComponent implements OnInit {
     // TODO: we need constant i or j (ask zotos)
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
-        // const eX = this.xDerivativesMatrix[i][j];
-        // const eY = this.yDerivativesMatrix[i][j];
+        const eX = this.xDerivativesMatrix[i][j];
+        const eY = this.yDerivativesMatrix[i][j];
 
-        const eX = getEx(i, j);
-        const eY = getEy(i, j);
+        let x = _this.getRealXY(i);
+        let y = _this.getRealXY(j);
+        // const eX = getEx(x, y);
+        // const eY = getEy(x, y);
         const axisPoint = this.axis[j];
         this.derivtionForPlot.push([
-          eX,
-          eY,
+          // roundMe(x),
+          // roundMe(y),
+          // roundMe(100 * magnitude(eX, eY)),
+          // roundMe(radians(eX, eY))
+          x,
+          y,
           magnitude(eX, eY),
-          radians(eX, eY)
+          roundMe(radians(eX, eY))
         ]);
       }
     }
 
+    function roundMe(val) {
+      return Math.round((val + Number.EPSILON) * 10000) / 10000;
+    }
     //       length = Math.round(200 - (x + y));
     //       direction = Math.round(((x + y) / 200) * 360);
-    function getEx(i, j) {
-      let x = _this.getRealXY(i);
-      let y = _this.getRealXY(j);
-      let eq = -1 * (1 - 2 * x) * y * (1 - y);
-      return eq;
-    }
-    function getEy(i, j) {
-      let x = _this.getRealXY(i);
-      let y = _this.getRealXY(i);
-      let eq = -1 * (1 - 2 * y) * x * (1 - x);
-      return eq;
-    }
+    // function getEx(x, y) {
+    //   let eq = (1 - 2 * x) * y * (1 - y);
+    //   return eq;
+    // }
+    // function getEy(x, y) {
+    //   let eq = (1 - 2 * y) * x * (1 - x);
+    //   return eq;
+    // }
     function magnitude(i, j) {
       const sum = Math.pow(i, 2) + Math.pow(j, 2);
       return Math.sqrt(sum);
@@ -190,7 +195,9 @@ export class HomeComponent implements OnInit {
       if (i == 0) {
         return 0;
       } else {
-        return Math.atan(j / i);
+        let rads = (Math.atan(j / i) * 180) / Math.PI;
+        // if (rads < 0) return -1 * rads;
+        return rads;
       }
     }
   }

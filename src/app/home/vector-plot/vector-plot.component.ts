@@ -10,6 +10,7 @@ export class VectorPlotComponent implements OnInit {
   @Input() vectorData: any;
   public options: Options = {
     chart: {
+      height: 600,
       type: "vector",
       spacingBottom: 30
     },
@@ -33,22 +34,26 @@ export class VectorPlotComponent implements OnInit {
       borderWidth: 1
     },
     xAxis: {
+      min: 0,
+      max: 1,
       title: {
         text: "x"
         //align: 'center'
       }
     },
     yAxis: {
+      min: 0,
+      max: 1,
       title: {
         text: "y"
         //align: 'center'
       }
     },
-    tooltip: {
-      formatter: function() {
-        return "<b>" + this.series.name + "</b><br/>" + this.x + ": " + this.y;
-      }
-    },
+    // tooltip: {
+    //   formatter: function() {
+    //     return "<b>" + this.series.name + "</b><br/>" + this.x + ": " + this.y;
+    //   }
+    // },
     plotOptions: {
       area: {
         fillOpacity: 0.5
@@ -69,6 +74,8 @@ export class VectorPlotComponent implements OnInit {
     this.chart.addSeries({
       type: "vector",
       name: "Electric vector field",
+      turboThreshold: 0,
+      color: "red",
       data: this.vectorData
     });
     // function generateData() {
