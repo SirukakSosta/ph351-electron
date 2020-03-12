@@ -75,6 +75,7 @@ export class VectorPlotComponent implements OnInit {
       type: "vector",
       name: "Electric vector field",
       turboThreshold: 0,
+      rotationOrigin: "start",
       color: "red",
       data: this.vectorData
     });

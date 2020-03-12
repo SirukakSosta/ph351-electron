@@ -153,40 +153,29 @@ export class HomeComponent implements OnInit {
     // TODO: we need constant i or j (ask zotos)
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
-        const eX = this.xDerivativesMatrix[i][j];
-        const eY = this.yDerivativesMatrix[i][j];
-
         let x = _this.getRealXY(i);
         let y = _this.getRealXY(j);
+
+        const eX = this.xDerivativesMatrix[i][j];
+        const eY = this.yDerivativesMatrix[i][j];
         // const eX = getEx(x, y);
         // const eY = getEy(x, y);
         const axisPoint = this.axis[j];
-        this.derivtionForPlot.push([
-          // roundMe(x),
-          // roundMe(y),
-          // roundMe(100 * magnitude(eX, eY)),
-          // roundMe(radians(eX, eY))
-          x,
-          y,
-          magnitude(eX, eY),
-          roundMe(radians(eX, eY))
-        ]);
+        this.derivtionForPlot.push([x, y, magnitude(eX, eY), radians(eX, eY)]);
       }
     }
 
     function roundMe(val) {
       return Math.round((val + Number.EPSILON) * 10000) / 10000;
     }
-    //       length = Math.round(200 - (x + y));
-    //       direction = Math.round(((x + y) / 200) * 360);
-    // function getEx(x, y) {
-    //   let eq = (1 - 2 * x) * y * (1 - y);
-    //   return eq;
-    // }
-    // function getEy(x, y) {
-    //   let eq = (1 - 2 * y) * x * (1 - x);
-    //   return eq;
-    // }
+    function getEx(x, y) {
+      let eq = (1 - 2 * x) * y * (1 - y);
+      return eq;
+    }
+    function getEy(x, y) {
+      let eq = (1 - 2 * y) * x * (1 - x);
+      return eq;
+    }
     function magnitude(i, j) {
       const sum = Math.pow(i, 2) + Math.pow(j, 2);
       return Math.sqrt(sum);
@@ -196,8 +185,10 @@ export class HomeComponent implements OnInit {
         return 0;
       } else {
         let rads = (Math.atan(j / i) * 180) / Math.PI;
+        let mapToChats = (-1 * rads + 270) % 360;
+
         // if (rads < 0) return -1 * rads;
-        return rads;
+        return mapToChats;
       }
     }
   }
