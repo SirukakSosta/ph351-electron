@@ -149,10 +149,16 @@ export class HomeComponent implements OnInit {
   private createElectricFieldData() {
     const constantY = 1;
 
-    for (let l = 0; l < this.SIZE; l++) {
-      const x = this.xDerivativesMatrix[l][constantY];
-      const y = this.yDerivativesMatrix[l][constantY];
-      this.derivtionForPlot.push([x, y, magnitude(x, y), radians(x, y)]);
+    for (let i = 0; i < this.SIZE; i++) {
+      const eX = this.xDerivativesMatrix[i][constantY];
+      const eY = this.yDerivativesMatrix[i][constantY];
+      const axisPoint = this.axis[i];
+      this.derivtionForPlot.push([
+        axisPoint,
+        axisPoint,
+        magnitude(eX, eY),
+        radians(eX, eY)
+      ]);
     }
 
     function magnitude(i, j) {

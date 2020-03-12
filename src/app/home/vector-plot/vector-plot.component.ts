@@ -14,7 +14,7 @@ export class VectorPlotComponent implements OnInit {
       spacingBottom: 30
     },
     title: {
-      text: "Electric Field - y constant *"
+      text: "Electric Field"
     },
     // subtitle: {
     //   text: "* Jane's banana consumption is unknown",
@@ -34,13 +34,13 @@ export class VectorPlotComponent implements OnInit {
     },
     xAxis: {
       title: {
-        text: "Ex"
+        text: "y"
         //align: 'center'
       }
     },
     yAxis: {
       title: {
-        text: "Ey"
+        text: "x"
         //align: 'center'
       }
     },
