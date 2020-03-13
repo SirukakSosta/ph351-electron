@@ -1,11 +1,10 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Subscription } from "rxjs";
-import { filter, map, tap } from 'rxjs/operators';
+import { filter, map, tap } from "rxjs/operators";
 import { AM } from "../interface";
 import { PdeLabService } from "../pde-lab.service";
 import { exerciseChargeEquationMap } from "../variable";
-
 
 // constants
 @Component({
@@ -14,6 +13,7 @@ import { exerciseChargeEquationMap } from "../variable";
   styleUrls: ["./pde-wrapper.component.scss"]
 })
 export class PdeWrapperComponent implements OnInit, OnDestroy {
+  isCollapsed = false;
   OMEGA = 0.3;
   SIZE: number = 30;
   H = 1 / (this.SIZE - 1);
@@ -33,22 +33,25 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   // derivtionForPlot = [];
   chargeEquation: (i: number, j: number, h: number) => number;
   exerciseSubscription: Subscription;
-  voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(map(e => !!e[0] && !!e[0].length));
+  voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(
+    map(e => !!e[0] && !!e[0].length)
+  );
 
-  constructor(private route: ActivatedRoute, private lab: PdeLabService) { }
+  constructor(private route: ActivatedRoute, private lab: PdeLabService) {}
 
   ngOnInit(): void {
-
-    this.exerciseSubscription = this.route.paramMap.pipe(
-      filter(paramMap => paramMap.has('am')),
-      tap((paramMap) => {
-        const exercise = paramMap.get('am') as AM;
-        this.lab.resetVariables()
-        this.chargeEquation = exerciseChargeEquationMap[exercise].chargeEquation;
-        this.chargeEquationLatex = exerciseChargeEquationMap[exercise].latex;
-      })
-    ).subscribe()
-
+    this.exerciseSubscription = this.route.paramMap
+      .pipe(
+        filter(paramMap => paramMap.has("am")),
+        tap(paramMap => {
+          const exercise = paramMap.get("am") as AM;
+          this.lab.resetVariables();
+          this.chargeEquation =
+            exerciseChargeEquationMap[exercise].chargeEquation;
+          this.chargeEquationLatex = exerciseChargeEquationMap[exercise].latex;
+        })
+      )
+      .subscribe();
 
     let test = [0, 1, 2, 1, 3, 2, 2, 2, 3, 0];
     this.H = 1 / 10;
@@ -97,7 +100,8 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
 
     this.energy =
       Math.round(
-        (this.calculateTotalEnergy(this.lab.voltageMatrix) + Number.EPSILON) * 10000
+        (this.calculateTotalEnergy(this.lab.voltageMatrix) + Number.EPSILON) *
+          10000
       ) / 10000;
 
     // this.calculateDerivativeMatrices();
@@ -106,9 +110,6 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     // console.log("dify", this.yDerivativesMatrix);
     // this.createElectricFieldData();
     // console.log(this.derivtionForPlot);
-
-
-
   }
   private getRealXY(i: number) {
     return i / (this.SIZE - 1);
@@ -293,11 +294,11 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     let p =
       (1 - this.OMEGA) * this.lab.voltageMatrix[i][j] +
       (this.OMEGA / 4.0) *
-      (this.lab.voltageMatrix[i + 1][j] +
-        this.lab.voltageMatrix[i - 1][j] +
-        this.lab.voltageMatrix[i][j + 1] +
-        this.lab.voltageMatrix[i][j - 1] +
-        this.chargeMatrix[i][j]);
+        (this.lab.voltageMatrix[i + 1][j] +
+          this.lab.voltageMatrix[i - 1][j] +
+          this.lab.voltageMatrix[i][j + 1] +
+          this.lab.voltageMatrix[i][j - 1] +
+          this.chargeMatrix[i][j]);
     return p;
   }
   private calculateCharge(i: number, j: number): number {
@@ -305,7 +306,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     const y = this.getRealXY(j);
     // const result = Math.pow(this.H, 2) * (2.0 * ((1 - x) * x + (1 - y) * y));
     // const result = Math.pow(this.H, 2) * 12 * (Math.pow(x, 2));
-    const result = this.chargeEquation(x, y, this.H)
+    const result = this.chargeEquation(x, y, this.H);
     return result;
   }
   private getRandomValues(): number {
@@ -338,6 +339,6 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.exerciseSubscription.unsubscribe()
+    this.exerciseSubscription.unsubscribe();
   }
 }

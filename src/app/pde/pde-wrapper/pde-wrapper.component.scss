@@ -1,30 +1,30 @@
-.container1 {
-  // display: flex;
-  // flex-direction: row;
-  // height: 100vh;
-
-  .menu {
-    background: #e3e3e3;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-
-    .form {
-      padding: 2rem;
+.menu {
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  .form {
+    padding: 5px;
+    .item {
+      margin-bottom: 0.5rem;
+      label {
+        margin-bottom: 0;
+      }
     }
+  }
 
-    .energy {
-      width: 100%;
-      text-align: center;
-      padding: 1rem 0;
-      background: black;
-      color: white;
-    }
+  .energy {
+    width: 100%;
+    text-align: center;
+    padding: 1rem 0.2rem;
+    background: black;
+    color: white;
+  }
 
-    .eqations {
-      padding: 2rem;
-      text-align: center;
-    }
+  .eqations {
+    font-size: 12px;
+    padding: 1rem 0.2rem;
+    text-align: center;
   }
 }
 
@@ -37,17 +37,14 @@
   width: 100%;
 
   .graph-btns {
-    display: flex;
-    flex-direction: row;
     width: 100%;
-    justify-content: space-around;
     // flex-basis: 31%;
   }
 }
 
 .btn {
   cursor: pointer;
-  color:#02a902;
+  color: #02a902;
   background: white;
   padding: 1rem 0;
   text-align: center;
@@ -79,127 +76,31 @@ app-loading {
   z-index: 5;
   background: rgba(6, 1, 1, 0.82);
 }
-
-input {
-  font-size: 18px;
-  padding: 10px 10px 10px 5px;
-  display: block;
-  width: 300px;
-  border: none;
-  border-bottom: 1px solid #757575;
+.layout {
+  height: 100vh;
 }
 
-input:focus {
-  outline: none;
+.logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
 }
 
-/* LABEL ======================================= */
-label {
-  color: #999;
-  font-size: 18px;
-  font-weight: normal;
-  position: absolute;
-  pointer-events: none;
-  left: 5px;
-  top: 10px;
-  transition: 0.2s ease all;
-  -moz-transition: 0.2s ease all;
-  -webkit-transition: 0.2s ease all;
+nz-header {
+  background: #fff;
+  padding: 0;
 }
 
-/* active state */
-input:focus~label,
-input:valid~label {
-  top: -20px;
-  font-size: 14px;
-  color: #5264ae;
+nz-content {
+  margin: 24px 16px 0;
 }
 
-/* BOTTOM BARS ================================= */
-.bar {
-  position: relative;
-  display: block;
-  width: 300px;
+.inner-content {
+  padding: 24px;
+  background: #fff;
+  min-height: 100%;
 }
 
-.bar:before,
-.bar:after {
-  content: "";
-  height: 2px;
-  width: 0;
-  bottom: 1px;
-  position: absolute;
-  background: #5264ae;
-  transition: 0.2s ease all;
-  -moz-transition: 0.2s ease all;
-  -webkit-transition: 0.2s ease all;
-}
-
-.bar:before {
-  left: 50%;
-}
-
-.bar:after {
-  right: 50%;
-}
-
-/* active state */
-input:focus~.bar:before,
-input:focus~.bar:after {
-  width: 50%;
-}
-
-/* HIGHLIGHTER ================================== */
-.highlight {
-  position: absolute;
-  height: 60%;
-  width: 100px;
-  top: 25%;
-  left: 0;
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-/* active state */
-input:focus~.highlight {
-  -webkit-animation: inputHighlighter 0.3s ease;
-  -moz-animation: inputHighlighter 0.3s ease;
-  animation: inputHighlighter 0.3s ease;
-}
-
-
-
-
-/* ANIMATIONS ================ */
-@-webkit-keyframes inputHighlighter {
-  from {
-    background: #5264ae;
-  }
-
-  to {
-    width: 0;
-    background: transparent;
-  }
-}
-
-@-moz-keyframes inputHighlighter {
-  from {
-    background: #5264ae;
-  }
-
-  to {
-    width: 0;
-    background: transparent;
-  }
-}
-
-@keyframes inputHighlighter {
-  from {
-    background: #5264ae;
-  }
-
-  to {
-    width: 0;
-    background: transparent;
-  }
+nz-footer {
+  text-align: center;
 }
