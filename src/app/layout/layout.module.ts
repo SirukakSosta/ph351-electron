@@ -7,6 +7,8 @@ import { NzGridModule } from "ng-zorro-antd/grid";
 import { NzLayoutModule } from "ng-zorro-antd/layout";
 import { NzInputModule } from "ng-zorro-antd/input";
 import { NzButtonModule } from "ng-zorro-antd/button";
+import { NzRadioModule } from "ng-zorro-antd/radio";
+import { NzSliderModule } from "ng-zorro-antd/slider";
 
 @NgModule({
   imports: [
@@ -23,7 +25,9 @@ import { NzButtonModule } from "ng-zorro-antd/button";
     NzGridModule,
     NzLayoutModule,
     NzInputModule,
-    NzButtonModule
+    NzButtonModule,
+    NzRadioModule,
+    NzSliderModule
   ]
 })
 export class LayoutModule {}

@@ -10,6 +10,8 @@ import { PdeLabService } from "../pde-lab.service";
   styleUrls: ["./line.component.scss"]
 })
 export class LineComponent implements OnInit {
+  radioValue = "x";
+  selectedAxis: any = "x";
   // @Input() potentialMatrix: any;
   // @Input() axis: any;
   @Input() title: any;
@@ -19,46 +21,52 @@ export class LineComponent implements OnInit {
     layout: {
       // width: 1200,
       // height: 800,
-      autosize :stripSummaryForJitFileSuffix,
-      title: "hi",
-      xaxis: {
-        title: "Y - Distance units"
-      }
+      autosize: stripSummaryForJitFileSuffix
     },
     data: {}
   };
 
-  data$: Observable<any>
-  constantAxis$$ = new BehaviorSubject<'x' | 'y'>('x') ;
+  data$: Observable<any>;
+  constantAxis$$ = new BehaviorSubject<"x" | "y">("x");
   selectedH$$ = new BehaviorSubject<number>(undefined);
   hMaxValue = this.lab.voltageMatrix$.pipe(map(e => e.length));
 
-  constructor(private lab: PdeLabService) { }
+  constructor(private lab: PdeLabService) {}
 
   ngOnInit(): void {
     console.log("AXIS", this.lab.axis);
 
-    this.data$ = combineLatest(this.lab.axis$, this.lab.voltageMatrix$, this.constantAxis$$, this.selectedH$$).pipe(
-      mergeMap(e => [{ axis: e[0], voltageMatrix: e[1], constantAxis: e[2], selectedH: e[3] }]),
+    this.data$ = combineLatest(
+      this.lab.axis$,
+      this.lab.voltageMatrix$,
+      this.constantAxis$$,
+      this.selectedH$$
+    ).pipe(
+      mergeMap(e => [
+        { axis: e[0], voltageMatrix: e[1], constantAxis: e[2], selectedH: e[3] }
+      ]),
       // filter((e) => !!e.voltageMatrix.length && !!e.voltageMatrix[0].length),
       debounceTime(10),
-      tap(({  axis, selectedH }) => {
-
+      tap(({ axis, selectedH }) => {
         if (!selectedH) {
-          this.selectH (axis.length / 2);
+          this.selectH(axis.length / 2);
         }
-       
       }),
       tap(({ axis, constantAxis, selectedH }) => {
-
-     
         this.graph.layout["yaxis"] = {
-          title: `${this.title} - Φ(${selectedH / axis.length}, ${constantAxis})`
+          title: `Φ(${selectedH / axis.length}, ${constantAxis})`
         };
+        this.graph.layout["xaxis"] = {
+          title: `${this.selectedAxis === "x" ? "x" : "y"}`
+        };
+        this.graph.layout["title"] = {
+          text: `Φ(${selectedH /
+            axis.length}, ${constantAxis}) - constant axis ${constantAxis}`
+        };
+        // title: `V(x,y) - constant ${this.selectConstantAxis}`,
       }),
       map(({ axis, voltageMatrix, constantAxis, selectedH }) => {
-
-        console.log(axis, voltageMatrix, constantAxis)
+        console.log(axis, voltageMatrix, constantAxis);
         // this.cX = Math.round(axis.length / 2);
         let y = [];
 
@@ -69,9 +77,7 @@ export class LineComponent implements OnInit {
           if (voltageMatrix[selectedH]) {
             y.push(voltageMatrix[selectedH][i]);
           }
-
         }
-
 
         var trace1 = {
           x: axis,
@@ -82,7 +88,7 @@ export class LineComponent implements OnInit {
 
         return [trace1];
       })
-    )
+    );
 
     // this.cX = this.lab.axis.length / 2;
     // let y = [];
@@ -116,12 +122,12 @@ export class LineComponent implements OnInit {
     // };
   }
 
-
   selectH(h: number) {
-    this.selectedH$$.next(h)
+    this.selectedH$$.next(h);
   }
-  selectConstantAxis(e: 'x' | 'y') {
-    console.log(e)
-    this.constantAxis$$.next(e)
+  selectConstantAxis(e: "x" | "y") {
+    console.log(e);
+    this.selectedAxis = e;
+    this.constantAxis$$.next(e);
   }
 }

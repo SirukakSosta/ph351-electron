@@ -1,32 +1,55 @@
 <div class="d-flex flex-column h-100">
-    <form class="p-2">
-        <div class="form-group">
-            <label for="exampleFormControlInput1" class="mr-3">Constant axis</label>
+  <label for="exampleFormControlInput1" class="mr-3">Constant axis</label>
+  <nz-radio-group [(ngModel)]="radioValue">
+    <label
+      nz-radio
+      nzValue="x"
+      (click)="selectConstantAxis('x')"
+      [checked]="(constantAxis$$ | async) === 'x'"
+      >x</label
+    >
+    <label
+      nz-radio
+      nzValue="y"
+      (click)="selectConstantAxis('y')"
+      [checked]="(constantAxis$$ | async) === 'y'"
+      >y</label
+    >
+  </nz-radio-group>
+  <!-- <div>
+    <label for="exampleFormControlSelect1" class="mr-3">
+      H index ({{ selectedH$$ | async }})</label
+    >
+    <nz-slider
+      [(ngModel)]="selectedH$$"
+      [nzMin]="0"
+      [nzMax]="hMaxValue | async"
+      (change)="selectH($event.target.value)"
+    ></nz-slider>
+  </div> -->
+  <form class="p-2">
+    <div class="form-group">
+      <label for="exampleFormControlSelect1" class="mr-3">
+        H index ({{ selectedH$$ | async }})</label
+      >
+      <input
+        type="range"
+        name="points"
+        id="points"
+        value="selectedH$$ | async"
+        min="0"
+        [max]="hMaxValue | async"
+        [value]="selectedH$$ | async"
+        data-show-value="true"
+        data-popup-enabled="true"
+        (change)="selectH($event.target.value)"
+      />
+    </div>
+  </form>
 
-            <div class="form-check form-check-inline" (click)="selectConstantAxis('x')">
-                <input name="inlineRadioOptions" class="form-check-input" type="radio"
-                    [checked]="(constantAxis$$  | async) === 'x'">
-                <label class="form-check-label" for="defaultCheck1">
-                    x
-                </label>
-            </div>
-            <div class="form-check form-check-inline" (click)="selectConstantAxis('y')">
-                <input name="inlineRadioOptions" class="form-check-input" type="radio"
-                    [checked]="(constantAxis$$  | async) === 'y'">
-                <label class="form-check-label" for="defaultCheck2">
-                    y
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="exampleFormControlSelect1" class="mr-3"> H index ({{selectedH$$ | async}})</label>
-            <input type="range" name="points" id="points" value="selectedH$$ | async" min="0" [max]="hMaxValue | async"
-                [value]="selectedH$$ | async" data-show-value="true" data-popup-enabled="true"
-                (change)="selectH($event.target.value)" />
-
-        </div>
-
-    </form>
-
-    <plotly-plot class="flex-grow" [data]="data$ | async" [layout]="graph.layout"></plotly-plot>
+  <plotly-plot
+    class="flex-grow"
+    [data]="data$ | async"
+    [layout]="graph.layout"
+  ></plotly-plot>
 </div>
