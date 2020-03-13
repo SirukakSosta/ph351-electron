@@ -9,7 +9,7 @@ export const routes: Routes = [
             path: 'core', component: CoreComponent, canActivate: [],
             children: [
                 {
-                    path: 'pde', loadChildren: () => import('../home/home.module').then(e => e.HomeModule)
+                    path: 'pde', loadChildren: () => import('../pde/pde.module').then(e => e.PdeModule)
                 },
                 {
                     path: '',

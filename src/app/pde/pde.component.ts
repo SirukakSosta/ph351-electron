@@ -1,12 +1,18 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
+import { ActivatedRoute } from "@angular/router";
+import { Subscription } from "rxjs";
+import { filter, tap } from 'rxjs/operators';
+import { AM } from "./interface";
 import { getColumnFrom2dArray } from "./method";
+import { exerciseChargeEquationMap } from "./variable";
+
 // constants
 @Component({
-  selector: "app-home",
-  templateUrl: "./home.component.html",
-  styleUrls: ["./home.component.scss"]
+  selector: "app-pde",
+  templateUrl: "./pde.component.html",
+  styleUrls: ["./pde.component.scss"]
 })
-export class HomeComponent implements OnInit {
+export class PdeComponent implements OnInit, OnDestroy {
   OMEGA = 0.3;
   SIZE: number = 30;
   H = 1 / (this.SIZE - 1);
@@ -21,17 +27,33 @@ export class HomeComponent implements OnInit {
   xDerivativesMatrix: number[][]; /** katheto */
   loading = false;
   poissonEquation: string = "\\nabla^2\\Phi(x,y) = S(x,y)";
-  chargeEquationLatex = "S(x,y) = x(1-x)y(1-y)";
+  chargeEquationLatex: string;
   constantY = 0;
   derivtionForPlot = [];
-  constructor() { }
+  chargeEquation: (i: number, j: number, h: number) => number;
+  exerciseSubscription: Subscription;
+
+  constructor(private route: ActivatedRoute) { }
 
   ngOnInit(): void {
+
+    this.exerciseSubscription = this.route.paramMap.pipe(
+      filter(paramMap => paramMap.has('am')),
+      tap((paramMap) => {
+        const exercise = paramMap.get('am') as AM;
+        this.chargeEquation = exerciseChargeEquationMap[exercise].chargeEquation;
+        this.chargeEquationLatex = exerciseChargeEquationMap[exercise].latex
+      })
+    ).subscribe()
+
+
     let test = [0, 1, 2, 1, 3, 2, 2, 2, 3, 0];
     this.H = 1 / 10;
     const lk = this.calculateDerivative(test);
     console.log(test);
     console.log(lk);
+
+    // this.start()
   }
   public start() {
     this.ready = false;
@@ -81,6 +103,9 @@ export class HomeComponent implements OnInit {
     console.log("dify", this.yDerivativesMatrix);
     this.createElectricFieldData();
     console.log(this.derivtionForPlot);
+
+
+
   }
   private getRealXY(i: number) {
     return i / (this.SIZE - 1);
@@ -255,7 +280,7 @@ export class HomeComponent implements OnInit {
   private fillChargeMatrixWithValues(): void {
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
-        this.chargeMatrix[i][j] = this.chargeEquation(i, j);
+        this.chargeMatrix[i][j] = this.calculateCharge(i, j);
       }
     }
   }
@@ -271,11 +296,12 @@ export class HomeComponent implements OnInit {
         this.chargeMatrix[i][j]);
     return p;
   }
-  private chargeEquation(i: number, j: number): number {
+  private calculateCharge(i: number, j: number): number {
     const x = this.getRealXY(i);
     const y = this.getRealXY(j);
-    const result = Math.pow(this.H, 2) * (2.0 * ((1 - x) * x + (1 - y) * y));
+    // const result = Math.pow(this.H, 2) * (2.0 * ((1 - x) * x + (1 - y) * y));
     // const result = Math.pow(this.H, 2) * 12 * (Math.pow(x, 2));
+    const result = this.chargeEquation(x, y, this.H)
     return result;
   }
   private getRandomValues(): number {
@@ -305,5 +331,9 @@ export class HomeComponent implements OnInit {
       return true;
     }
     return false;
+  }
+
+  ngOnDestroy(){
+    this.exerciseSubscription.unsubscribe()
   }
 }

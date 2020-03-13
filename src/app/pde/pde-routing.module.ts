@@ -1,12 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { HomeComponent } from './home.component';
+import { PdeComponent } from './pde.component';
 
 const routes: Routes = [
   {
+    path: 'eq/:am',
+    component: PdeComponent
+  },
+  {
     path: '',
-    component: HomeComponent
+    component: PdeComponent
   },
   {
     path: '',
@@ -20,4 +24,4 @@ const routes: Routes = [
   imports: [CommonModule, RouterModule.forChild(routes)],
   exports: []
 })
-export class HomeRoutingModule { }
+export class PdeRoutingModule { }

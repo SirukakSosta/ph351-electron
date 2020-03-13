@@ -1,10 +1,23 @@
 <!-- <app-loading *ngIf="loading"></app-loading> -->
 <!-- <div *ngIf="!loading">
 </div> -->
- 
-<div class="container">
+
+<div class="p-3" *ngIf="!chargeEquation">
+
+  <h4>
+    Επιλογή Εργασίας
+  </h4>
+  <ul>
+    <li> <a href="#" [routerLink]="['/','core','pde','eq','3943']">ph3943</a></li>
+    <li> <a href="#" [routerLink]="['/','core','pde','eq','3131']">ph3131</a></li>
+  </ul>
+
+</div>
+
+<div class="container1 d-flex h-100" *ngIf="!!chargeEquation">
   <app-loading *ngIf="loading"></app-loading>
   <div class="menu">
+
     <div class="form">
       <div class="group">
         <input type="text" [(ngModel)]="H" />
@@ -35,7 +48,7 @@
     <div class="eqations">
       <p>Relaxation method for <strong>Poisson equation</strong></p>
       <ng-katex [equation]="poissonEquation"></ng-katex>
-      <p>And <strong>charge density</strong></p>
+      <p class="mt-2">And <strong>charge density</strong></p>
       <ng-katex [equation]="chargeEquationLatex"></ng-katex>
     </div>
     <div class="energy">

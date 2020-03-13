@@ -11,11 +11,10 @@ import "reflect-metadata";
 import "../polyfills";
 import { AppComponent } from "./app.component";
 import { CoreModule } from "./core/core.module";
-import { HomeModule } from "./home/home.module";
 import { LayoutModule } from "./layout/layout.module";
+import { PdeModule } from "./pde/pde.module";
 import { AppRoutingModule } from "./routing/routing.module";
 import { SharedModule } from "./shared/shared.module";
-
 
 
 
@@ -34,7 +33,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     CoreModule,
     SharedModule,
     AppRoutingModule,
-    HomeModule,
+    PdeModule,
     PlotlyModule,
     TranslateModule.forRoot({
       loader: {
