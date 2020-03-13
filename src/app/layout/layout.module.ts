@@ -1,11 +1,11 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+// import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { LoadingComponent } from "./loading/loading.component";
-
+import { NgZorroAntdModule } from "ng-zorro-antd";
 @NgModule({
-    imports: [CommonModule,NgbModule],
-    declarations: [LoadingComponent],
-    exports: [LoadingComponent,NgbModule]
+  imports: [CommonModule, NgZorroAntdModule],
+  declarations: [LoadingComponent],
+  exports: [LoadingComponent, NgZorroAntdModule]
 })
-export class LayoutModule { }
+export class LayoutModule {}

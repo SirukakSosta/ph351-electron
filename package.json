@@ -64,7 +64,7 @@
     "chai": "4.2.0",
     "codelyzer": "5.1.2",
     "conventional-changelog-cli": "2.0.32",
-    "core-js": "3.1.4", 
+    "core-js": "3.1.4",
     "cross-env": "7.0.0",
     "electron": "8.0.1",
     "electron-builder": "22.3.2",
@@ -94,6 +94,7 @@
     "node": ">=10.13.0"
   },
   "dependencies": {
+    "@angular/animations": "9.0.6",
     "@howtimeflies/ngx-highcharts": "1.2.0",
     "@ng-bootstrap/ng-bootstrap": "6.0.0",
     "@types/mathjs": "6.0.4",
@@ -102,6 +103,7 @@
     "mathjax": "3.0.1",
     "mathjs": "6.6.1",
     "ng-katex": "2.0.3",
+    "ng-zorro-antd": "8.5.2",
     "plotly.js": "1.52.3"
   }
 }

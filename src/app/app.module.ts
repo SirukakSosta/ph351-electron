@@ -2,7 +2,7 @@ import { HttpClient, HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { BrowserModule } from "@angular/platform-browser";
-// NG Translate 
+// NG Translate
 import { TranslateLoader, TranslateModule } from "@ngx-translate/core";
 import { TranslateHttpLoader } from "@ngx-translate/http-loader";
 import { PlotlyModule } from "angular-plotly.js";
@@ -16,7 +16,7 @@ import { PdeModule } from "./pde/pde.module";
 import { AppRoutingModule } from "./routing/routing.module";
 import { SharedModule } from "./shared/shared.module";
 
-
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 PlotlyModule.plotlyjs = PlotlyJS;
 // AoT requires an exported function for factories
@@ -28,6 +28,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   declarations: [AppComponent],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     HttpClientModule,
     CoreModule,
@@ -46,4 +47,4 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}
