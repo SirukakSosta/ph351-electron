@@ -11,10 +11,14 @@ export function radians(i: number, j: number) {
     if (i == 0) {
         return 0;
     } else {
-        let rads = Math.atan2(j,i)*180/Math.PI;
+        let rads = Math.atan2(j, i) * 180 / Math.PI;
         // let mapToChats = (-1 * rads + 270) % 360;
 
         // if (rads < 0) return -1 * rads;
         return rads;
     }
+}
+
+export function getHFromSize(size: number) {
+    return 1 / (size - 1);
 }

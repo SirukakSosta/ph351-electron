@@ -12,7 +12,7 @@ export const exerciseChargeEquationMap: Record<AM, {
     },
     "3131": {
         chargeEquation: (x: number, y: number, h: number) => {
-            return Math.pow(h, 2) * (2.0 * ((1 - x) * x + (1 - y) * y))
+            return Math.pow(h, 2) * (12.0 * Math.pow(x, 2) )
         },
         latex: 'S(x,y) = 12 *x^2'
     }

@@ -59,22 +59,23 @@
   </div>
   <div class="plotly-container">
     <div class="graph-btns" *ngIf="ready">
-      <div class="btn" (click)="action = '3D'">3D Potential</div>
-      <div class="btn" (click)="action = 'LINE'">2D Potential</div>
-      <div class="btn" (click)="action = 'ENERGY'">2D Electric field</div>
+      <div class="btn" routerLinkActive="active-chart" [routerLink]="['potential-3d']">3D Potential</div>
+      <div class="btn" routerLinkActive="active-chart" [routerLink]="['potential-2d']">2D Potential</div>
+      <div class="btn" routerLinkActive="active-chart" [routerLink]="['electric-field']">2D Electric field</div>
     </div>
-    <ng-container *ngIf="action === '3D' && ready">
+    <router-outlet *ngIf="voltageMatrixHasBeenCalculated | async"></router-outlet>
+
+    <!-- <ng-container *ngIf="action === '3D' && ready">
       <app-three-d-surface [potentialMatrix]="voltageMatrix" [axis]="axis" [title]="'3d potential'">
       </app-three-d-surface>
-    </ng-container>
+    </ng-container> -->
 
-    <ng-container *ngIf="action === 'LINE' && ready">
-      <app-line [potentialMatrix]="voltageMatrix" [axis]="axis" [title]="'Potential'"></app-line>
-    </ng-container>
-    <ng-container *ngIf="action === 'ENERGY' && ready">
-      <!-- <app-line [potentialMatrix]="derivativesMatrix" [type]="'ENERGY'" [axis]="axis" [title]="'Electric field'">
-      </app-line> -->
+    <!-- <ng-container *ngIf="action === 'LINE' && ready">
+      <app-line [potentialMatrix]="lab.voltageMatrix" [axis]="lab.axis" [title]="'Potential'"></app-line>
+    </ng-container> -->
+    <!-- <ng-container *ngIf="action === 'ENERGY' && ready">
+
       <app-vector-plot [vectorData]="derivtionForPlot"></app-vector-plot>
-    </ng-container>
+    </ng-container> -->
   </div>
 </div>

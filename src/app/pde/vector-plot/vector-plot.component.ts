@@ -1,5 +1,7 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { Chart, Options } from "highcharts";
+import { tap } from "rxjs/operators";
+import { PdeLabService } from "../pde-lab.service";
 
 @Component({
   selector: "app-vector-plot",
@@ -7,7 +9,7 @@ import { Chart, Options } from "highcharts";
   styleUrls: ["./vector-plot.component.css"]
 })
 export class VectorPlotComponent implements OnInit {
-  @Input() vectorData: any;
+  // @Input() vectorData: any;
   public options: Options = {
     chart: {
       height: 600,
@@ -65,20 +67,41 @@ export class VectorPlotComponent implements OnInit {
     series: []
   };
 
+  constructor(private lab: PdeLabService) {
+
+  }
+
   public chart: Chart;
   ngOnInit() {
     console.log("data to plot");
   }
   public onLoad(evt) {
     this.chart = evt.chart;
-    this.chart.addSeries({
-      type: "vector",
-      name: "Electric vector field",
-      turboThreshold: 0,
-      rotationOrigin: "start",
-      color: "red",
-      data: this.vectorData
-    });
+
+    this.chart.series = []
+
+    this.lab.electricField$.pipe(
+      tap((electricField: any[]) => {
+        console.log('electricField', electricField)
+        
+        if (this.chart.get('series-a')) {
+          this.chart.get('series-a').remove()
+        }
+
+        this.chart.addSeries({
+          id: 'series-a',
+          type: "vector",
+          name: "Electric vector field",
+          turboThreshold: 0,
+          rotationOrigin: "start",
+          color: "red",
+          data: electricField
+        });
+        // this.chart.redraw()
+
+      })
+    ).subscribe()
+
     // function generateData() {
     //   var data = [],
     //     x,

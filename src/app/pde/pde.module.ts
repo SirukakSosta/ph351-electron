@@ -8,9 +8,10 @@ import { LayoutModule } from "../layout/layout.module";
 import { SharedModule } from "../shared/shared.module";
 import { LineComponent } from "./line/line.component";
 import { PdeRoutingModule } from "./pde-routing.module";
-import { PdeComponent } from "./pde.component";
+import { PdeWrapperComponent } from "./pde-wrapper/pde-wrapper.component";
 import { ThreeDSurfaceComponent } from "./three-d-surface/three-d-surface.component";
 import { VectorPlotComponent } from "./vector-plot/vector-plot.component";
+ 
 
 const config: HighchartsConfig = {
   cdnBaseUrl: "https://code.highcharts.com",
@@ -26,7 +27,7 @@ const config: HighchartsConfig = {
 
 @NgModule({
   declarations: [
-    PdeComponent,
+    PdeWrapperComponent,
     ThreeDSurfaceComponent,
     LineComponent,
     VectorPlotComponent

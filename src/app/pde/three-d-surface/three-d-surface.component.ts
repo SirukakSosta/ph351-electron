@@ -1,14 +1,19 @@
-import { Component, OnInit, Input } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Subscription } from "rxjs";
+import { tap } from "rxjs/operators";
+import { PdeLabService } from "../pde-lab.service";
 
 @Component({
   selector: "app-three-d-surface",
   templateUrl: "./three-d-surface.component.html",
   styleUrls: ["./three-d-surface.component.css"]
 })
-export class ThreeDSurfaceComponent implements OnInit {
-  @Input() potentialMatrix: any;
-  @Input() axis: any;
+export class ThreeDSurfaceComponent implements OnInit, OnDestroy {
+  // @Input() potentialMatrix: any;
+  // @Input() axis: any;
   @Input() title: any;
+  voltageSubscription: Subscription;
+  axisSubscription: Subscription;
 
   public graph = {
     data: [
@@ -39,12 +44,25 @@ export class ThreeDSurfaceComponent implements OnInit {
       }
     }
   };
-  constructor() {}
+  constructor(private lab: PdeLabService) { }
 
   ngOnInit(): void {
-    this.graph.data[0].z = this.potentialMatrix;
-    this.graph.data[0].x = this.axis;
-    this.graph.data[0].y = this.axis;
+    this.voltageSubscription = this.lab.voltageMatrix$.pipe(
+      tap(e => this.graph.data[0].z = e)
+    ).subscribe()
+    this.axisSubscription = this.lab.axis$.pipe(
+      tap(axis => {
+        this.graph.data[0].x = axis;
+        this.graph.data[0].y = axis;
+      })
+    ).subscribe()
+    // this.graph.data[0].z = this.lab.voltageMatrix;
+    // this.graph.data[0].x = this.lab.axis;
+    // this.graph.data[0].y = this.lab.axis;
     this.graph.layout.title = this.title;
+  }
+  ngOnDestroy() {
+    this.voltageSubscription.unsubscribe();
+    this.axisSubscription.unsubscribe();
   }
 }
