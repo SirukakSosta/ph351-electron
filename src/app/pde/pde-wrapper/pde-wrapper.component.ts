@@ -17,7 +17,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   OMEGA = 0.3;
   SIZE: number = 30;
   H = 1 / (this.SIZE - 1);
-  ITERATIONS: number = 100;
+  ITERATIONS: number = 3000;
   ready: boolean = false;
   energy = 0;
   action: string;
@@ -56,7 +56,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     // console.log(test);
     // console.log(lk);
 
-    this.start()
+    // this.start()
   }
   public start() {
     this.ready = false;
