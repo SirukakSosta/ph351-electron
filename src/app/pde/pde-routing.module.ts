@@ -24,7 +24,12 @@ const routes: Routes = [
       {
         path: 'electric-field',
         component: VectorPlotComponent,
-      }
+      }, {
+        path: 'potential-3d',
+        redirectTo: '',
+        pathMatch: 'full'
+      },
+      { path: '**', redirectTo: '' }
     ]
   },
 

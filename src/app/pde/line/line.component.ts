@@ -1,3 +1,4 @@
+import { stripSummaryForJitFileSuffix } from "@angular/compiler/src/aot/util";
 import { Component, Input, OnInit } from "@angular/core";
 import { BehaviorSubject, combineLatest, Observable } from "rxjs";
 import { debounceTime, map, mergeMap, tap } from "rxjs/operators";
@@ -6,7 +7,7 @@ import { PdeLabService } from "../pde-lab.service";
 @Component({
   selector: "app-line",
   templateUrl: "./line.component.html",
-  styleUrls: ["./line.component.css"]
+  styleUrls: ["./line.component.scss"]
 })
 export class LineComponent implements OnInit {
   // @Input() potentialMatrix: any;
@@ -16,8 +17,9 @@ export class LineComponent implements OnInit {
   // cX = 0;
   public graph = {
     layout: {
-      width: 1200,
-      height: 800,
+      // width: 1200,
+      // height: 800,
+      autosize :stripSummaryForJitFileSuffix,
       title: "hi",
       xaxis: {
         title: "Y - Distance units"

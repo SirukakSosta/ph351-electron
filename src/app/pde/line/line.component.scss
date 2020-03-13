@@ -1,0 +1,10 @@
+:host {
+    ::ng-deep.plot-container plotly {
+        height: 100%;
+
+    }
+    ::ng-deep.js-plotly-plot  {
+        height: 100%;
+
+    }
+}

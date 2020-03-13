@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { debounceTime, map } from "rxjs/operators";
-import { getColumnFrom2dArray, getHFromSize } from "./method";
 import { ElectricField } from "./electricField";
+import { getHFromSize } from "./method";
 
 @Injectable({
   providedIn: "root"
@@ -167,5 +167,10 @@ export class PdeLabService {
       let value = (temp[i] - temp[i - 1]) / _H;
       return value;
     }
+  }
+
+  resetVariables(){
+    this.voltageMatrix$$.next([])
+    this.axis$$.next([])
   }
 }

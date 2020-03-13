@@ -57,14 +57,15 @@
     </div>
 
   </div>
-  <div class="plotly-container">
+  <div class="plotly-container h-100 d-flex flex-column h-100" *ngIf="voltageMatrixHasBeenCalculated | async">
     <div class="graph-btns" *ngIf="ready">
       <div class="btn" routerLinkActive="active-chart" [routerLink]="['potential-3d']">3D Potential</div>
       <div class="btn" routerLinkActive="active-chart" [routerLink]="['potential-2d']">2D Potential</div>
       <div class="btn" routerLinkActive="active-chart" [routerLink]="['electric-field']">2D Electric field</div>
     </div>
-    <router-outlet *ngIf="voltageMatrixHasBeenCalculated | async"></router-outlet>
-
+    <div class="flex-grow">
+      <router-outlet *ngIf="voltageMatrixHasBeenCalculated | async"></router-outlet>
+    </div>
     <!-- <ng-container *ngIf="action === '3D' && ready">
       <app-three-d-surface [potentialMatrix]="voltageMatrix" [axis]="axis" [title]="'3d potential'">
       </app-three-d-surface>
