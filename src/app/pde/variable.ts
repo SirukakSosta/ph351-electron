@@ -1,3 +1,4 @@
+import { cos, sin } from "mathjs";
 import { AM } from "./interface";
 
 export const exerciseChargeEquationMap: Record<
@@ -15,8 +16,8 @@ export const exerciseChargeEquationMap: Record<
   },
   "3131": {
     chargeEquation: (x: number, y: number, h: number) => {
-      return Math.pow(h, 2) * (12.0 * Math.pow(x, 2));
+      return Math.pow(h, 2) * ((cos(x * Math.PI)) + Math.pow(y, 2) * (sin(y * Math.PI)))
     },
-    latex: "S(x,y) = 12 *x^2"
+    latex: "S(x,y) = cos(x * π) + y^2 * sin(y *π)"
   }
 };
