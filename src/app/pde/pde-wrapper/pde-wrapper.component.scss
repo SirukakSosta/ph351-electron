@@ -3,10 +3,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
   .form {
     padding: 5px;
+
     .item {
       margin-bottom: 0.5rem;
+
       label {
         margin-bottom: 0;
       }
@@ -76,8 +79,9 @@ app-loading {
   z-index: 5;
   background: rgba(6, 1, 1, 0.82);
 }
+
 .layout {
-  height: 100vh;
+  height: 100%;
 }
 
 .logo {

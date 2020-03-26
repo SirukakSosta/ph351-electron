@@ -9,8 +9,7 @@ import { PdeLabService } from "../pde-lab.service";
   styleUrls: ["./three-d-surface.component.css"]
 })
 export class ThreeDSurfaceComponent implements OnInit, OnDestroy {
-  // @Input() potentialMatrix: any;
-  // @Input() axis: any;
+
   @Input() title: any;
   voltageSubscription: Subscription;
   axisSubscription: Subscription;
@@ -34,8 +33,9 @@ export class ThreeDSurfaceComponent implements OnInit, OnDestroy {
       }
     ],
     layout: {
+      autosize: true,
       width: 1200,
-      height: 800,
+      height: 600,
       title: this.title,
       scene: {
         xaxis: { title: "X - Distance unit" },
@@ -47,18 +47,18 @@ export class ThreeDSurfaceComponent implements OnInit, OnDestroy {
   constructor(private lab: PdeLabService) { }
 
   ngOnInit(): void {
+
     this.voltageSubscription = this.lab.voltageMatrix$.pipe(
       tap(e => this.graph.data[0].z = e)
     ).subscribe()
+
     this.axisSubscription = this.lab.axis$.pipe(
       tap(axis => {
         this.graph.data[0].x = axis;
         this.graph.data[0].y = axis;
       })
     ).subscribe()
-    // this.graph.data[0].z = this.lab.voltageMatrix;
-    // this.graph.data[0].x = this.lab.axis;
-    // this.graph.data[0].y = this.lab.axis;
+
     this.graph.layout.title = this.title;
   }
   ngOnDestroy() {

@@ -12,6 +12,9 @@ export const routes: Routes = [
                     path: 'pde', loadChildren: () => import('../pde/pde.module').then(e => e.PdeModule)
                 },
                 {
+                    path: 'ed', loadChildren: () => import('../ed/ed.module').then(e => e.EdModule)
+                },
+                {
                     path: '',
                     redirectTo: '/core/pde',
                     pathMatch: 'full'
