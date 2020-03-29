@@ -1,7 +1,7 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-import { RouterModule } from "@angular/router";
 import { LayoutModule } from "../layout/layout.module";
+import { MathCommonModule } from "../math-common/math-common.module";
 import { SharedModule } from "../shared/shared.module";
 import { EdRoutingModule } from "./ed-routing.module";
 import { EdWrapperComponent } from './ed-wrapper/ed-wrapper.component';
@@ -18,9 +18,10 @@ import { EdWrapperComponent } from './ed-wrapper/ed-wrapper.component';
 
     EdRoutingModule,
 
+    LayoutModule,
+    MathCommonModule
 
-    RouterModule,
-    LayoutModule
+
   ],
 })
 export class EdModule { }

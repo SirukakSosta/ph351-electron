@@ -98,12 +98,14 @@
     "@howtimeflies/ngx-highcharts": "1.2.0",
     "@ng-bootstrap/ng-bootstrap": "6.0.0",
     "@types/mathjs": "6.0.4",
+    "@types/numeric": "1.2.0",
     "angular-plotly.js": "2.0.0",
     "highcharts": "8.0.4",
     "mathjax": "3.0.1",
     "mathjs": "6.6.1",
     "ng-katex": "2.0.3",
     "ng-zorro-antd": "8.5.2",
+    "numeric": "1.2.6",
     "plotly.js": "1.52.3"
   }
 }

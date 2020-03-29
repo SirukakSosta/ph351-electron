@@ -13,6 +13,7 @@ export class EdWrapperComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+
   }
 
 }
