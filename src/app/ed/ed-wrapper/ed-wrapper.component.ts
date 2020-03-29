@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { EdLabService } from '../ed-lab.service';
 
 @Component({
   selector: 'app-ed-wrapper',
@@ -10,9 +11,11 @@ export class EdWrapperComponent implements OnInit {
   // todo
   // play with https://github.com/sasekazu/visualize-jacobi-diagonalization/blob/master/js/main.js
 
-  constructor() { }
+  constructor(private lab: EdLabService) { }
 
   ngOnInit(): void {
+
+    // this.lab.diagonalize()
 
   }
 

@@ -37,7 +37,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     map(e => !!e[0] && !!e[0].length)
   );
 
-  constructor(private route: ActivatedRoute, private lab: PdeLabService) {}
+  constructor(private route: ActivatedRoute, private lab: PdeLabService) { }
 
   ngOnInit(): void {
     this.exerciseSubscription = this.route.paramMap
@@ -101,7 +101,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     this.energy =
       Math.round(
         (this.calculateTotalEnergy(this.lab.voltageMatrix) + Number.EPSILON) *
-          10000
+        10000
       ) / 10000;
 
     // this.calculateDerivativeMatrices();
@@ -229,14 +229,8 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     let sumTwo = 0.0;
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
-        let firstTerm = Math.pow(
-          this.getVoltage(i, j) - this.getVoltage(i - 1, j),
-          2
-        );
-        let secondTerm = Math.pow(
-          this.getVoltage(i, j) - this.getVoltage(i, j - 1),
-          2
-        );
+        let firstTerm = Math.pow(this.getVoltage(i, j) - this.getVoltage(i - 1, j), 2);
+        let secondTerm = Math.pow(this.getVoltage(i, j) - this.getVoltage(i, j - 1), 2);
         let thirdTerm = this.chargeMatrix[i][j] * this.lab.voltageMatrix[i][j];
         sumOne += firstTerm + secondTerm;
         if (i < this.SIZE - 2 || j < this.SIZE - 2) {
@@ -294,11 +288,11 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     let p =
       (1 - this.OMEGA) * this.lab.voltageMatrix[i][j] +
       (this.OMEGA / 4.0) *
-        (this.lab.voltageMatrix[i + 1][j] +
-          this.lab.voltageMatrix[i - 1][j] +
-          this.lab.voltageMatrix[i][j + 1] +
-          this.lab.voltageMatrix[i][j - 1] +
-          this.chargeMatrix[i][j]);
+      (this.lab.voltageMatrix[i + 1][j] +
+        this.lab.voltageMatrix[i - 1][j] +
+        this.lab.voltageMatrix[i][j + 1] +
+        this.lab.voltageMatrix[i][j - 1] +
+        this.chargeMatrix[i][j]);
     return p;
   }
   private calculateCharge(i: number, j: number): number {
