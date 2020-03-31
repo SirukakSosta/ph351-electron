@@ -100,11 +100,11 @@ export class EdCoreService {
     let m = 1;
     let i = 1;
     // lets find k = 4;
-    const k = 6;
+    const k = 8;
     let realPart = 0;
     let imageinaryPart = 0;
     let finalData = [];
-    for (let dt = 1; dt < 100; dt += 0.1) {
+    for (let dt = 0.1; dt < 100; dt += 0.1) {
       for (let i = 0; i < N; i++) {
         for (let m = 0; m < N; m++) {
           const Z_IM_PART = this.createZpart(m, i, eigenVectors, basisVectors);
@@ -123,9 +123,9 @@ export class EdCoreService {
               Math.sin(eigenValues[m] * dt);
         }
       }
-      const magnitude = Math.sqrt(
-        Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2)
-      );
+      const magnitude =
+        Math.sqrt(Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2)) /
+        (Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2));
       finalData.push({ time: dt, mag: magnitude });
     }
     // console.log("finaldata", finalData);

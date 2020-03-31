@@ -12,6 +12,7 @@ export class EdWrapperComponent implements OnInit {
   // play with https://github.com/sasekazu/visualize-jacobi-diagonalization/blob/master/js/main.js
   data: any;
   layout: any;
+  dataHist: any;
   constructor(
     // private lab: EdLabService,
     private _edCoreService: EdCoreService
@@ -39,5 +40,24 @@ export class EdWrapperComponent implements OnInit {
     };
     this.data = data;
     this.layout = layout;
+    this.dataHist = [
+      {
+        ...trace1,
+        type: "histogram2d",
+        histnorm: "probability",
+        autobinx: false,
+        autobiny: false,
+        xbins: {
+          start: 0,
+          end: 10,
+          size: 0.01
+        },
+        ybins: {
+          start: 0,
+          end: 1,
+          size: 0.1
+        }
+      }
+    ];
   }
 }
