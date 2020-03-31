@@ -20,10 +20,12 @@ export class EdCoreService {
     const ans = (<any>math).eigs(hamiltonianMatrix);
     const { values, vectors } = ans;
     const eigenValues = values;
-    const eigenVectors = vectors; /** IMPORTANT - vectors are in rows in this matrix */
+    const eigenVectors = this.normalizeEigenVectors(
+      vectors
+    ); /** IMPORTANT - vectors are in rows in this matrix */
     // console.log("EIGEN VALUES + VECTORS");
-    // console.table(values);
-    // console.table(vectors);
+    console.table(values);
+    console.table(vectors);
     return this.constractParts(
       initialVector,
       eigenValues,
@@ -123,9 +125,9 @@ export class EdCoreService {
               Math.sin(eigenValues[m] * dt);
         }
       }
-      const magnitude =
-        Math.sqrt(Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2)) /
-        (Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2));
+      let magnitude = Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2);
+      magnitude = Math.sqrt(magnitude);
+      // (Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2));
       finalData.push({ time: dt, mag: magnitude });
     }
     // console.log("finaldata", finalData);
@@ -173,5 +175,19 @@ export class EdCoreService {
       tmp.push(basisVectors[row][col]);
     }
     return tmp;
+  }
+  private normalizeEigenVectors(
+    eigenVectors: Array<Array<any>>
+  ): Array<Array<any>> {
+    for (let row = 0; row < N; row++) {
+      let count = 0;
+      for (let col = 0; col < N; col++) {
+        count = count + eigenVectors[row][col];
+      }
+      for (let i = 0; i < N; i++) {
+        eigenVectors[row][i] = eigenVectors[row][i] / count;
+      }
+    }
+    return eigenVectors;
   }
 }
