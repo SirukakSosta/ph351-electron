@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import * as math from "mathjs";
 
 /** Constants */
-const N = 4; /** Grid size */
+const N = 10; /** Grid size */
 const step = 1 / N; /** Step */
 @Injectable({
   providedIn: "root"
@@ -15,6 +15,11 @@ export class EdCoreService {
     const hamiltonianMatrix = this.hamiltonianMatrix(basisVectors);
     console.log("hamiltonianMatrix Created");
     console.table(hamiltonianMatrix);
+    const ans = (<any>math).eigs(hamiltonianMatrix);
+    const { values, vectors } = ans;
+    console.log("EIGEN VALUES + VECTORS");
+    console.table(values);
+    console.table(vectors);
   }
 
   private createVectorBase(): Array<Array<number>> {
@@ -37,19 +42,19 @@ export class EdCoreService {
 
     for (let i = 0; i < N; i++) {
       let k = 0;
-      console.log(
-        "----------------------------------------------------------------------"
-      );
-      console.log("Hamiltonian N=", i);
+      // console.log(
+      //   "----------------------------------------------------------------------"
+      // );
+      // console.log("Hamiltonian N=", i);
       /** Sunoriaki sinithiki */
       if (i === N - 1) {
         k = -1; /** gia na girisi sosta sti mideniki thesi */
       } else {
         k = i;
       }
-      console.log("BRACKETS");
-      console.log(`|${k + 1}><${i}|`);
-      console.log(`|${i}><${k + 1}|`);
+      // console.log("BRACKETS");
+      // console.log(`|${k + 1}><${i}|`);
+      // console.log(`|${i}><${k + 1}|`);
       const firstPartColumn = this.columnVector(basisVectors, k + 1);
       const firstPartRow = this.rowVector(basisVectors, i);
       const secondPartColumn = this.columnVector(basisVectors, i);
@@ -68,9 +73,9 @@ export class EdCoreService {
         }
       }
       // console.table(tmp);
-      console.log(
-        "----------------------------------------------------------------------"
-      );
+      // console.log(
+      //   "----------------------------------------------------------------------"
+      // );
     }
 
     return hamiltonian;
