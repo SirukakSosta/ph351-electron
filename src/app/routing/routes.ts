@@ -16,13 +16,9 @@ export const routes: Routes = [
             loadChildren: () =>
               import("../pde/pde.module").then(e => e.PdeModule)
           },
-
           {
-            path: "diagonization",
-            loadChildren: () =>
-              import("../diagonization/diagonization.module").then(
-                e => e.DiagonizationModule
-              )
+            path: "ed",
+            loadChildren: () => import("../ed/ed.module").then(e => e.EdModule)
           },
           {
             path: "",
