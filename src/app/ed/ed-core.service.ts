@@ -8,18 +8,29 @@ const step = 1 / N; /** Step */
   providedIn: "root"
 })
 export class EdCoreService {
-  constructor() {
-    const initialVector = [];
-    const basisVectors = this.createVectorBase();
+  constructor() {}
+
+  public start() {
+    const initialVector = [1, 2, 1, 0, 1, 2, 1, 0, 2, 1];
+    const basisVectors = this.createVectorBase(); /** IMPORTANT - vectors are in columns in this matrix */
     console.log("BasiVector Created");
     const hamiltonianMatrix = this.hamiltonianMatrix(basisVectors);
     console.log("hamiltonianMatrix Created");
     console.table(hamiltonianMatrix);
     const ans = (<any>math).eigs(hamiltonianMatrix);
     const { values, vectors } = ans;
-    console.log("EIGEN VALUES + VECTORS");
-    console.table(values);
-    console.table(vectors);
+    const eigenValues = values;
+    const eigenVectors = vectors; /** IMPORTANT - vectors are in rows in this matrix */
+    // console.log("EIGEN VALUES + VECTORS");
+    // console.table(values);
+    // console.table(vectors);
+    return this.constractParts(
+      initialVector,
+      eigenValues,
+      eigenVectors,
+      basisVectors
+    );
+    // retun
   }
 
   private createVectorBase(): Array<Array<number>> {
@@ -80,6 +91,53 @@ export class EdCoreService {
 
     return hamiltonian;
   }
+  private constractParts(
+    initialVector,
+    eigenValues,
+    eigenVectors,
+    basisVectors
+  ) {
+    let m = 1;
+    let i = 1;
+    // lets find k = 4;
+    const k = 6;
+    let realPart = 0;
+    let imageinaryPart = 0;
+    let finalData = [];
+    for (let dt = 1; dt < 100; dt += 0.1) {
+      for (let i = 0; i < N; i++) {
+        for (let m = 0; m < N; m++) {
+          const Z_IM_PART = this.createZpart(m, i, eigenVectors, basisVectors);
+          const Z_KM_PART = this.createZpart(m, k, eigenVectors, basisVectors);
+          realPart =
+            realPart +
+            initialVector[i] *
+              Z_IM_PART *
+              Z_KM_PART *
+              Math.cos(eigenValues[m] * dt);
+          imageinaryPart =
+            imageinaryPart +
+            initialVector[i] *
+              Z_IM_PART *
+              Z_KM_PART *
+              Math.sin(eigenValues[m] * dt);
+        }
+      }
+      const magnitude = Math.sqrt(
+        Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2)
+      );
+      finalData.push({ time: dt, mag: magnitude });
+    }
+    // console.log("finaldata", finalData);
+    return finalData;
+  }
+  private createZpart(m, i, eigenVectors, basisVectors): number {
+    // <e_m|x_i>
+    const x_i = this.columnVector(basisVectors, i);
+    const e_m = this.rowVector(eigenVectors, m);
+    const zPartIM = this.calculateBraKet(x_i, e_m);
+    return zPartIM;
+  }
   private calculateketBra(
     columnVector: Array<number>,
     rowVector: Array<number>
@@ -91,6 +149,16 @@ export class EdCoreService {
       }
     }
     return currentMatrix;
+  }
+  private calculateBraKet(
+    columnVector: Array<number>,
+    rowVector: Array<number>
+  ): number {
+    let dotProduct = 0;
+    for (let i = 0; i < N; i++) {
+      dotProduct = dotProduct + columnVector[i] * rowVector[i];
+    }
+    return dotProduct;
   }
   private columnVector(basisVectors, col) {
     let tmp = [];
