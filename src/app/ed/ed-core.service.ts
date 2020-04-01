@@ -14,8 +14,9 @@ export class EdCoreService {
     let initialVector = [1, 1, 1, 0, 1, 2, 1, 0, 2, 1];
     initialVector = this.normalizeVector(initialVector);
     const basisVectors = this.createVectorBase(); /** IMPORTANT - vectors are in columns in this matrix */
-    const hamiltonianMatrix = this.hamiltonianMatrix(basisVectors);
-    const ans = (<any>math).eigs(hamiltonianMatrix);
+    let hamiltonianMatrix = this.hamiltonianMatrix(basisVectors);
+    let hamiltonianMatrixWithPotential = this.addPotential(hamiltonianMatrix);
+    const ans = (<any>math).eigs(hamiltonianMatrixWithPotential);
     const { values, vectors } = ans;
     const eigenValues = values;
     /** IMPORTANT - vectors are in rows in this matrix */
@@ -74,6 +75,34 @@ export class EdCoreService {
 
     return hamiltonian;
   }
+  addPotential(oldHamiltonian: Array<Array<number>>): Array<Array<number>> {
+    let newHamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
+    for (let row = 0; row < N; row++) {
+      for (let col = 0; col < N; col++) {
+        //  prostheto stixia mono sth diagonio
+        if (row === col) {
+          console.log(this.potentialFunction(row));
+          newHamiltonian[row][col] =
+            oldHamiltonian[row][col] + this.potentialFunction(row);
+        } else {
+          newHamiltonian[row][col] = oldHamiltonian[row][col];
+        }
+      }
+    }
+    return newHamiltonian;
+  }
+  potentialFunction(i: number): number {
+    console.log("real", i, this.relalX(i));
+    const x = this.relalX(i);
+    const factor = 1;
+    const harmonicOscilator = factor * Math.pow(x, 2);
+    return harmonicOscilator;
+    // x = transform i to real x
+  }
+  relalX(i: number): number {
+    const x = i / (N - 1);
+    return x;
+  }
   private constractParts(
     initialVector,
     eigenValues,
@@ -85,7 +114,7 @@ export class EdCoreService {
     // lets find k = 4;
     const k = 8;
     let finalData = [];
-    for (let dt = 0.1; dt < 50; dt += 0.01) {
+    for (let dt = 0; dt < 50; dt += 0.01) {
       let realPart = 0;
       let imageinaryPart = 0;
       for (let i = 0; i < N; i++) {
@@ -181,5 +210,14 @@ export class EdCoreService {
       tmp.push(vector[i] / count);
     }
     return tmp;
+  }
+  generateGuassianVector(): Array<number> {
+    let gaussianVector = [];
+    for (let i = 0; i < N; i++) {
+      const x = this.relalX(i);
+      const gauss = Math.exp(-(Math.pow(x, 2) / 2));
+      gaussianVector.push(gauss);
+    }
+    return [];
   }
 }
