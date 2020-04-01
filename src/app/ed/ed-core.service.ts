@@ -11,7 +11,8 @@ export class EdCoreService {
   constructor() {}
 
   public start() {
-    const initialVector = [1, 2, 1, 0, 1, 2, 1, 0, 2, 1];
+    let initialVector = [1, 1, 1, 0, 1, 2, 1, 0, 2, 1];
+    initialVector = this.normalizeVector(initialVector);
     const basisVectors = this.createVectorBase(); /** IMPORTANT - vectors are in columns in this matrix */
     console.log("BasiVector Created");
     const hamiltonianMatrix = this.hamiltonianMatrix(basisVectors);
@@ -20,12 +21,15 @@ export class EdCoreService {
     const ans = (<any>math).eigs(hamiltonianMatrix);
     const { values, vectors } = ans;
     const eigenValues = values;
-    const eigenVectors = this.normalizeEigenVectors(
-      vectors
-    ); /** IMPORTANT - vectors are in rows in this matrix */
-    // console.log("EIGEN VALUES + VECTORS");
-    console.table(values);
+    /** IMPORTANT - vectors are in rows in this matrix */
+    console.log("EIGEN VEC - BEFORE NORM");
     console.table(vectors);
+    // const eigenVectors = this.normalizeEigenVectors(
+    //   vectors
+    // ); /** IMPORTANT - vectors are in rows in this matrix */
+    const eigenVectors = vectors;
+    // console.table(values);
+    // console.table(vectors);
     return this.constractParts(
       initialVector,
       eigenValues,
@@ -103,14 +107,16 @@ export class EdCoreService {
     let i = 1;
     // lets find k = 4;
     const k = 8;
-    let realPart = 0;
-    let imageinaryPart = 0;
     let finalData = [];
-    for (let dt = 0.1; dt < 100; dt += 0.1) {
+    for (let dt = 0.1; dt < 50; dt += 0.1) {
+      let realPart = 0;
+      let imageinaryPart = 0;
       for (let i = 0; i < N; i++) {
         for (let m = 0; m < N; m++) {
           const Z_IM_PART = this.createZpart(m, i, eigenVectors, basisVectors);
           const Z_KM_PART = this.createZpart(m, k, eigenVectors, basisVectors);
+          // console.log("cos", Math.cos(eigenValues[m] * dt));
+          // console.log("sin", Math.cos(eigenValues[m] * dt));
           realPart =
             realPart +
             initialVector[i] *
@@ -125,8 +131,10 @@ export class EdCoreService {
               Math.sin(eigenValues[m] * dt);
         }
       }
+      //I DONT
+      // console.log("PARTS (R,I)", realPart, imageinaryPart);
       let magnitude = Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2);
-      magnitude = Math.sqrt(magnitude);
+      // magnitude = Math.sqrt(magnitude);
       // (Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2));
       finalData.push({ time: dt, mag: magnitude });
     }
@@ -179,15 +187,32 @@ export class EdCoreService {
   private normalizeEigenVectors(
     eigenVectors: Array<Array<any>>
   ): Array<Array<any>> {
+    let tmp = new Array(N).fill(0).map(() => new Array(N).fill(0));
     for (let row = 0; row < N; row++) {
       let count = 0;
       for (let col = 0; col < N; col++) {
-        count = count + eigenVectors[row][col];
+        count = count + Math.pow(eigenVectors[row][col], 2);
       }
+      console.log("count is sqrt", Math.sqrt(count));
       for (let i = 0; i < N; i++) {
-        eigenVectors[row][i] = eigenVectors[row][i] / count;
+        console.log("norm before", eigenVectors[row][i]);
+        tmp[row][i] = eigenVectors[row][i] / Math.sqrt(count);
+        console.log("norm aftre", tmp[row][i]);
       }
     }
-    return eigenVectors;
+    return tmp;
+  }
+  private normalizeVector(vector: Array<number>): Array<number> {
+    let tmp = [];
+    let count = 0;
+    for (let i = 0; i < N; i++) {
+      count = count + Math.pow(vector[i], 2);
+    }
+    count = Math.sqrt(count);
+
+    for (let i = 0; i < N; i++) {
+      tmp.push(vector[i] / count);
+    }
+    return tmp;
   }
 }
