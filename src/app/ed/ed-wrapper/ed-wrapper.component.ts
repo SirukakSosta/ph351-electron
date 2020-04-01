@@ -36,6 +36,7 @@ export class EdWrapperComponent implements OnInit {
     this.listOfOption = children;
     // this.lab.diagonalize()
     const states = this._edCoreService.start();
+    console.log(states);
     // states.forEach((state, index) => {
     //   let trace1 = {
     //     x: [],

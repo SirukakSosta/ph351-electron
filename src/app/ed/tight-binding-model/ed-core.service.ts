@@ -1,7 +1,14 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
 import { MatrixHelperService } from "./matrix-helper.service";
-import { N, STEP, TIME_STEP, TIME_END, TIME_START } from "./defaults";
+import {
+  N,
+  STEP,
+  TIME_STEP,
+  TIME_END,
+  TIME_START,
+  createVectorBase
+} from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
 
 @Injectable({
@@ -18,10 +25,12 @@ export class EdCoreService {
   ) {}
 
   public start() {
-    let initialVector = [1, 1, 1, 0, 1, 2, 1, 0, 2, 1];
+    let initialVector = this._matrixHelper.generateRandomVector();
     initialVector = this._matrixHelper.normalizeVector(initialVector);
-    const basisVectors = this.createVectorBase(); /** IMPORTANT - vectors are in columns in this matrix */
-    let hamiltonianMatrix = this.hamiltonianMatrix(basisVectors);
+    const basisVectors = createVectorBase(); /** IMPORTANT - vectors are in columns in this matrix */
+    let hamiltonianMatrix = this._hamiltonianService.generateHamiltonian(
+      basisVectors
+    );
     let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(
       hamiltonianMatrix
     );
@@ -35,85 +44,47 @@ export class EdCoreService {
     this.eigenValues = eigenValues;
     this.basisVectors = basisVectors;
     this.eigenVectors = eigenVectors;
+    // console.log(this.averagePosition());
     return this.constractParts();
     // retun
   }
 
-  private createVectorBase(): Array<Array<number>> {
-    /** kathe sthlh toy pinaka eiai idiodianisma ths bashs */
-    let basisVectors = new Array(N).fill(0).map(() => new Array(N).fill(0));
-    for (let row = 0; row < N; row++) {
-      for (let col = 0; col < N; col++) {
-        if (row === col) {
-          basisVectors[row][col] = 1;
-        }
-      }
-    }
-    return basisVectors;
-  }
-  private hamiltonianMatrix(
-    basisVectors: Array<Array<number>>
-  ): Array<Array<number>> {
-    let hamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
-    let tmp = new Array(N).fill(0).map(() => new Array(N).fill(0));
-
-    for (let i = 0; i < N; i++) {
-      let k = 0;
-      if (i === N - 1) {
-        k = -1; /** gia na girisi sosta sti mideniki thesi */
-      } else {
-        k = i;
-      }
-      const firstPartColumn = this._matrixHelper.getColVector(
-        basisVectors,
-        k + 1
-      );
-      const firstPartRow = this._matrixHelper.getRowVector(basisVectors, i);
-      const secondPartColumn = this._matrixHelper.getColVector(basisVectors, i);
-      const secondPartRow = this._matrixHelper.getRowVector(
-        basisVectors,
-        k + 1
-      );
-
-      const firstPart = this._matrixHelper.calculateketBra(
-        firstPartColumn,
-        firstPartRow
-      );
-      const secondPart = this._matrixHelper.calculateketBra(
-        secondPartColumn,
-        secondPartRow
-      );
-
-      /** Add the two matrices for N step */
-      for (let row = 0; row < N; row++) {
-        for (let col = 0; col < N; col++) {
-          tmp[row][col] = firstPart[row][col] + secondPart[row][col];
-          hamiltonian[row][col] =
-            hamiltonian[row][col] + firstPart[row][col] + secondPart[row][col];
-        }
-      }
-    }
-
-    return hamiltonian;
-  }
-
   private constractParts() {
-    let m = 1;
-    let i = 1;
-    // lets find k = 4;
-    const k = 8;
     let states = [];
-    for (let k = 0; k < N; k++) {
-      let finalDataForEachState = [];
-      for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
-        finalDataForEachState.push({
-          time: dt,
-          mag: this.getPropability(dt, k)
-        });
-      }
-      states.push(finalDataForEachState);
+    // for (let k = 0; k < N; k++) {
+    let finalDataForEachState = [];
+    for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
+      finalDataForEachState.push({
+        time: dt,
+        mag: this.getPropability(dt, 50)
+      });
     }
+    states.push(finalDataForEachState);
+    // }
     return states;
+  }
+  private averagePosition() {
+    let averageXOverTime = [];
+    for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
+      console.log(
+        `dt is ${dt}--------------------------------------------------`
+      );
+
+      let propabilityOverAllStates = 0;
+      let test = "";
+      for (let k = 0; k < N; k++) {
+        const propability = this.getPropability(dt, k);
+        test += ", " + propability.toFixed(4);
+        propabilityOverAllStates += propability;
+        // console.log("k", k, propability);
+      }
+      averageXOverTime.push(propabilityOverAllStates);
+      // console.log(test + "----" + propabilityOverAllStates);
+      console.log(`--------------------------------------------------`);
+    }
+
+    // console.log(test);
+    return averageXOverTime;
   }
   private getPropability(dt: number, state: number): number {
     let realPart = 0;
