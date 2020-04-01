@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { EdLabService } from "../ed-lab.service";
-import { EdCoreService } from "../ed-core.service";
+import { EdCoreService } from "../tight-binding-model/ed-core.service";
 
 @Component({
   selector: "app-ed-wrapper",

@@ -45,7 +45,7 @@ export class MatrixHelperService {
     }
     return dotProduct;
   }
-  private calculateketBra(
+  public calculateketBra(
     columnVector: Array<number>,
     rowVector: Array<number>
   ): Array<Array<any>> {
@@ -57,5 +57,21 @@ export class MatrixHelperService {
       }
     }
     return currentMatrix;
+  }
+  public getColVector(basisVectors: Array<Array<number>>, col: number) {
+    const N = basisVectors.length;
+    let tmp = [];
+    for (let row = 0; row < N; row++) {
+      tmp.push(basisVectors[row][col]);
+    }
+    return tmp;
+  }
+  public getRowVector(basisVectors: Array<Array<number>>, row: number) {
+    const N = basisVectors.length;
+    let tmp = [];
+    for (let col = 0; col < N; col++) {
+      tmp.push(basisVectors[row][col]);
+    }
+    return tmp;
   }
 }

@@ -1,13 +1,9 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
 import { MatrixHelperService } from "./matrix-helper.service";
+import { N, STEP, TIME_STEP, TIME_END, TIME_START } from "./defaults";
+import { HamiltonianService } from "./hamiltonian.service";
 
-/** Constants */
-const N = 10; /** Grid size */
-const step = 1 / N; /** Step */
-const TIME_START = 0;
-const TIME_END = 100;
-const TIME_STEP = 0.1;
 @Injectable({
   providedIn: "root"
 })
@@ -16,14 +12,19 @@ export class EdCoreService {
   private eigenValues: Array<any>;
   private eigenVectors: Array<any>;
   private basisVectors: Array<any>;
-  constructor(private _matrixHelper: MatrixHelperService) {}
+  constructor(
+    private _matrixHelper: MatrixHelperService,
+    private _hamiltonianService: HamiltonianService
+  ) {}
 
   public start() {
     let initialVector = [1, 1, 1, 0, 1, 2, 1, 0, 2, 1];
     initialVector = this._matrixHelper.normalizeVector(initialVector);
     const basisVectors = this.createVectorBase(); /** IMPORTANT - vectors are in columns in this matrix */
     let hamiltonianMatrix = this.hamiltonianMatrix(basisVectors);
-    let hamiltonianMatrixWithPotential = this.addPotential(hamiltonianMatrix);
+    let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(
+      hamiltonianMatrix
+    );
     const ans = (<any>math).eigs(hamiltonianMatrixWithPotential);
     const { values, vectors } = ans;
     const eigenVectors = vectors;
@@ -63,10 +64,16 @@ export class EdCoreService {
       } else {
         k = i;
       }
-      const firstPartColumn = this.columnVector(basisVectors, k + 1);
-      const firstPartRow = this.rowVector(basisVectors, i);
-      const secondPartColumn = this.columnVector(basisVectors, i);
-      const secondPartRow = this.rowVector(basisVectors, k + 1);
+      const firstPartColumn = this._matrixHelper.getColVector(
+        basisVectors,
+        k + 1
+      );
+      const firstPartRow = this._matrixHelper.getRowVector(basisVectors, i);
+      const secondPartColumn = this._matrixHelper.getColVector(basisVectors, i);
+      const secondPartRow = this._matrixHelper.getRowVector(
+        basisVectors,
+        k + 1
+      );
 
       const firstPart = this._matrixHelper.calculateketBra(
         firstPartColumn,
@@ -89,34 +96,7 @@ export class EdCoreService {
 
     return hamiltonian;
   }
-  addPotential(oldHamiltonian: Array<Array<number>>): Array<Array<number>> {
-    let newHamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
-    for (let row = 0; row < N; row++) {
-      for (let col = 0; col < N; col++) {
-        //  prostheto stixia mono sth diagonio
-        if (row === col) {
-          console.log(this.potentialFunction(row));
-          newHamiltonian[row][col] =
-            oldHamiltonian[row][col] + this.potentialFunction(row);
-        } else {
-          newHamiltonian[row][col] = oldHamiltonian[row][col];
-        }
-      }
-    }
-    return newHamiltonian;
-    return oldHamiltonian;
-  }
-  potentialFunction(i: number): number {
-    const x = this.relalX(i);
-    const factor = 1;
-    const harmonicOscilator = factor * Math.pow(x, 2);
-    return harmonicOscilator;
-    // x = transform i to real x
-  }
-  relalX(i: number): number {
-    const x = i / (N - 1);
-    return x;
-  }
+
   private constractParts() {
     let m = 1;
     let i = 1;
@@ -161,24 +141,9 @@ export class EdCoreService {
   }
   private createZpart(m, i): number {
     // <e_m|x_i>
-    const x_i = this.columnVector(this.basisVectors, i);
-    const e_m = this.rowVector(this.eigenVectors, m);
+    const x_i = this._matrixHelper.getColVector(this.basisVectors, i);
+    const e_m = this._matrixHelper.getRowVector(this.eigenVectors, m);
     const zPartIM = this._matrixHelper.calculateBraKet(x_i, e_m);
     return zPartIM;
-  }
-
-  private columnVector(basisVectors, col) {
-    let tmp = [];
-    for (let row = 0; row < N; row++) {
-      tmp.push(basisVectors[row][col]);
-    }
-    return tmp;
-  }
-  private rowVector(basisVectors, row) {
-    let tmp = [];
-    for (let col = 0; col < N; col++) {
-      tmp.push(basisVectors[row][col]);
-    }
-    return tmp;
   }
 }
