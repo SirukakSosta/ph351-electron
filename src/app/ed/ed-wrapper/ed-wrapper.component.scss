@@ -1,5 +1,15 @@
 :host {
-    .layout {
-        height: 100%;
-    }
+  .layout {
+    height: 100%;
+  }
+}
+
+.state-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .item {
+    display: block;
+  }
 }

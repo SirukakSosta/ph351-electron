@@ -10,6 +10,7 @@ import { EdCoreService } from "../ed-core.service";
 export class EdWrapperComponent implements OnInit {
   // todo
   // play with https://github.com/sasekazu/visualize-jacobi-diagonalization/blob/master/js/main.js
+  states = [];
   data: any;
   layout: any;
   dataHist: any;
@@ -20,44 +21,47 @@ export class EdWrapperComponent implements OnInit {
 
   ngOnInit(): void {
     // this.lab.diagonalize()
-    const d = this._edCoreService.start();
-    var trace1 = {
-      x: [],
-      y: [],
-      mode: "lines+markers",
-      name: "Scatter + Lines"
-    };
-    d.forEach(item => {
-      trace1.x.push(item.time);
-      trace1.y.push(item.mag);
-    });
-    let customWidth = 800;
-    console.log(d);
-    var data = [trace1];
-    var layout = {
-      width: customWidth,
-      title: "Adding Names to Line and Scatter Plot"
-    };
-    this.data = data;
-    this.layout = layout;
-    this.dataHist = [
-      {
-        ...trace1,
-        type: "histogram2d",
-        histnorm: "probability",
-        autobinx: false,
-        autobiny: false,
-        xbins: {
-          start: 0,
-          end: 10,
-          size: 0.01
+    const states = this._edCoreService.start();
+    // states.forEach((state, index) => {
+    //   let trace1 = {
+    //     x: [],
+    //     y: [],
+    //     mode: "lines+markers",
+    //     name: "Scatter + Lines"
+    //   };
+    //   state.forEach(item => {
+    //     trace1.x.push(item.time);
+    //     trace1.y.push(item.mag);
+    //   });
+    //   let customWidth = 600;
+    //   var data = [trace1];
+    //   var layout = {
+    //     width: customWidth,
+    //     title: `Propability Time evolution for state ${index + 1}`
+    //   };
+    //   this.states.push({ data, layout });
+    // });
+    let traces = [];
+    states.forEach((state, index) => {
+      let trace1 = {
+        x: [],
+        y: [],
+        marker: {
+          size: 1
         },
-        ybins: {
-          start: 0,
-          end: 1,
-          size: 0.1
-        }
-      }
-    ];
+        mode: "lines+markers",
+        name: `Status - (${index + 1})`
+      };
+
+      trace1.x = state.map(s => s.time);
+      trace1.y = state.map(k => k.mag);
+      traces.push(trace1);
+    });
+    console.log(traces);
+    this.data = traces;
+    this.layout = {
+      width: 1600,
+      title: `Propability Time evolution for state`
+    };
   }
 }

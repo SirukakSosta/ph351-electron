@@ -1,28 +1,17 @@
 <nz-layout class="layout">
   <app-loading *ngIf="loading"></app-loading>
-  <nz-sider
-    nzCollapsible
-    [(nzCollapsed)]="isCollapsed"
-    [nzBreakpoint]="'lg'"
-    [nzCollapsedWidth]="0"
-    [nzZeroTrigger]="zeroTrigger"
-  >
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzBreakpoint]="'lg'" [nzCollapsedWidth]="0"
+    [nzZeroTrigger]="zeroTrigger">
     <div class="menu">
       <div nz-row [nzGutter]="4" class="form">
         <div nz-col [nzSpan]="24">
           <ul nz-menu nzMode="horizontal" [nzTheme]="'dark'">
             <li nz-submenu nzTitle="Students AM" nzIcon="down-square">
               <ul>
-                <li
-                  nz-menu-item
-                  [routerLink]="['/', 'core', 'ed', 'eq', '3131']"
-                >
+                <li nz-menu-item [routerLink]="['/', 'core', 'ed', 'eq', '3131']">
                   Ph 3131
                 </li>
-                <li
-                  nz-menu-item
-                  [routerLink]="['/', 'core', 'ed', 'eq', '3943']"
-                >
+                <li nz-menu-item [routerLink]="['/', 'core', 'ed', 'eq', '3943']">
                   Ph 3943
                 </li>
               </ul>
@@ -46,8 +35,14 @@
                             <a href="#" [routerLink]="['/', 'core', 'ed', 'eq', '3131']">ph3131</a>
                         </li>
                     </ul> -->
+          <!-- <div class="state-container">
+            <ng-container *ngFor="let s of states">
+              <div class="item">
+                <plotly-plot [data]="s.data" [layout]="s.layout"></plotly-plot>
+              </div>
+            </ng-container>
+          </div> -->
           <plotly-plot [data]="data" [layout]="layout"></plotly-plot>
-          <plotly-plot [data]="dataHist" [layout]="layout"></plotly-plot>
         </div>
       </div>
     </nz-content>

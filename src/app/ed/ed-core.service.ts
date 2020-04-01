@@ -4,6 +4,9 @@ import * as math from "mathjs";
 /** Constants */
 const N = 10; /** Grid size */
 const step = 1 / N; /** Step */
+const TIME_START = 0;
+const TIME_END = 100;
+const TIME_STEP = 0.1;
 @Injectable({
   providedIn: "root"
 })
@@ -90,9 +93,9 @@ export class EdCoreService {
       }
     }
     return newHamiltonian;
+    return oldHamiltonian;
   }
   potentialFunction(i: number): number {
-    console.log("real", i, this.relalX(i));
     const x = this.relalX(i);
     const factor = 1;
     const harmonicOscilator = factor * Math.pow(x, 2);
@@ -113,32 +116,49 @@ export class EdCoreService {
     let i = 1;
     // lets find k = 4;
     const k = 8;
-    let finalData = [];
-    for (let dt = 0; dt < 50; dt += 0.01) {
-      let realPart = 0;
-      let imageinaryPart = 0;
-      for (let i = 0; i < N; i++) {
-        for (let m = 0; m < N; m++) {
-          const Z_IM_PART = this.createZpart(m, i, eigenVectors, basisVectors);
-          const Z_KM_PART = this.createZpart(m, k, eigenVectors, basisVectors);
-          realPart =
-            realPart +
-            initialVector[i] *
-              Z_IM_PART *
-              Z_KM_PART *
-              Math.cos(eigenValues[m] * dt);
-          imageinaryPart =
-            imageinaryPart +
-            initialVector[i] *
-              Z_IM_PART *
-              Z_KM_PART *
-              Math.sin(eigenValues[m] * dt);
+    let states = [];
+    for (let k = 0; k < N; k++) {
+      let finalDataForEachState = [];
+      for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
+        let realPart = 0;
+        let imageinaryPart = 0;
+        for (let i = 0; i < N; i++) {
+          for (let m = 0; m < N; m++) {
+            const Z_IM_PART = this.createZpart(
+              m,
+              i,
+              eigenVectors,
+              basisVectors
+            );
+            const Z_KM_PART = this.createZpart(
+              m,
+              k,
+              eigenVectors,
+              basisVectors
+            );
+            realPart =
+              realPart +
+              initialVector[i] *
+                Z_IM_PART *
+                Z_KM_PART *
+                Math.cos(eigenValues[m] * dt);
+            imageinaryPart =
+              imageinaryPart +
+              initialVector[i] *
+                Z_IM_PART *
+                Z_KM_PART *
+                Math.sin(eigenValues[m] * dt);
+          }
         }
+        let magnitude = Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2);
+        finalDataForEachState.push({
+          time: dt,
+          mag: magnitude
+        });
       }
-      let magnitude = Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2);
-      finalData.push({ time: dt, mag: magnitude });
+      states.push(finalDataForEachState);
     }
-    return finalData;
+    return states;
   }
   private createZpart(m, i, eigenVectors, basisVectors): number {
     // <e_m|x_i>
