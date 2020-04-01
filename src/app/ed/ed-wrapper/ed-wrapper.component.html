@@ -42,6 +42,13 @@
               </div>
             </ng-container>
           </div> -->
+          <div class="selection">Select a state: <nz-select [(ngModel)]="singleValue" [nzSize]="size"
+              (ngModelChange)="selectNewData(singleValue)">
+              <nz-option *ngFor="let option of listOfOption" [nzLabel]="option.label" [nzValue]="option.value">
+              </nz-option>
+            </nz-select>
+          </div>
+
           <plotly-plot [data]="data" [layout]="layout"></plotly-plot>
         </div>
       </div>

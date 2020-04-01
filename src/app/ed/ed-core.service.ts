@@ -1,5 +1,6 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
+import { MatrixHelperService } from "./matrix-helper.service";
 
 /** Constants */
 const N = 10; /** Grid size */
@@ -11,25 +12,29 @@ const TIME_STEP = 0.1;
   providedIn: "root"
 })
 export class EdCoreService {
-  constructor() {}
+  private initialVector: Array<any>;
+  private eigenValues: Array<any>;
+  private eigenVectors: Array<any>;
+  private basisVectors: Array<any>;
+  constructor(private _matrixHelper: MatrixHelperService) {}
 
   public start() {
     let initialVector = [1, 1, 1, 0, 1, 2, 1, 0, 2, 1];
-    initialVector = this.normalizeVector(initialVector);
+    initialVector = this._matrixHelper.normalizeVector(initialVector);
     const basisVectors = this.createVectorBase(); /** IMPORTANT - vectors are in columns in this matrix */
     let hamiltonianMatrix = this.hamiltonianMatrix(basisVectors);
     let hamiltonianMatrixWithPotential = this.addPotential(hamiltonianMatrix);
     const ans = (<any>math).eigs(hamiltonianMatrixWithPotential);
     const { values, vectors } = ans;
+    const eigenVectors = vectors;
     const eigenValues = values;
     /** IMPORTANT - vectors are in rows in this matrix */
-    const eigenVectors = vectors;
-    return this.constractParts(
-      initialVector,
-      eigenValues,
-      eigenVectors,
-      basisVectors
-    );
+    /** Set global array/ matrices */
+    this.initialVector = initialVector;
+    this.eigenValues = eigenValues;
+    this.basisVectors = basisVectors;
+    this.eigenVectors = eigenVectors;
+    return this.constractParts();
     // retun
   }
 
@@ -63,8 +68,14 @@ export class EdCoreService {
       const secondPartColumn = this.columnVector(basisVectors, i);
       const secondPartRow = this.rowVector(basisVectors, k + 1);
 
-      const firstPart = this.calculateketBra(firstPartColumn, firstPartRow);
-      const secondPart = this.calculateketBra(secondPartColumn, secondPartRow);
+      const firstPart = this._matrixHelper.calculateketBra(
+        firstPartColumn,
+        firstPartRow
+      );
+      const secondPart = this._matrixHelper.calculateketBra(
+        secondPartColumn,
+        secondPartRow
+      );
 
       /** Add the two matrices for N step */
       for (let row = 0; row < N; row++) {
@@ -106,12 +117,7 @@ export class EdCoreService {
     const x = i / (N - 1);
     return x;
   }
-  private constractParts(
-    initialVector,
-    eigenValues,
-    eigenVectors,
-    basisVectors
-  ) {
+  private constractParts() {
     let m = 1;
     let i = 1;
     // lets find k = 4;
@@ -120,75 +126,47 @@ export class EdCoreService {
     for (let k = 0; k < N; k++) {
       let finalDataForEachState = [];
       for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
-        let realPart = 0;
-        let imageinaryPart = 0;
-        for (let i = 0; i < N; i++) {
-          for (let m = 0; m < N; m++) {
-            const Z_IM_PART = this.createZpart(
-              m,
-              i,
-              eigenVectors,
-              basisVectors
-            );
-            const Z_KM_PART = this.createZpart(
-              m,
-              k,
-              eigenVectors,
-              basisVectors
-            );
-            realPart =
-              realPart +
-              initialVector[i] *
-                Z_IM_PART *
-                Z_KM_PART *
-                Math.cos(eigenValues[m] * dt);
-            imageinaryPart =
-              imageinaryPart +
-              initialVector[i] *
-                Z_IM_PART *
-                Z_KM_PART *
-                Math.sin(eigenValues[m] * dt);
-          }
-        }
-        let magnitude = Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2);
         finalDataForEachState.push({
           time: dt,
-          mag: magnitude
+          mag: this.getPropability(dt, k)
         });
       }
       states.push(finalDataForEachState);
     }
     return states;
   }
-  private createZpart(m, i, eigenVectors, basisVectors): number {
-    // <e_m|x_i>
-    const x_i = this.columnVector(basisVectors, i);
-    const e_m = this.rowVector(eigenVectors, m);
-    const zPartIM = this.calculateBraKet(x_i, e_m);
-    return zPartIM;
-  }
-  private calculateketBra(
-    columnVector: Array<number>,
-    rowVector: Array<number>
-  ): Array<Array<any>> {
-    let currentMatrix = new Array(N).fill(0).map(() => new Array(N).fill(0));
-    for (let row = 0; row < N; row++) {
-      for (let col = 0; col < N; col++) {
-        currentMatrix[row][col] = columnVector[row] * rowVector[col];
+  private getPropability(dt: number, state: number): number {
+    let realPart = 0;
+    let imageinaryPart = 0;
+    for (let i = 0; i < N; i++) {
+      for (let m = 0; m < N; m++) {
+        const Z_IM_PART = this.createZpart(m, i);
+        const Z_KM_PART = this.createZpart(m, state);
+        realPart =
+          realPart +
+          this.initialVector[i] *
+            Z_IM_PART *
+            Z_KM_PART *
+            Math.cos(this.eigenValues[m] * dt);
+        imageinaryPart =
+          imageinaryPart +
+          this.initialVector[i] *
+            Z_IM_PART *
+            Z_KM_PART *
+            Math.sin(this.eigenValues[m] * dt);
       }
     }
-    return currentMatrix;
+    let magnitude = Math.pow(realPart, 2) + Math.pow(imageinaryPart, 2);
+    return magnitude;
   }
-  private calculateBraKet(
-    columnVector: Array<number>,
-    rowVector: Array<number>
-  ): number {
-    let dotProduct = 0;
-    for (let i = 0; i < N; i++) {
-      dotProduct = dotProduct + columnVector[i] * rowVector[i];
-    }
-    return dotProduct;
+  private createZpart(m, i): number {
+    // <e_m|x_i>
+    const x_i = this.columnVector(this.basisVectors, i);
+    const e_m = this.rowVector(this.eigenVectors, m);
+    const zPartIM = this._matrixHelper.calculateBraKet(x_i, e_m);
+    return zPartIM;
   }
+
   private columnVector(basisVectors, col) {
     let tmp = [];
     for (let row = 0; row < N; row++) {
@@ -202,42 +180,5 @@ export class EdCoreService {
       tmp.push(basisVectors[row][col]);
     }
     return tmp;
-  }
-  private normalizeEigenVectors(
-    eigenVectors: Array<Array<any>>
-  ): Array<Array<any>> {
-    let tmp = new Array(N).fill(0).map(() => new Array(N).fill(0));
-    for (let row = 0; row < N; row++) {
-      let count = 0;
-      for (let col = 0; col < N; col++) {
-        count = count + Math.pow(eigenVectors[row][col], 2);
-      }
-      for (let i = 0; i < N; i++) {
-        tmp[row][i] = eigenVectors[row][i] / Math.sqrt(count);
-      }
-    }
-    return tmp;
-  }
-  private normalizeVector(vector: Array<number>): Array<number> {
-    let tmp = [];
-    let count = 0;
-    for (let i = 0; i < N; i++) {
-      count = count + Math.pow(vector[i], 2);
-    }
-    count = Math.sqrt(count);
-
-    for (let i = 0; i < N; i++) {
-      tmp.push(vector[i] / count);
-    }
-    return tmp;
-  }
-  generateGuassianVector(): Array<number> {
-    let gaussianVector = [];
-    for (let i = 0; i < N; i++) {
-      const x = this.relalX(i);
-      const gauss = Math.exp(-(Math.pow(x, 2) / 2));
-      gaussianVector.push(gauss);
-    }
-    return [];
   }
 }
