@@ -50,6 +50,10 @@
           </div>
 
           <plotly-plot [data]="data" [layout]="layout"></plotly-plot>
+          <div class="chart-container">
+            <ngx-highchart [options]="options" [modules]="['highcharts-3d', 'highcharts-more']" (load)="onLoad($event)">
+            </ngx-highchart>
+          </div>
         </div>
       </div>
     </nz-content>

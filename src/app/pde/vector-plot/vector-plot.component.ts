@@ -19,13 +19,6 @@ export class VectorPlotComponent implements OnInit {
     title: {
       text: "Electric Field"
     },
-    // subtitle: {
-    //   text: "* Jane's banana consumption is unknown",
-    //   floating: true,
-    //   align: "right",
-    //   verticalAlign: "bottom",
-    //   y: 15
-    // },
     legend: {
       layout: "vertical",
       align: "left",
@@ -48,14 +41,8 @@ export class VectorPlotComponent implements OnInit {
       max: 1,
       title: {
         text: "y"
-        //align: 'center'
       }
     },
-    // tooltip: {
-    //   formatter: function() {
-    //     return "<b>" + this.series.name + "</b><br/>" + this.x + ": " + this.y;
-    //   }
-    // },
     plotOptions: {
       area: {
         fillOpacity: 0.5
@@ -67,9 +54,7 @@ export class VectorPlotComponent implements OnInit {
     series: []
   };
 
-  constructor(private lab: PdeLabService) {
-
-  }
+  constructor(private lab: PdeLabService) {}
 
   public chart: Chart;
   ngOnInit() {
@@ -78,29 +63,30 @@ export class VectorPlotComponent implements OnInit {
   public onLoad(evt) {
     this.chart = evt.chart;
 
-    this.chart.series = []
+    this.chart.series = [];
 
-    this.lab.electricField$.pipe(
-      tap((electricField: any[]) => {
-        console.log('electricField', electricField)
-        
-        if (this.chart.get('series-a')) {
-          this.chart.get('series-a').remove()
-        }
+    this.lab.electricField$
+      .pipe(
+        tap((electricField: any[]) => {
+          console.log("electricField", electricField);
 
-        this.chart.addSeries({
-          id: 'series-a',
-          type: "vector",
-          name: "Electric vector field",
-          turboThreshold: 0,
-          rotationOrigin: "start",
-          color: "red",
-          data: electricField
-        });
-        // this.chart.redraw()
+          if (this.chart.get("series-a")) {
+            this.chart.get("series-a").remove();
+          }
 
-      })
-    ).subscribe()
+          this.chart.addSeries({
+            id: "series-a",
+            type: "vector",
+            name: "Electric vector field",
+            turboThreshold: 0,
+            rotationOrigin: "start",
+            color: "red",
+            data: electricField
+          });
+          // this.chart.redraw()
+        })
+      )
+      .subscribe();
 
     // function generateData() {
     //   var data = [],
