@@ -2,8 +2,8 @@
 export const N = 100; /** Grid size */
 export const STEP = 1 / N; /** Step */
 export const TIME_START = 0;
-export const TIME_END = 20;
-export const TIME_STEP = 0.2;
+export const TIME_END = 1000;
+export const TIME_STEP = 100;
 
 export const createVectorBase = (): Array<Array<number>> => {
   /** kathe sthlh toy pinaka eiai idiodianisma ths bashs */

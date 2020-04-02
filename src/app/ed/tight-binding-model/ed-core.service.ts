@@ -50,18 +50,28 @@ export class EdCoreService {
   }
 
   private constractParts() {
-    let states = [];
-    // for (let k = 0; k < N; k++) {
+    /** Gia kathe xroniki stigmi. Exo ena array me tis pithanotites YR^2 + YI ^2. Kathe element toy array antistixi se mia idiokatastasi toy sistimatos */
     let finalDataForEachState = [];
+    let deltaTimes = [];
+    let realPosition = [];
     for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
-      finalDataForEachState.push({
-        time: dt,
-        mag: this.getPropability(dt, 50)
-      });
+      let propabilityForAllStatesPerTime = [];
+      for (let k = 0; k < N; k++) {
+        propabilityForAllStatesPerTime.push(this.getPropability(dt, k));
+      }
+      finalDataForEachState.push(propabilityForAllStatesPerTime);
+      deltaTimes.push(dt);
     }
-    states.push(finalDataForEachState);
-    // }
-    return states;
+
+    for (let i = 0; i < N; i++) {
+      // realPosition.push(this._hamiltonianService.relalX(i));
+      realPosition.push(i);
+    }
+    return {
+      propabilities: finalDataForEachState,
+      time: deltaTimes,
+      space: realPosition
+    };
   }
   private averagePosition() {
     let averageXOverTime = [];

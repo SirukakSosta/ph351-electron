@@ -72,7 +72,8 @@ export class HamiltonianService {
     return oldHamiltonian;
   }
   public potentialFunction(i: number): number {
-    const x = this.relalX(i);
+    // const x = this.relalX(i);
+    const x = i;
     const factor = 1;
     const harmonicOscilator = factor * Math.pow(x, 2);
     const exam = Math.sin((2 * Math.PI * x) / 10);
@@ -81,7 +82,7 @@ export class HamiltonianService {
     // x = transform i to real x
   }
 
-  private relalX(i: number): number {
+  public relalX(i: number): number {
     const x = i / (N - 1);
     return x;
   }

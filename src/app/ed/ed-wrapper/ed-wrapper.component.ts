@@ -36,51 +36,66 @@ export class EdWrapperComponent implements OnInit {
     this.listOfOption = children;
     // this.lab.diagonalize()
     const states = this._edCoreService.start();
-    console.log(states);
+    const time = states.time;
+    const space = states.space;
+    let traces = [];
+    for (let row = 0; row < states.propabilities.length; row++) {
+      let trace = {
+        x: space,
+        y: states.propabilities[row],
+        marker: {
+          size: 1
+        },
+        mode: "lines+markers",
+        name: `time - (${time[row]})`
+      };
+      traces.push(trace);
+    }
+
+    this.data = [...traces];
+    this.layout = {
+      width: 1600,
+      title: `Propability Time evolution`
+    };
+
+    // console.table(states.propabilities);
+    // console.log(states);
+    // return;
     // states.forEach((state, index) => {
-    //   let trace1 = {
+    //   let trace = {
     //     x: [],
     //     y: [],
     //     mode: "lines+markers",
     //     name: "Scatter + Lines"
     //   };
     //   state.forEach(item => {
-    //     trace1.x.push(item.time);
-    //     trace1.y.push(item.mag);
+    //     trace.x.push(item.time);
+    //     trace.y.push(item.mag);
     //   });
     //   let customWidth = 600;
-    //   var data = [trace1];
+    //   var data = [trace];
     //   var layout = {
     //     width: customWidth,
     //     title: `Propability Time evolution for state ${index + 1}`
     //   };
     //   this.states.push({ data, layout });
     // });
-    let traces = [];
-    states.forEach((state, index) => {
-      let trace1 = {
-        x: [],
-        y: [],
-        marker: {
-          size: 1
-        },
-        mode: "lines+markers",
-        name: `Status - (${index + 1})`
-      };
+    // states.forEach((state, index) => {
+    //   let trace = {
+    //     x: [],
+    //     y: [],
+    //     marker: {
+    //       size: 1
+    //     },
+    //     mode: "lines+markers",
+    //     name: `Status - (${index + 1})`
+    //   };
 
-      trace1.x = state.map(s => s.time);
-      trace1.y = state.map(k => k.mag);
-      traces.push(trace1);
-    });
-    this.traces = traces;
-    this.data = [traces[0]];
-    this.layout = {
-      width: 1600,
-      title: `Propability Time evolution for state - 1`
-    };
-    setTimeout(() => {
-      console.log("rerender");
-    }, 5000);
+    //   trace.x = state.map(s => s.time);
+    //   trace.y = state.map(k => k.mag);
+    //   traces.push(trace);
+    // });
+    // this.traces = traces;
   }
   selectNewData(index) {
     this.data = [this.traces[index]];

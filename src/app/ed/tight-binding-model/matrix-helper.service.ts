@@ -78,7 +78,8 @@ export class MatrixHelperService {
   public generateRandomVector(): Array<number> {
     let vector = [];
     for (let i = 0; i < N; i++) {
-      const x = this.relalX(i);
+      // const x = this.relalX(i);
+      const x = i;
       const exp_value = (-1 / 50) * Math.pow(x - 50, 2);
       const c_i = Math.exp(exp_value);
       vector.push(c_i);
