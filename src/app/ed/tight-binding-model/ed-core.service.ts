@@ -10,7 +10,7 @@ import {
   createVectorBase
 } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
-
+const fs = require("fs");
 @Injectable({
   providedIn: "root"
 })
@@ -34,6 +34,7 @@ export class EdCoreService {
     let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(
       hamiltonianMatrix
     );
+
     const ans = (<any>math).eigs(hamiltonianMatrixWithPotential);
     const { values, vectors } = ans;
     const eigenVectors = vectors;
@@ -51,50 +52,56 @@ export class EdCoreService {
 
   private constractParts() {
     /** Gia kathe xroniki stigmi. Exo ena array me tis pithanotites YR^2 + YI ^2. Kathe element toy array antistixi se mia idiokatastasi toy sistimatos */
-    let finalDataForEachState = [];
-    let deltaTimes = [];
-    let realPosition = [];
+    // let finalDataForEachState = [];
+    // let deltaTimes = [];
+    // let realPosition = [];
+    // let avgX = [];
+    // let diaspora = [];
+    let increment = 0;
     for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
+      console.log(performance.now() * 0.001 + "sec");
       let propabilityForAllStatesPerTime = [];
-      for (let k = 0; k < N; k++) {
-        propabilityForAllStatesPerTime.push(this.getPropability(dt, k));
-      }
-      finalDataForEachState.push(propabilityForAllStatesPerTime);
-      deltaTimes.push(dt);
-    }
-
-    for (let i = 0; i < N; i++) {
-      // realPosition.push(this._hamiltonianService.relalX(i));
-      realPosition.push(i);
-    }
-    return {
-      propabilities: finalDataForEachState,
-      time: deltaTimes,
-      space: realPosition
-    };
-  }
-  private averagePosition() {
-    let averageXOverTime = [];
-    for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
-      console.log(
-        `dt is ${dt}--------------------------------------------------`
-      );
-
-      let propabilityOverAllStates = 0;
-      let test = "";
+      let avgs = 0;
+      let avgsSquared = 0;
       for (let k = 0; k < N; k++) {
         const propability = this.getPropability(dt, k);
-        test += ", " + propability.toFixed(4);
-        propabilityOverAllStates += propability;
-        // console.log("k", k, propability);
+        propabilityForAllStatesPerTime.push(this.getPropability(dt, k));
+        avgs += propability * k;
+        avgsSquared += propability * Math.pow(k, 2);
       }
-      averageXOverTime.push(propabilityOverAllStates);
-      // console.log(test + "----" + propabilityOverAllStates);
-      console.log(`--------------------------------------------------`);
+      const diasp = Math.sqrt(avgsSquared - Math.pow(avgs, 2));
+      // avgX.push(avgs);
+      // diaspora.push(diasp);
+      // finalDataForEachState.push(propabilityForAllStatesPerTime);
+      // deltaTimes.push(dt);
+      this.saveData(dt, avgs, diasp, propabilityForAllStatesPerTime, increment);
+      increment++;
     }
 
-    // console.log(test);
-    return averageXOverTime;
+    // for (let i = 0; i < N; i++) {
+    //   // realPosition.push(this._hamiltonianService.relalX(i));
+    //   realPosition.push(i);
+    // }
+    return {
+      propabilities: "finalDataForEachState",
+      time: "deltaTimes",
+      space: "realPosition",
+      avgX: "avgX",
+      diaspora: "diaspora"
+    };
+  }
+  private saveData(dt, averageX, diaspora, propabilities, indexing) {
+    const savedData = {
+      time: dt,
+      averageX,
+      diaspora,
+      propabilities
+    };
+    const nsavedData = JSON.stringify(savedData);
+    fs.writeFile(`./ed-data/time${indexing}.json`, nsavedData, function(err) {
+      // file saved or err
+      console.log("save error", err);
+    });
   }
   private getPropability(dt: number, state: number): number {
     let realPart = 0;

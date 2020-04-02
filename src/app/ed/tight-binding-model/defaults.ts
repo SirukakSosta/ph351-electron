@@ -1,5 +1,5 @@
 /** Constants */
-export const N = 80; /** Grid size */
+export const N = 150; /** Grid size */
 export const STEP = 1 / N; /** Step */
 export const TIME_START = 0;
 export const TIME_END = 1000;
