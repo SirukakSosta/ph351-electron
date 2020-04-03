@@ -1,5 +1,5 @@
 <nz-layout class="layout">
-  <app-loading *ngIf="loading"></app-loading>
+  <!-- <app-loading *ngIf="loading"></app-loading> -->
   <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzBreakpoint]="'lg'" [nzCollapsedWidth]="0"
     [nzZeroTrigger]="zeroTrigger">
     <div class="menu">
@@ -24,7 +24,7 @@
   <nz-layout>
     <nz-content>
       <div class="inner-content">
-        <div class="p-3" *ngIf="!chargeEquation">
+        <div class="p-3" >
           <h3>Project in Exact Diagonalization (ED)</h3>
 
           <!-- <ul>
@@ -42,20 +42,21 @@
               </div>
             </ng-container>
           </div> -->
-          <div class="selection">Select a state: <nz-select [(ngModel)]="singleValue" [nzSize]="size"
+
+          <!-- <div class="selection">Select a state: <nz-select [(ngModel)]="singleValue" [nzSize]="size"
               (ngModelChange)="selectNewData(singleValue)">
               <nz-option *ngFor="let option of listOfOption" [nzLabel]="option.label" [nzValue]="option.value">
               </nz-option>
             </nz-select>
-          </div>
+          </div> -->
 
           <plotly-plot [data]="data" [layout]="layout"></plotly-plot>
           <!-- <div class="chart-container">
             <ngx-highchart [options]="options" [modules]="['highcharts-3d', 'highcharts-more']" (load)="onLoad($event)">
             </ngx-highchart>
           </div> -->
-          <plotly-plot [data]="avgData" [layout]="avgLayout"></plotly-plot>
-          <plotly-plot [data]="diasporaData" [layout]="diasporaLayout"></plotly-plot>
+          <plotly-plot [data]="avgData | async" [layout]="avgLayout"></plotly-plot>
+          <plotly-plot [data]="diasporaData | async" [layout]="diasporaLayout"></plotly-plot>
         </div>
       </div>
     </nz-content>

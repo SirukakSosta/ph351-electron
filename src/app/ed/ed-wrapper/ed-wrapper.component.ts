@@ -1,5 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Chart, Options } from "highcharts";
+import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
 import { N } from "../tight-binding-model/defaults";
 import { EdCoreService } from "../tight-binding-model/ed-core.service";
 // const fs = require("fs");
@@ -17,11 +19,12 @@ interface extractedData {
 export class EdWrapperComponent implements OnInit {
   // todo
   // play with https://github.com/sasekazu/visualize-jacobi-diagonalization/blob/master/js/main.js
+  isCollapsed = false;
   states = [];
   traces = [];
-  avgData: any;
+  avgData: Observable<any[]>;
   avgLayout: any;
-  diasporaData: any;
+  diasporaData: Observable<any[]>;
   diasporaLayout: any;
   public chart: Chart;
   threeDdata: any;
@@ -132,8 +135,8 @@ export class EdWrapperComponent implements OnInit {
     this.edData = states;
     const time = states.time;
     const space = states.space;
-    const avgX = states.avgX;
-    const diaspora = states.diaspora;
+    // const avgX = states.avgX;
+    // const diaspora = states.diaspora;
     let traces = [];
     // plot 1 P(x,t)
     for (let row = 0; row < states.propabilities.length; row++) {
@@ -155,33 +158,65 @@ export class EdWrapperComponent implements OnInit {
       title: `Propability Time evolution`
     };
     //plot 2 mesi thesi over time
-    this.avgData = [
-      {
-        x: time,
-        y: avgX,
-        marker: {
-          size: 1
-        },
-        mode: "lines+markers",
-        name: `time - ()`
-      }
-    ];
+
+    this.avgData = this._edCoreService.average$.pipe(
+      map(average => [
+        {
+          x: time,
+          y: average,
+          marker: {
+            size: 1
+          },
+          mode: "lines+markers",
+          name: `time - ()`
+        }
+      ])
+    )
+
+    // this.avgData = [
+    //   {
+    //     x: time,
+    //     y: avgX,
+    //     marker: {
+    //       size: 1
+    //     },
+    //     mode: "lines+markers",
+    //     name: `time - ()`
+    //   }
+    // ];
     this.avgLayout = {
       width: 1600,
       title: `Mean position over time`
     };
+
+
+
     // plot 3 diaspora over time
-    this.diasporaData = [
-      {
-        x: time,
-        y: diaspora,
-        marker: {
-          size: 1
-        },
-        mode: "lines+markers",
-        name: `time - ()`
-      }
-    ];
+    this.diasporaData = this._edCoreService.diaspora$.pipe(
+      map(diaspora => [
+        {
+          x: time,
+          y: diaspora,
+          marker: {
+            size: 1
+          },
+          mode: "lines+markers",
+          name: `time - ()`
+        }
+      ])
+    )
+
+    // this.diasporaData = [
+    //   {
+    //     x: time,
+    //     y: diaspora,
+    //     marker: {
+    //       size: 1
+    //     },
+    //     mode: "lines+markers",
+    //     name: `time - ()`
+    //   }
+    // ];
     this.diasporaLayout = {
       width: 1600,
       title: `Diaspora over time`

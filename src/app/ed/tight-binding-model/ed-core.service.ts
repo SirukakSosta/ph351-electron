@@ -35,6 +35,9 @@ export class EdCoreService {
   timeStepComputationBucketMap: Map<number, TimeStepComputationBucket> = new Map();
   finalResult$$: BehaviorSubject<{ propabilities: number[][]; time: number[]; space: number[], avgX: number, diaspora: number }>
 
+
+  diaspora$: Observable<number>;
+  average$: Observable<number>;
   // finalResult$= ;
 
   // edWorkers: Worker[] = [];
@@ -237,8 +240,8 @@ export class EdCoreService {
       propabilities: finalDataForEachState,
       time: [],
       space: [],
-      avgX,
-      diaspora
+      // avgX,
+      // diaspora
     };
   }
 
