@@ -3,9 +3,9 @@
 // export const STEP = 1 / N; /** Step */
 export const TIME_START = 0;
 export const TIME_END = 1000;
-export const TIME_STEP = 100;
+export const TIME_STEP = 200;
 
-export function createVectorBase (size: number): Array<Array<number>>  {
+export function createVectorBase(size: number): Array<Array<number>> {
   /** kathe sthlh toy pinaka eiai idiodianisma ths bashs */
   let basisVectors = new Array(size).fill(0).map(() => new Array(size).fill(0));
   for (let row = 0; row < size; row++) {
@@ -16,7 +16,7 @@ export function createVectorBase (size: number): Array<Array<number>>  {
     }
   }
   return basisVectors;
-};
+}
 
 export function getStepDx(size: number) {
   return 1 / size;
