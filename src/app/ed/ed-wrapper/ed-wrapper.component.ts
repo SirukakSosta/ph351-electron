@@ -1,9 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { Chart, Options } from "highcharts";
 import { Observable } from "rxjs";
-import { filter, map, startWith, tap } from "rxjs/operators";
+import { filter, map, sampleTime, tap } from "rxjs/operators";
 import { TIME_END, TIME_START, TIME_STEP } from "../tight-binding-model/defaults";
-import { EdComputationWorkerEvent, EdCoreService } from "../tight-binding-model/ed-core.service";
+import { EdCoreService } from "../tight-binding-model/ed-core.service";
 // const fs = require("fs");
 interface extractedData {
   time: number;
@@ -181,6 +181,7 @@ export class EdWrapperComponent implements OnInit {
     //plot 2 mesi thesi over time
 
     this.avgData = this._edCoreService.average$.pipe(
+      sampleTime(100),
       map(average => [
         {
           x: this._edCoreService.deltaTimes,
@@ -216,6 +217,7 @@ export class EdWrapperComponent implements OnInit {
     // plot 3 diaspora over time
     this.diasporaData = this._edCoreService.diaspora$.pipe(
       // tap(e=> console.log(e)),
+      sampleTime(100),
       map(diaspora => [
         {
           x: this._edCoreService.deltaTimes,
@@ -270,7 +272,8 @@ export class EdWrapperComponent implements OnInit {
   public onLoad(evt) {
 
     this._edCoreService.timeStepResultsAggregate$.pipe(
-      startWith([] as EdComputationWorkerEvent[]),
+      sampleTime(100),
+      // startWith([] as EdComputationWorkerEvent[]),
       tap((timestepResults) => {
 
         // console.log('timestepResults', timestepResults)
@@ -280,8 +283,9 @@ export class EdWrapperComponent implements OnInit {
 
         // let series = []
         timestepResults
-          .filter(e => !!e.result
-            && e.progress === 100
+          .filter(e => !!e.result 
+            && (e.dtIndex === 0 || e.progress === 100)
+            // && e.progress === 100
           )
           .forEach((timestepResult, index) => {
 
@@ -298,9 +302,19 @@ export class EdWrapperComponent implements OnInit {
                 data: []
               });
             }
+
+            let data = []
+
+            for (let i = 0; i < space.length; i++) {
+              const _space = space[i];
+              const _propability = timestepResult.result.propabilityForAllStates[i]
+              data.push([_space, _propability, timestepResult.dt]);
+            }
+
+
             // console.log([space, timestepResult.result.propabilityForAllStates, time])
-            const data = [space, timestepResult.result.propabilityForAllStates, time]
-              console.log(data)
+            // const data = [space, timestepResult.result.propabilityForAllStates, timestepResult]
+            // console.log(data)
             this.chart.get(seriesName).update({ data } as any, true)
           })
 

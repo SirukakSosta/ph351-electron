@@ -126,7 +126,7 @@ export class EdCoreService {
 
   }
 
-  public stop() {
+  public reset() {
 
     this.clearTimeStepComputationBucketMap();
     if (this.operationSubscription) {
@@ -140,7 +140,7 @@ export class EdCoreService {
 
   public start(size: number, start: number, end: number, step: number) {
 
-    this.stop();
+    this.reset();
 
     const basisVectors = createVectorBase(size); /** IMPORTANT - vectors are in columns in this matrix */
     let hamiltonianMatrix = this._hamiltonianService.generateHamiltonian(basisVectors);
