@@ -17,30 +17,14 @@ interface extractedData {
   styleUrls: ["./ed-wrapper.component.scss"]
 })
 export class EdWrapperComponent implements OnInit {
-  // todo
-  // play with https://github.com/sasekazu/visualize-jacobi-diagonalization/blob/master/js/main.js
-  isCollapsed = false;
-  states = [];
-  traces = [];
-  avgData: Observable<any[]>;
-  avgLayout: any;
+  // chart data observables 
   diasporaData: Observable<any[]>;
-  diasporaLayout: any;
-  public chart: Chart;
-  threeDdata: any;
-  threeDlayout: any;
-  data: any;
-  edData: any;
-  layout: any;
-  dataHist: any;
-  listOfOption: Array<{ label: string; value: number }> = [];
-  // singleValue = 0;
-  size = 100;
-  timeStart = TIME_START;
-  timeEnd = TIME_END;
-  timeStep = TIME_STEP;
+  avgData: Observable<any[]>;
 
-  public options: Options = {
+  // chart layouts 
+  avgLayout: any;
+  diasporaLayout: any;
+  options: Options = {
     chart: {
       // height: 600,
       type: "column",
@@ -92,14 +76,33 @@ export class EdWrapperComponent implements OnInit {
     series: []
   };
 
+
+  isCollapsed = false;
+  // states = [];
+  // traces = [];
+
+
+  public chart: Chart;
+  // threeDdata: any;
+  // threeDlayout: any;
+  // data: any;
+  // edData: any;
+  // layout: any;
+  // dataHist: any;
+  // listOfOption: Array<{ label: string; value: number }> = [];
+  // singleValue = 0;
+
+  // computational variables
+  size = 100;
+  timeStart = TIME_START;
+  timeEnd = TIME_END;
+  timeStep = TIME_STEP;
+
+
   progresses: Observable<number>[] = []
 
 
-  constructor(
-
-    // private lab: EdLabService,
-    private _edCoreService: EdCoreService
-  ) { }
+  constructor(public _edCoreService: EdCoreService) { }
 
   ngOnInit(): void {
     // const children: Array<{ label: string; value: number; }> = [];
@@ -246,7 +249,7 @@ export class EdWrapperComponent implements OnInit {
 
 
   start() {
-    console.log(888)
+
     this._edCoreService.start(this.size, this.timeStart, this.timeEnd, this.timeStep);
 
     this.progresses = Array.from(this._edCoreService.timeStepComputationBucketMap.values())
@@ -257,10 +260,10 @@ export class EdWrapperComponent implements OnInit {
   }
 
 
-  selectNewData(index) {
-    this.data = [this.traces[index]];
-    this.layout.title = `Propability Time evolution for state ${index + 1}`;
-  }
+  // selectNewData(index) {
+  //   this.data = [this.traces[index]];
+  //   this.layout.title = `Propability Time evolution for state ${index + 1}`;
+  // }
 
 
 
@@ -296,7 +299,9 @@ export class EdWrapperComponent implements OnInit {
               });
             }
             // console.log([space, timestepResult.result.propabilityForAllStates, time])
-            this.chart.get(seriesName).update({ data: [space, timestepResult.result.propabilityForAllStates, time] } as any, true)
+            const data = [space, timestepResult.result.propabilityForAllStates, time]
+              console.log(data)
+            this.chart.get(seriesName).update({ data } as any, true)
           })
 
         // this.chart.series = []

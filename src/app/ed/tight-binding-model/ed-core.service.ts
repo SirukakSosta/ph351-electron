@@ -45,6 +45,7 @@ export class EdCoreService {
 
   resultCollectorSuscription: Subscription;
   operationSubscription: Subscription;
+  refreshLatency = 200;
 
   constructor(private _hamiltonianService: HamiltonianService) {
 
@@ -52,7 +53,7 @@ export class EdCoreService {
 
   constructTimeStepComputationBucketMap(start: number, end: number, step: number) {
 
-console.log(88)
+    console.log(88)
 
     let dtIndex = 0;
     for (let dt = start; dt < end; dt += step) {
@@ -74,7 +75,7 @@ console.log(88)
 
 
     this.resultCollectorSuscription = combineLatest(computationEvents$).pipe(
-      sampleTime(200),
+      sampleTime(this.refreshLatency),
       // set time steps
       tap(computationEvents => {
         // const timeSteps = computationEvents.map(computationEvent => computationEvent.result.propabilityForAllStates);

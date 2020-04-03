@@ -50,6 +50,13 @@
             Start
           </button>
         </div>
+        <hr />
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Refresh Latency</label>
+            <input nz-input type="number" placeholder="Time Step" [(ngModel)]="_edCoreService.refreshLatency" />
+          </div>
+        </div>
       </div>
     </div>
   </nz-sider>
