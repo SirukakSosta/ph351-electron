@@ -4,9 +4,11 @@
     "outDir": "../out-tsc/app",
     "module": "ESNext",
     "baseUrl": "",
-    "types": []
+    "types": [],
+    "strict": false
   },
   "exclude": [
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.worker.ts"
   ]
 }

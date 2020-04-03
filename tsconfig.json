@@ -4,6 +4,7 @@
     "module": "esnext",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
+    "strict": false,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
@@ -17,7 +18,7 @@
       "es2016",
       "es2015",
       "dom"
-    ] 
+    ]
   },
   "include": [
     "main.ts",
@@ -26,5 +27,4 @@
   "exclude": [
     "node_modules"
   ],
-  
 }
