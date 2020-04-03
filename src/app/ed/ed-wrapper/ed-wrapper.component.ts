@@ -99,7 +99,7 @@ export class EdWrapperComponent implements OnInit {
   // singleValue = 0;
 
   // computational variables
-  size = 100;
+  size = 50;
   timeStart = TIME_START;
   timeEnd = TIME_END;
   timeStep = TIME_STEP;
