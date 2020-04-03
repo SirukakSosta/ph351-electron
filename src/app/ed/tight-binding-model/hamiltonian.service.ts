@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { createPotentialFunction } from "../methods";
 import { MatrixHelperService } from "./matrix-helper.service";
 @Injectable({
   providedIn: "root"
@@ -51,7 +52,7 @@ export class HamiltonianService {
 
     return hamiltonian;
   }
-  public addPotential(oldHamiltonian: Array<Array<number>>): Array<Array<number>> {
+  public addPotential(oldHamiltonian: Array<Array<number>>, potentialFunction: string): Array<Array<number>> {
     const N = oldHamiltonian.length;
     let newHamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
     for (let row = 0; row < N; row++) {
@@ -59,7 +60,7 @@ export class HamiltonianService {
         //  prostheto stixia mono sth diagonio
         if (row === col) {
           newHamiltonian[row][col] =
-            oldHamiltonian[row][col] + this.potentialFunction(row);
+            oldHamiltonian[row][col] + createPotentialFunction(row, potentialFunction);
         } else {
           newHamiltonian[row][col] = oldHamiltonian[row][col];
         }
@@ -68,16 +69,16 @@ export class HamiltonianService {
     return newHamiltonian;
     return oldHamiltonian;
   }
-  public potentialFunction(i: number): number {
-    // const x = this.relalX(i);
-    const x = i;
-    const factor = 1;
-    const harmonicOscilator = factor * Math.pow(x, 2);
-    const exam = Math.sin((2 * Math.PI * x) / 10);
-    const tanoglidis = 0.5 * x;
-    return tanoglidis;
-    // x = transform i to real x
-  }
+  // public potentialFunction(i: number): number {
+  //   // const x = this.relalX(i);
+  //   const x = i;
+  //   const factor = 1;
+  //   const harmonicOscilator = factor * Math.pow(x, 2);
+  //   const exam = Math.sin((2 * Math.PI * x) / 10);
+  //   const tanoglidis = 0.5 * x;
+  //   return tanoglidis;
+  //   // x = transform i to real x
+  // }
 
   // public relalX(i: number): number {
   //   const x = i / (N - 1);

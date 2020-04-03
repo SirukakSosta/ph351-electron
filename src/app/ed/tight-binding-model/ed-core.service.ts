@@ -51,9 +51,7 @@ export class EdCoreService {
 
   }
 
-  constructTimeStepComputationBucketMap(start: number, end: number, step: number) {
-
-    console.log(88)
+  constructTimeStepComputationBucketMap(start: number, end: number, step: number, startDxStep: number) {
 
     let dtIndex = 0;
     for (let dt = start; dt < end; dt += step) {
@@ -70,9 +68,7 @@ export class EdCoreService {
 
   private constructResultObservables() {
 
-
     const computationEvents$ = Array.from(this.timeStepComputationBucketMap.values()).map(e => e.workerEvent$);
-
 
     this.resultCollectorSuscription = combineLatest(computationEvents$).pipe(
       sampleTime(this.refreshLatency),
@@ -108,12 +104,12 @@ export class EdCoreService {
   }
 
   private startTimelapseComputations(initialVector: Array<any>, eigenValues: Array<any>, eigenVectors: Array<any>, basisVectors: Array<any>,
-    start: number, end: number, step: number, size: number) {
+    start: number, end: number, step: number, size: number, startDxStep: number) {
 
     // clear buckets if already exist. terminates workers as well
     this.clearTimeStepComputationBucketMap();
     // construct new computation buckets for new space and time variables
-    this.constructTimeStepComputationBucketMap(start, end, step);
+    this.constructTimeStepComputationBucketMap(start, end, step, startDxStep);
     // construct final result observable by merging all the step computations
     this.constructResultObservables();
     // this.resetExistingWorkers();
@@ -121,7 +117,8 @@ export class EdCoreService {
     Array.from(this.timeStepComputationBucketMap.values()).forEach(bucket => {
       const dt = bucket.dt;
       const dtIndex = bucket.dtIndex;
-      bucket.worker.postMessage(JSON.stringify({ dt, dtIndex, initialVector, eigenValues, eigenVectors, basisVectors, size }))
+      // post to web worker
+      bucket.worker.postMessage(JSON.stringify({ dt, dtIndex, initialVector, eigenValues, eigenVectors, basisVectors, size, startDxStep }))
     })
 
   }
@@ -138,24 +135,44 @@ export class EdCoreService {
 
   }
 
-  public start(size: number, start: number, end: number, step: number) {
+  public start(size: number, start: number, end: number, step: number, startDxStep: number, waveFunction: string, potentialFunction: string) {
 
     this.reset();
 
     const basisVectors = createVectorBase(size); /** IMPORTANT - vectors are in columns in this matrix */
     let hamiltonianMatrix = this._hamiltonianService.generateHamiltonian(basisVectors);
-    let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(hamiltonianMatrix);
+    let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(hamiltonianMatrix, potentialFunction);
+
+console.log(hamiltonianMatrixWithPotential)
 
     const ans = (<any>math).eigs(hamiltonianMatrixWithPotential);
     const { values, vectors } = ans;
     const eigenVectors = vectors;
-    const eigenValues = values;
-    const initialVector = createInitialVector(size);
-    this.deltaTimes = createDeltaTimes(start, end, step);
-    this.realPosition = createPosition(size);
 
-    this.startTimelapseComputations(initialVector, eigenValues, eigenVectors, basisVectors, start, end, step, size)
+    console.log('eigenVectors', eigenVectors)
+
+    const eigenValues = values;
+
+    const isOrthogonal = this.isOrthogonal(eigenVectors)
+
+    const initialVector = createInitialVector(size, waveFunction);
+    this.deltaTimes = createDeltaTimes(start, end, step);
+    this.realPosition = createPosition(size, startDxStep);
+
+    this.startTimelapseComputations(initialVector, eigenValues, eigenVectors, basisVectors, start, end, step, size, startDxStep)
   }
 
+  isOrthogonal(eigenVectors: number[][]) {
+
+    // let initialVector = eigenVectors[68];
+    // console.log(calculateBraKet(initialVector,eigenVectors[69]))
+    // for (let i = 1; i < eigenVectors.length; i++) {
+
+    //   console.log(calculateBraKet(initialVector, eigenVectors[i]))
+
+
+    // }
+
+  }
 
 }

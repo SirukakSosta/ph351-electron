@@ -1,10 +1,14 @@
-function generateRandomVector(N: number): Array<number> {
+
+function generateRandomVector(N: number, waveFunction: string): Array<number> {
     let vector = [];
     for (let i = 0; i < N; i++) {
         // const x = this.relalX(i);
+
+
+
         const x = i;
         const exp_value = (-1 / 50) * Math.pow(x - 50, 2);
-        const c_i = Math.exp(exp_value);
+        const c_i = eval(waveFunction) // Math.exp(exp_value);
         vector.push(c_i);
     }
     return vector;
@@ -26,10 +30,24 @@ function normalizeVector(vector: Array<number>): Array<number> {
 }
 
 
-export function createInitialVector(N: number) {
+export function createInitialVector(N: number, waveFunction: string) {
 
-    const randomVector = generateRandomVector(N);
+    const randomVector = generateRandomVector(N, waveFunction);
     const normalizedVector = normalizeVector(randomVector);
     return normalizedVector;
 
+}
+
+export function createPotentialFunction(i: number, potentialFunction: string): number {
+    // const x = this.relalX(i);
+    const x = i;
+    const factor = 1;
+    const harmonicOscilator = factor * Math.pow(x, 2);
+    // const exam = Math.sin((2 * Math.PI * x) / 10);
+    // const tanoglidis =  0.5 * i // Math.sign(sin(2 * Math.PI * x));
+
+    const potential = eval(potentialFunction)
+
+    return potential;
+    // x = transform i to real x
 }

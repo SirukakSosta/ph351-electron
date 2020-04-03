@@ -1,15 +1,10 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
+import { PlotComponent, PlotlyService } from "angular-plotly.js";
 import { Chart, Options } from "highcharts";
-import { Observable } from "rxjs";
-import { filter, map, sampleTime, tap } from "rxjs/operators";
-import {
-  TIME_END,
-  TIME_START,
-  TIME_STEP
-} from "../tight-binding-model/defaults";
+import { BehaviorSubject, Observable, timer } from "rxjs";
+import { map, sampleTime, take, tap } from "rxjs/operators";
+import { TIME_END, TIME_START, TIME_STEP } from "../tight-binding-model/defaults";
 import { EdCoreService } from "../tight-binding-model/ed-core.service";
-import * as plotly from "angular-plotly.js";
-import { PlotlyService } from "angular-plotly.js";
 // const fs = require("fs");
 interface extractedData {
   time: number;
@@ -23,7 +18,7 @@ interface extractedData {
   styleUrls: ["./ed-wrapper.component.scss"]
 })
 export class EdWrapperComponent implements OnInit {
-  @ViewChild("propabilityPlotly") propabilityPlotly: any;
+  @ViewChild("propabilityPlotly") propabilityPlotly: PlotComponent;
 
   // chart data observables
   diasporaData: Observable<any[]>;
@@ -68,7 +63,7 @@ export class EdWrapperComponent implements OnInit {
   public chart: Chart;
   // threeDdata: any;
   // threeDlayout: any;
-  data = [];
+  // data = [];
   // edData: any;
   layout: any;
   // dataHist: any;
@@ -76,50 +71,61 @@ export class EdWrapperComponent implements OnInit {
   // singleValue = 0;
 
   // computational variables
-  size = 50;
+  size = 70;
   timeStart = TIME_START;
   timeEnd = TIME_END;
   timeStep = TIME_STEP;
+  startDxStep = 30;
+  waveFunction: string = 'Math.exp((-1 / 50) * Math.pow(x - 50, 2))'
+  potentialFunction: string = '0.5 * x'
 
   progresses: Observable<number>[] = [];
+  progresses1: Observable<number>;
+
+  propabilityPlotlyData$$ = new BehaviorSubject([])
+  propabilityPlotlyData$ = this.propabilityPlotlyData$$.asObservable().pipe(
+    // sampleTime(1000)
+  )
 
   constructor(
     public _edCoreService: EdCoreService,
     public plotly: PlotlyService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+
+    console.log(this)
     // const update = {
     //   title: 'New Title',
     //   data: this.data
     // }
-    const k = this.plotly.getPlotly();
-    console.log(k);
-    function getData() {
-      return Math.random();
-    }
-    k.plot("chart", [
-      {
-        y: [getData()],
-        type: "line"
-      }
-    ]);
-    // return;
-    var cnt = 0;
-    setInterval(function() {
-      k.extendTraces("chart", { y: [[getData()]] }, [0]);
-      cnt++;
-      if (cnt > 500) {
-        k.relayout("chart", {
-          xaxis: {
-            range: [cnt - 500, cnt]
-          }
-        });
-      }
-    }, 15);
+    // const k = this.plotly.getPlotly();
+    // console.log(k);
+    // function getData() {
+    //   return Math.random();
+    // }
+    // k.plot("chart", [
+    //   {
+    //     y: [getData()],
+    //     type: "line"
+    //   }
+    // ]);
+    // // return;
+    // var cnt = 0;
+    // setInterval(function() {
+    //   k.extendTraces("chart", { y: [[getData()]] }, [0]);
+    //   cnt++;
+    //   if (cnt > 500) {
+    //     k.relayout("chart", {
+    //       xaxis: {
+    //         range: [cnt - 500, cnt]
+    //       }
+    //     });
+    //   }
+    // }, 15);
 
     // .relayout(this.propabilityPlotly.plotEl.nativeElement, update);
-    console.log("plot", k);
+    // console.log("plot", k);
     this.containerWidth =
       document.getElementById("inner-content").offsetWidth - 500;
 
@@ -189,39 +195,12 @@ export class EdWrapperComponent implements OnInit {
     // this.data = [...traces];
 
     //plot 2 mesi thesi over time
-    this._edCoreService.timeStepResultsAggregate$
-      .pipe(
-        sampleTime(100),
-        // startWith([] as EdComputationWorkerEvent[]),
-        tap(timestepResults => {
-          // console.log('timestepResults', timestepResults)
+    let traces1 = [];
 
-          const space = this._edCoreService.realPosition;
-          const time = this._edCoreService.deltaTimes;
 
-          // let series = []
-          timestepResults
-            .filter(
-              e => !!e.result
-              // && (e.dtIndex === 0 || e.progress === 100)
-              // && e.progress === 100
-            )
-            .forEach((timestepResult, index) => {
-              let traces = [];
-              let trace = {
-                x: space,
-                y: timestepResult.result.propabilityForAllStates,
-                marker: {
-                  size: 1
-                },
-                mode: "lines+markers",
-                name: `time - (${time[index]})`
-              };
-              this.data.push(trace);
-            });
-        })
-      )
-      .subscribe();
+    this.plot3dAllTimeSteps();
+
+
     this.layout = {
       width: 1600,
       title: `Propability Time evolution`
@@ -294,23 +273,166 @@ export class EdWrapperComponent implements OnInit {
     };
   }
 
+  plot3dAllTimeSteps() {
+    this._edCoreService.timeStepResultsAggregate$
+      .pipe(
+      
+        sampleTime(100),
+        // startWith([] as EdComputationWorkerEvent[]),
+        tap(timestepResults => {
+          // console.log('timestepResults', timestepResults)
+
+          const space = this._edCoreService.realPosition;
+          const time = this._edCoreService.deltaTimes;
+
+          // let series = []
+          timestepResults
+            .filter(
+              e => !!e.result
+              // && (e.dtIndex % 10 === 0)
+              // && (e.dtIndex === 0 || e.progress === 100)
+              // && e.progress === 100
+            )
+            .forEach((timestepResult, index) => {
+              // let traces = [];
+
+
+              let trace = {
+                x: space,
+                y: timestepResult.result.propabilityForAllStates,
+                marker: {
+                  size: 1
+                },
+                mode: "lines+markers",
+                name: `time - (${time[index]})`
+              };
+              // this.data.push(trace);
+              this.propabilityPlotlyData$$.next([...this.propabilityPlotlyData$$.getValue(), trace])
+            });
+        }),
+        sampleTime(400),
+      )
+      .subscribe();
+  }
+
+  plot3dTimeLapse() {
+
+    this.propabilityPlotlyData$$.next([])
+    this._edCoreService.timeStepResultsAggregate$
+      .pipe(
+        take(1),
+        tap(timestepResults => {
+
+          timestepResults.forEach(timestepResult => {
+
+            const space = this._edCoreService.realPosition;
+            const time = this._edCoreService.deltaTimes;
+
+            let trace = {
+              x: space,
+              y: timestepResult.result.propabilityForAllStates,
+              marker: {
+                size: 1
+              },
+              mode: "lines+markers",
+              name: `time - (${time[timestepResult.dtIndex]})`
+            };
+
+            timer(timestepResult.dtIndex * 300).pipe(
+              tap(e => {
+                this.propabilityPlotlyData$$.next([trace])
+              }),
+              take(1)
+            ).subscribe()
+
+
+          })
+        })
+
+      ).
+      subscribe()
+
+    // this._edCoreService.timeStepResultsAggregate$
+    //   .pipe(
+    //     sampleTime(100),
+    //     // startWith([] as EdComputationWorkerEvent[]),
+    //     map(timestepResults => {
+    //       // console.log('timestepResults', timestepResults)
+
+    //       const space = this._edCoreService.realPosition;
+    //       const time = this._edCoreService.deltaTimes;
+
+    //       // let series = []
+    //       return timestepResults
+    //         .filter(
+    //           e => !!e.result
+    //           // && (e.dtIndex % 10 === 0)
+    //           // && (e.dtIndex === 0 || e.progress === 100)
+    //           // && e.progress === 100
+    //         )
+    //         .map((timestepResult, index) => {
+    //           // let traces = [];
+    //           let trace = {
+    //             x: space,
+    //             y: timestepResult.result.propabilityForAllStates,
+    //             marker: {
+    //               size: 1
+    //             },
+    //             mode: "lines+markers",
+    //             name: `time - (${time[index]})`
+    //           };
+
+    //           return trace
+
+    //           // this.data.push(trace);
+    //         }),
+    //         tap((traces: any[]) => {
+
+    //           console.log('traces', traces)
+
+    //           concat(traces.map(trace => timer(1000))).subscribe(e => {
+    //             console.log(e)
+    //           })
+
+    //         })
+    //     })
+    //   )
+    //   .subscribe();
+
+  }
+
   start() {
-    this.data = [];
+
+    this.propabilityPlotlyData$$.next([])
     this._edCoreService.start(
       this.size,
       this.timeStart,
       this.timeEnd,
-      this.timeStep
+      this.timeStep,
+      this.startDxStep,
+        this.waveFunction,
+        this.potentialFunction
     );
 
-    this.progresses = Array.from(
-      this._edCoreService.timeStepComputationBucketMap.values()
-    ).map(e =>
-      e.workerEvent$.pipe(
-        filter(e => !!e.progress),
-        map(e => e.progress)
-      )
-    );
+    this.progresses1 = this._edCoreService.timeStepResultsAggregate$.pipe(
+     
+      map(computationResults => {
+        return computationResults.filter(computationResult => computationResult.progress < 100).length
+      }),
+      sampleTime(100),
+    )
+
+    // this.progresses = Array.from(
+    //   this._edCoreService.timeStepComputationBucketMap.values()
+    // ).map(e =>
+    //   e.workerEvent$.pipe(
+    //     filter(e => !!e.progress),
+    //     map(e => e.progress),
+    //     map(progresses => {
+    //       return
+    //     })
+    //   )
+    // );
   }
 
   // selectNewData(index) {

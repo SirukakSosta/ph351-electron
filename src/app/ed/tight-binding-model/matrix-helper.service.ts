@@ -59,7 +59,7 @@ export class MatrixHelperService {
     return currentMatrix;
   }
   public getColVector(basisVectors: Array<Array<number>>, col: number) {
-    const N = basisVectors.length;
+    const N = basisVectors.length; 
     let tmp = [];
     for (let row = 0; row < N; row++) {
       tmp.push(basisVectors[row][col]);

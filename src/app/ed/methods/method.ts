@@ -17,7 +17,7 @@ function getRowVector(basisVectors: Array<Array<number>>, row: number) {
     return tmp;
 }
 
-function calculateBraKet(columnVector: Array<number>, rowVector: Array<number>): number {
+export function calculateBraKet(columnVector: Array<number>, rowVector: Array<number>): number {
     const length = columnVector.length;
     let dotProduct = 0;
     for (let i = 0; i < length; i++) {
@@ -52,10 +52,10 @@ export function getPropability(dt: number, state: number, points: number, eigenV
 
 };
 
-export function createPosition(N: number) {
+export function createPosition(N: number, startDxStep: number) {
     const positions: number[] = [];
     for (let i = 0; i < N; i++) {
-        positions.push(i);
+        positions.push(i + startDxStep);
     }
     return positions;
 }

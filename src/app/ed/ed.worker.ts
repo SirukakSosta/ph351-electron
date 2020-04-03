@@ -10,6 +10,7 @@ type input = {
   eigenVectors: Array<any>,
   basisVectors: Array<any>,
   size: number
+  startDxStep: number
 }
 
 type output = {
@@ -27,19 +28,25 @@ type output = {
 addEventListener('message', ({ data }) => {
 
   const input = JSON.parse(data) as input;
-  const response = JSON.stringify({ progress: 0 });
+  // const response = JSON.stringify({ progress: 0 });
   // postMessage(response);
 
   let propabilityForAllStates: number[] = [];
   let avgs = 0;
   let avgsSquared = 0;
-  for (let k = 0; k < input.size; k++) {
+  let diaspora = 0;
+  let propabilitySum = 0;
+
+  for (let k = input.startDxStep; k < input.size; k++) {
 
 
     const propability = getPropability(input.dt, k, input.size, input.eigenVectors, input.basisVectors, input.initialVector, input.eigenValues);
+
     propabilityForAllStates.push(propability);
     avgs += propability * k;
     avgsSquared += propability * Math.pow(k, 2);
+    diaspora = Math.sqrt(avgsSquared - Math.pow(avgs, 2));
+    propabilitySum += propability;
 
     // async update on results
     if ((k % (input.size / 20)) === 0) {
@@ -48,13 +55,13 @@ addEventListener('message', ({ data }) => {
     }
 
   }
-  const diaspora = Math.sqrt(avgsSquared - Math.pow(avgs, 2));
-  // avgX.push(avgs);
-  // diaspora.push(diasp);
-  // finalDataForEachState.push(propabilityForAllStatesPerTime);
-  // deltaTimes.push(dt);
-  // this.saveData(dt, avgs, diasp, propabilityForAllStatesPerTime, increment);
-  // increment++;
+
+  // console.log(input.dt,avgs)
+
+  // avgs = avgs / propabilitySum;
+
+  // console.log(input.dt,avgs)
+
   const output: output = { dtIndex: input.dtIndex, dt: input.dt, progress: 100, result: { propabilityForAllStates, diaspora, avgs } }
   postMessage(JSON.stringify(output))
 
