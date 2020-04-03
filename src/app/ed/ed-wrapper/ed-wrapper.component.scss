@@ -1,7 +1,28 @@
 :host {
   .layout {
     height: 100%;
+
+    .menu{
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
   }
+
+  .progress-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    nz-progress {
+      // display: inline-block;
+      transform: scale(0.7)
+    }
+  }
+
+
 }
 
 .state-container {

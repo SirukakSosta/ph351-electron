@@ -1,4 +1,5 @@
 <nz-layout class="layout">
+
   <!-- <app-loading *ngIf="loading"></app-loading> -->
   <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzBreakpoint]="'lg'" [nzCollapsedWidth]="0"
     [nzZeroTrigger]="zeroTrigger">
@@ -19,12 +20,43 @@
           </ul>
         </div>
       </div>
+      <div nz-row [nzGutter]="4" class="form">
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Points</label>
+            <input nz-input type="number" placeholder="Size" [(ngModel)]="size" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Time start</label>
+            <input nz-input type="number" placeholder="Time Start" [(ngModel)]="timeStart" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Time end</label>
+            <input nz-input type="number" placeholder="Time End" [(ngModel)]="timeEnd" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Time step</label>
+            <input nz-input type="number" placeholder="Time Step" [(ngModel)]="timeStep" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <button nz-button nzType="primary" nzBlock (click)="start();">
+            Start
+          </button>
+        </div>
+      </div>
     </div>
   </nz-sider>
   <nz-layout>
     <nz-content>
       <div class="inner-content">
-        <div class="p-3" >
+        <div class="p-3">
           <h3>Project in Exact Diagonalization (ED)</h3>
 
           <!-- <ul>
@@ -50,13 +82,22 @@
             </nz-select>
           </div> -->
 
-          <plotly-plot [data]="data" [layout]="layout"></plotly-plot>
-          <!-- <div class="chart-container">
+          <div class="progress-wrapper">
+            <nz-progress *ngFor="let progress of progresses" [nzPercent]="(progress | async)" nzType="circle"
+              [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }" [style.width]="  100 / progresses.length + '%'">
+            </nz-progress>
+          </div>
+
+          <!-- <plotly-plot [data]="data" [layout]="layout"></plotly-plot> -->
+          <div class="chart-container">
             <ngx-highchart [options]="options" [modules]="['highcharts-3d', 'highcharts-more']" (load)="onLoad($event)">
             </ngx-highchart>
-          </div> -->
-          <plotly-plot [data]="avgData | async" [layout]="avgLayout"></plotly-plot>
-          <plotly-plot [data]="diasporaData | async" [layout]="diasporaLayout"></plotly-plot>
+          </div>
+          <div class="d-flex mt-1">
+            <plotly-plot class="mr-1" [data]="avgData | async" [layout]="avgLayout"></plotly-plot>
+            <plotly-plot [data]="diasporaData | async" [layout]="diasporaLayout"></plotly-plot>
+          </div>
+
         </div>
       </div>
     </nz-content>

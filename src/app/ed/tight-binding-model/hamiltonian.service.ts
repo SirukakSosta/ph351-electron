@@ -1,14 +1,12 @@
 import { Injectable } from "@angular/core";
-import { N } from "./defaults";
 import { MatrixHelperService } from "./matrix-helper.service";
 @Injectable({
   providedIn: "root"
 })
 export class HamiltonianService {
-  constructor(private _matrixHelper: MatrixHelperService) {}
-  public generateHamiltonian(
-    basisVectors: Array<Array<number>>
-  ): Array<Array<number>> {
+  constructor(private _matrixHelper: MatrixHelperService) { }
+  public generateHamiltonian(basisVectors: Array<Array<number>>): Array<Array<number>> {
+    const N = basisVectors.length;
     let hamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
     let tmp = new Array(N).fill(0).map(() => new Array(N).fill(0));
 
@@ -53,9 +51,8 @@ export class HamiltonianService {
 
     return hamiltonian;
   }
-  public addPotential(
-    oldHamiltonian: Array<Array<number>>
-  ): Array<Array<number>> {
+  public addPotential(oldHamiltonian: Array<Array<number>>): Array<Array<number>> {
+    const N = oldHamiltonian.length;
     let newHamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
     for (let row = 0; row < N; row++) {
       for (let col = 0; col < N; col++) {
@@ -82,8 +79,8 @@ export class HamiltonianService {
     // x = transform i to real x
   }
 
-  public relalX(i: number): number {
-    const x = i / (N - 1);
-    return x;
-  }
+  // public relalX(i: number): number {
+  //   const x = i / (N - 1);
+  //   return x;
+  // }
 }

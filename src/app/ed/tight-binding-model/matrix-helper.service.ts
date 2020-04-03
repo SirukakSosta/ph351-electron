@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { N } from "./defaults";
 @Injectable({
   providedIn: "root"
 })
@@ -75,22 +74,22 @@ export class MatrixHelperService {
     }
     return tmp;
   }
-  public generateRandomVector(): Array<number> {
-    let vector = [];
-    for (let i = 0; i < N; i++) {
-      // const x = this.relalX(i);
-      const x = i;
-      const exp_value = (-1 / 50) * Math.pow(x - 50, 2);
-      const c_i = Math.exp(exp_value);
-      vector.push(c_i);
-    }
-    return vector;
-    // function randomNumber(min: number, max: number) {
-    //   return Math.random() * (max - min) + min;
-    // }
-  }
-  private relalX(i: number): number {
-    const x = i / (N - 1);
-    return x;
-  }
+  // public generateRandomVector(): Array<number> {
+  //   let vector = [];
+  //   for (let i = 0; i < N; i++) {
+  //     // const x = this.relalX(i);
+  //     const x = i;
+  //     const exp_value = (-1 / 50) * Math.pow(x - 50, 2);
+  //     const c_i = Math.exp(exp_value);
+  //     vector.push(c_i);
+  //   }
+  //   return vector;
+  //   // function randomNumber(min: number, max: number) {
+  //   //   return Math.random() * (max - min) + min;
+  //   // }
+  // }
+  // private relalX(i: number): number {
+  //   const x = i / (N - 1);
+  //   return x;
+  // }
 }

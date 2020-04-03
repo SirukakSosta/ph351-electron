@@ -1,4 +1,3 @@
-
 function getColVector(basisVectors: Array<Array<number>>, col: number) {
     const N = basisVectors.length;
     let tmp = [];
@@ -53,12 +52,12 @@ export function getPropability(dt: number, state: number, points: number, eigenV
 
 };
 
-export function createRealPosition(N: number) {
-    const realPosition: number[] = [];
+export function createPosition(N: number) {
+    const positions: number[] = [];
     for (let i = 0; i < N; i++) {
-        realPosition.push(i);
+        positions.push(i);
     }
-    return realPosition;
+    return positions;
 }
 
 export function createDeltaTimes(start: number, end: number, step: number) {

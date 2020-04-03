@@ -9,11 +9,7 @@ const routes: Routes = [
     component: EdWrapperComponent,
 
   },
-
-  {
-    path: '',
-    component: EdWrapperComponent
-  },
+ 
   {
     path: '',
     redirectTo: '',

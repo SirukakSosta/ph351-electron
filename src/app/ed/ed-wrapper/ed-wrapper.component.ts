@@ -1,9 +1,9 @@
 import { Component, OnInit } from "@angular/core";
 import { Chart, Options } from "highcharts";
 import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { N } from "../tight-binding-model/defaults";
-import { EdCoreService } from "../tight-binding-model/ed-core.service";
+import { filter, map, startWith, tap } from "rxjs/operators";
+import { TIME_END, TIME_START, TIME_STEP } from "../tight-binding-model/defaults";
+import { EdComputationWorkerEvent, EdCoreService } from "../tight-binding-model/ed-core.service";
 // const fs = require("fs");
 interface extractedData {
   time: number;
@@ -34,10 +34,15 @@ export class EdWrapperComponent implements OnInit {
   layout: any;
   dataHist: any;
   listOfOption: Array<{ label: string; value: number }> = [];
-  singleValue = 0;
+  // singleValue = 0;
+  size = 100;
+  timeStart = TIME_START;
+  timeEnd = TIME_END;
+  timeStep = TIME_STEP;
+
   public options: Options = {
     chart: {
-      height: 600,
+      // height: 600,
       type: "column",
       spacingBottom: 30,
       options3d: {
@@ -45,7 +50,8 @@ export class EdWrapperComponent implements OnInit {
         alpha: 15,
         beta: 15,
         depth: 1000,
-        viewDistance: 25
+        viewDistance: 25,
+        fitToPlot: true
       }
     },
     title: {
@@ -85,84 +91,96 @@ export class EdWrapperComponent implements OnInit {
     },
     series: []
   };
+
+  progresses: Observable<number>[] = []
+
+
   constructor(
+
     // private lab: EdLabService,
     private _edCoreService: EdCoreService
   ) { }
 
   ngOnInit(): void {
-    const children: Array<{
-      label: string;
-      value: number;
-    }> = [];
-    for (let i = 0; i < 10; i++) {
-      children.push({
-        label: `State - ${i + 1}`,
-        value: i
-      });
-    }
-    this.listOfOption = children;
+    // const children: Array<{ label: string; value: number; }> = [];
+
+    // for (let i = 0; i < 10; i++) {
+    //   children.push({
+    //     label: `State - ${i + 1}`,
+    //     value: i
+    //   });
+    // }
+    // this.listOfOption = children;
     // this.lab.diagonalize()
 
-    let increment = 0;
-    let noError = true;
-    var t0 = performance.now();
+    // let increment = 0;
+    // let noError = true;
+    // var t0 = performance.now();
 
-    const states = this._edCoreService.start();
+    // this._edCoreService.start();
 
-    var t1 = performance.now();
-    console.log("Call to doSomething took " + (t1 - t0) * 0.001 + " seconds.");
+
+    // this._edCoreService.timeStepResultsAggregate$.pipe(
+    //   // tap(e => console.log(e))
+    // ).subscribe()
+
+
+
+    // var t1 = performance.now();
+    // console.log("Call to doSomething took " + (t1 - t0) * 0.001 + " seconds.");
+    // // return;
+    // while (noError) {
+    //   // console.log("i run", increment);
+    //   // fs.readFile(`./ed-data/time${increment}.json`, "utf-8", (err, data) => {
+    //   //   if (err) {
+    //   //     noError = false;
+    //   //     return;
+    //   //   }
+
+    //   //   // Change how to handle the file content
+    //   //   console.log("The file content is : ", <extractedData>JSON.parse(data));
+    //   // });
+    //   if (increment === 9) {
+    //     noError = false;
+    //   }
+    //   increment++;
+    // }
+
+
+
     // return;
-    while (noError) {
-      // console.log("i run", increment);
-      // fs.readFile(`./ed-data/time${increment}.json`, "utf-8", (err, data) => {
-      //   if (err) {
-      //     noError = false;
-      //     return;
-      //   }
+    // console.log("finaldata", states);
+    // this.edData = states;
+    // const time = states.time;
+    // const space = states.space;
+    // // const avgX = states.avgX;
+    // // const diaspora = states.diaspora;
+    // let traces = [];
+    // // plot 1 P(x,t)
+    // for (let row = 0; row < states.propabilities.length; row++) {
+    //   let trace = {
+    //     x: space,
+    //     y: states.propabilities[row],
+    //     marker: {
+    //       size: 1
+    //     },
+    //     mode: "lines+markers",
+    //     name: `time - (${time[row]})`
+    //   };
+    //   traces.push(trace);
+    // }
 
-      //   // Change how to handle the file content
-      //   console.log("The file content is : ", <extractedData>JSON.parse(data));
-      // });
-      if (increment === 9) {
-        noError = false;
-      }
-      increment++;
-    }
-
-    // return;
-    console.log("finaldata", states);
-    this.edData = states;
-    const time = states.time;
-    const space = states.space;
-    // const avgX = states.avgX;
-    // const diaspora = states.diaspora;
-    let traces = [];
-    // plot 1 P(x,t)
-    for (let row = 0; row < states.propabilities.length; row++) {
-      let trace = {
-        x: space,
-        y: states.propabilities[row],
-        marker: {
-          size: 1
-        },
-        mode: "lines+markers",
-        name: `time - (${time[row]})`
-      };
-      traces.push(trace);
-    }
-
-    this.data = [...traces];
-    this.layout = {
-      width: 1600,
-      title: `Propability Time evolution`
-    };
+    // this.data = [...traces];
+    // this.layout = {
+    //   width: 1600,
+    //   title: `Propability Time evolution`
+    // };
     //plot 2 mesi thesi over time
 
     this.avgData = this._edCoreService.average$.pipe(
       map(average => [
         {
-          x: time,
+          x: this._edCoreService.deltaTimes,
           y: average,
           marker: {
             size: 1
@@ -185,17 +203,19 @@ export class EdWrapperComponent implements OnInit {
     //   }
     // ];
     this.avgLayout = {
-      width: 1600,
+      // width: 1600,
+      responsive: true,
       title: `Mean position over time`
     };
 
 
-
+    // this.diasporaData .subscribe(e => console.log(e))
     // plot 3 diaspora over time
     this.diasporaData = this._edCoreService.diaspora$.pipe(
+      // tap(e=> console.log(e)),
       map(diaspora => [
         {
-          x: time,
+          x: this._edCoreService.deltaTimes,
           y: diaspora,
           marker: {
             size: 1
@@ -218,41 +238,104 @@ export class EdWrapperComponent implements OnInit {
     //   }
     // ];
     this.diasporaLayout = {
-      width: 1600,
+      // width: 400,
+      responsive: true,
       title: `Diaspora over time`
     };
   }
+
+
+  start() {
+    console.log(888)
+    this._edCoreService.start(this.size, this.timeStart, this.timeEnd, this.timeStep);
+
+    this.progresses = Array.from(this._edCoreService.timeStepComputationBucketMap.values())
+      .map(e => e.workerEvent$
+        .pipe(filter(e => !!e.progress),
+          map(e => e.progress))
+      );
+  }
+
+
   selectNewData(index) {
     this.data = [this.traces[index]];
     this.layout.title = `Propability Time evolution for state ${index + 1}`;
   }
+
+
+
   public onLoad(evt) {
+
+    this._edCoreService.timeStepResultsAggregate$.pipe(
+      startWith([] as EdComputationWorkerEvent[]),
+      tap((timestepResults) => {
+
+        // console.log('timestepResults', timestepResults)
+
+        const space = this._edCoreService.realPosition;
+        const time = this._edCoreService.deltaTimes;
+
+        // let series = []
+        timestepResults
+          .filter(e => !!e.result
+            && e.progress === 100
+          )
+          .forEach((timestepResult, index) => {
+
+            // console.log(timestepResult, index)
+
+            const seriesName = `timestep${index}`;
+            const series = this.chart.get(seriesName);
+            if (!series) {
+              this.chart.addSeries({
+                id: seriesName,
+                type: "scatter",
+                turboThreshold: 0,
+                lineWidth: 2,
+                data: []
+              });
+            }
+            // console.log([space, timestepResult.result.propabilityForAllStates, time])
+            this.chart.get(seriesName).update({ data: [space, timestepResult.result.propabilityForAllStates, time] } as any, true)
+          })
+
+        // this.chart.series = []
+
+        // this.chart.options.data. = timestepResults.map(timestepResult => timestepResult.result)
+
+      })
+    ).subscribe()
+
+
+    // .subscribe(e => console.log(e))
+
     this.chart = evt.chart;
-    console.log("ON LOAD");
-    this.chart.series = [];
+    // console.log("ON LOAD");
+    // this.chart.series = [];
 
-    // if (this.chart.get("series-a")) {
-    //   this.chart.get("series-a").remove();
+    // // if (this.chart.get("series-a")) {
+    // //   this.chart.get("series-a").remove();
+    // // }
+    // for (let row = 0; row < this.edData.propabilities.length; row++) {
+    //   console.log(row);
+    //   // for each time we have 1 row of propabilities
+    //   let data = [];
+    //   const time = this.edData.time[row];
+    //   for (let prop = 0; prop < N; prop++) {
+    //     const space = this.edData.space[prop];
+    //     const propability = this.edData.propabilities[row][prop];
+    //     data.push([space, propability, time]);
+    //   }
+    //   this.chart.addSeries({
+    //     id: `timestep${row}`,
+    //     type: "scatter",
+    //     turboThreshold: 0,
+    //     lineWidth: 2,
+    //     // data
+    //   });
     // }
-    for (let row = 0; row < this.edData.propabilities.length; row++) {
-      console.log(row);
-      // for each time we have 1 row of propabilities
-      let data = [];
-      const time = this.edData.time[row];
-      for (let prop = 0; prop < N; prop++) {
-        const space = this.edData.space[prop];
-        const propability = this.edData.propabilities[row][prop];
-        data.push([space, propability, time]);
-      }
-      this.chart.addSeries({
-        type: "scatter",
-        turboThreshold: 0,
-        lineWidth: 2,
-        data
-      });
-    }
 
-    console.log("data to plot", this.chart);
+    // console.log("data to plot", this.chart);
     // this.chart.redraw()
   }
 }
