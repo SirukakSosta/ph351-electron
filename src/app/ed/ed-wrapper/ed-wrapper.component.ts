@@ -17,11 +17,11 @@ interface extractedData {
   styleUrls: ["./ed-wrapper.component.scss"]
 })
 export class EdWrapperComponent implements OnInit {
-  // chart data observables 
+  // chart data observables
   diasporaData: Observable<any[]>;
   avgData: Observable<any[]>;
 
-  // chart layouts 
+  // chart layouts
   avgLayout: any;
   diasporaLayout: any;
   options: Options = {
@@ -76,18 +76,17 @@ export class EdWrapperComponent implements OnInit {
     series: []
   };
 
-
+  containerWidth: number = 0;
   isCollapsed = false;
   // states = [];
   // traces = [];
 
-
   public chart: Chart;
   // threeDdata: any;
   // threeDlayout: any;
-  // data: any;
+  data: any;
   // edData: any;
-  // layout: any;
+  layout: any;
   // dataHist: any;
   // listOfOption: Array<{ label: string; value: number }> = [];
   // singleValue = 0;
@@ -98,13 +97,14 @@ export class EdWrapperComponent implements OnInit {
   timeEnd = TIME_END;
   timeStep = TIME_STEP;
 
-
-  progresses: Observable<number>[] = []
-
+  progresses: Observable<number>[] = [];
 
   constructor(public _edCoreService: EdCoreService) { }
 
   ngOnInit(): void {
+    this.containerWidth =
+      document.getElementById("inner-content").offsetWidth - 500;
+
     // const children: Array<{ label: string; value: number; }> = [];
 
     // for (let i = 0; i < 10; i++) {
@@ -122,12 +122,9 @@ export class EdWrapperComponent implements OnInit {
 
     // this._edCoreService.start();
 
-
     // this._edCoreService.timeStepResultsAggregate$.pipe(
     //   // tap(e => console.log(e))
     // ).subscribe()
-
-
 
     // var t1 = performance.now();
     // console.log("Call to doSomething took " + (t1 - t0) * 0.001 + " seconds.");
@@ -148,8 +145,6 @@ export class EdWrapperComponent implements OnInit {
     //   }
     //   increment++;
     // }
-
-
 
     // return;
     // console.log("finaldata", states);
@@ -174,10 +169,7 @@ export class EdWrapperComponent implements OnInit {
     // }
 
     // this.data = [...traces];
-    // this.layout = {
-    //   width: 1600,
-    //   title: `Propability Time evolution`
-    // };
+
     //plot 2 mesi thesi over time
 
     this.avgData = this._edCoreService.average$.pipe(
@@ -193,7 +185,7 @@ export class EdWrapperComponent implements OnInit {
           name: `time - ()`
         }
       ])
-    )
+    );
 
     // this.avgData = [
     //   {
@@ -212,7 +204,6 @@ export class EdWrapperComponent implements OnInit {
       title: `Mean position over time`
     };
 
-
     // this.diasporaData .subscribe(e => console.log(e))
     // plot 3 diaspora over time
     this.diasporaData = this._edCoreService.diaspora$.pipe(
@@ -229,7 +220,7 @@ export class EdWrapperComponent implements OnInit {
           name: `time - ()`
         }
       ])
-    )
+    );
 
     // this.diasporaData = [
     //   {
@@ -249,25 +240,28 @@ export class EdWrapperComponent implements OnInit {
     };
   }
 
-
   start() {
+    this._edCoreService.start(
+      this.size,
+      this.timeStart,
+      this.timeEnd,
+      this.timeStep
+    );
 
-    this._edCoreService.start(this.size, this.timeStart, this.timeEnd, this.timeStep);
-
-    this.progresses = Array.from(this._edCoreService.timeStepComputationBucketMap.values())
-      .map(e => e.workerEvent$
-        .pipe(filter(e => !!e.progress),
-          map(e => e.progress))
-      );
+    this.progresses = Array.from(
+      this._edCoreService.timeStepComputationBucketMap.values()
+    ).map(e =>
+      e.workerEvent$.pipe(
+        filter(e => !!e.progress),
+        map(e => e.progress)
+      )
+    );
   }
-
 
   // selectNewData(index) {
   //   this.data = [this.traces[index]];
   //   this.layout.title = `Propability Time evolution for state ${index + 1}`;
   // }
-
-
 
   public onLoad(evt) {
 
@@ -283,39 +277,66 @@ export class EdWrapperComponent implements OnInit {
 
         // let series = []
         timestepResults
-          .filter(e => !!e.result 
-            && (e.dtIndex === 0 || e.progress === 100)
+          .filter(e => !!e.result
+            // && (e.dtIndex === 0 || e.progress === 100)
             // && e.progress === 100
           )
           .forEach((timestepResult, index) => {
 
-            // console.log(timestepResult, index)
+            // plotly config
+            // return;
+            // console.log("finaldata", states);
+            // this.edData = states;
+            // const time = states.time;
+            // const space = states.space;
+            // // const avgX = states.avgX;
+            // // const diaspora = states.diaspora;
+            let traces = [];
+            // // plot 1 P(x,t)
+            // for (let row = 0; row < time.length; row++) {
+            let trace = {
+              x: space,
+              y: timestepResult.result.propabilityForAllStates,
+              marker: {
+                size: 1
+              },
+              mode: "lines+markers",
+              name: `time - (${time[index]})`
+            };
+            traces.push(trace);
+            // }
 
-            const seriesName = `timestep${index}`;
-            const series = this.chart.get(seriesName);
-            if (!series) {
-              this.chart.addSeries({
-                id: seriesName,
-                type: "scatter",
-                turboThreshold: 0,
-                lineWidth: 2,
-                data: []
-              });
-            }
+            this.data = [... this.data, ...traces]
+            console.log(this.data)
 
-            let data = []
+            this.layout = {
+              width: 1600,
+              title: `Propability Time evolution`
+            };
 
-            for (let i = 0; i < space.length; i++) {
-              const _space = space[i];
-              const _propability = timestepResult.result.propabilityForAllStates[i]
-              data.push([_space, _propability, timestepResult.dt]);
-            }
+            // highchart config
+            // const seriesName = `timestep${index}`;
+            // const series = this.chart.get(seriesName);
+            // if (!series) {
+            //   this.chart.addSeries({
+            //     id: seriesName,
+            //     type: "scatter",
+            //     turboThreshold: 0,
+            //     lineWidth: 2,
+            //     data: []
+            //   });
+            // }
 
+            // let data = []
 
-            // console.log([space, timestepResult.result.propabilityForAllStates, time])
-            // const data = [space, timestepResult.result.propabilityForAllStates, timestepResult]
-            // console.log(data)
-            this.chart.get(seriesName).update({ data } as any, true)
+            // for (let i = 0; i < space.length; i++) {
+            //   const _space = space[i];
+            //   const _propability = timestepResult.result.propabilityForAllStates[i]
+            //   data.push([_space, _propability, timestepResult.dt]);
+            // }
+
+            // this.chart.get(seriesName).update({ data } as any, true)
+
           })
 
         // this.chart.series = []

@@ -62,7 +62,7 @@
   </nz-sider>
   <nz-layout>
     <nz-content>
-      <div class="inner-content">
+      <div class="inner-content" id="inner-content">
         <div class="p-3">
           <h3>Project in Exact Diagonalization (ED)</h3>
 
@@ -90,16 +90,19 @@
           </div> -->
 
           <div class="progress-wrapper">
-            <nz-progress *ngFor="let progress of progresses" [nzPercent]="(progress | async)" nzType="circle"
-              [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }" [style.width]="  100 / progresses.length + '%'">
+            <div>
+
+            </div>
+            <nz-progress *ngFor="let progress of progresses" [nzWidth]="containerWidth / progresses.length"
+              [nzPercent]="(progress | async)" nzType="circle" [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }">
             </nz-progress>
           </div>
 
-          <!-- <plotly-plot [data]="data" [layout]="layout"></plotly-plot> -->
-          <div class="chart-container">
+          <plotly-plot [data]="data" [layout]="layout"></plotly-plot>
+          <!-- <div class="chart-container">
             <ngx-highchart [options]="options" [modules]="['highcharts-3d', 'highcharts-more']" (load)="onLoad($event)">
             </ngx-highchart>
-          </div>
+          </div> -->
           <div class="d-flex mt-1">
             <plotly-plot class="mr-1" [data]="avgData | async" [layout]="avgLayout"></plotly-plot>
             <plotly-plot [data]="diasporaData | async" [layout]="diasporaLayout"></plotly-plot>
