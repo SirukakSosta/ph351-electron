@@ -3,7 +3,6 @@ import { EdLabService } from "../ed-lab.service";
 import { EdCoreService } from "../tight-binding-model/ed-core.service";
 import { Chart, Options } from "highcharts";
 import { N } from "../tight-binding-model/defaults";
-const fs = require("fs");
 interface extractedData {
   time: number;
   averageX: number;
@@ -110,83 +109,67 @@ export class EdWrapperComponent implements OnInit {
 
     var t1 = performance.now();
     console.log("Call to doSomething took " + (t1 - t0) * 0.001 + " seconds.");
-    return;
-    while (noError) {
-      // console.log("i run", increment);
-      fs.readFile(`./ed-data/time${increment}.json`, "utf-8", (err, data) => {
-        if (err) {
-          noError = false;
-          return;
-        }
 
-        // Change how to handle the file content
-        console.log("The file content is : ", <extractedData>JSON.parse(data));
-      });
-      if (increment === 9) {
-        noError = false;
-      }
-      increment++;
+    // return;
+    // console.log("finaldata", states);
+    this.edData = states;
+    const time = states.time;
+    const space = states.space;
+    const avgX = states.avgX;
+    const diaspora = states.diaspora;
+    let traces = [];
+    // plot 1 P(x,t)
+    for (let row = 0; row < states.propabilities.length; row++) {
+      let trace = {
+        x: space,
+        y: states.propabilities[row],
+        marker: {
+          size: 1
+        },
+        mode: "lines+markers",
+        name: `time - (${time[row]})`
+      };
+      traces.push(trace);
     }
 
-    return;
-    // console.log("finaldata", states);
-    // this.edData = states;
-    // const time = states.time;
-    // const space = states.space;
-    // const avgX = states.avgX;
-    // const diaspora = states.diaspora;
-    // let traces = [];
-    // // plot 1 P(x,t)
-    // for (let row = 0; row < states.propabilities.length; row++) {
-    //   let trace = {
-    //     x: space,
-    //     y: states.propabilities[row],
-    //     marker: {
-    //       size: 1
-    //     },
-    //     mode: "lines+markers",
-    //     name: `time - (${time[row]})`
-    //   };
-    //   traces.push(trace);
-    // }
-
-    // this.data = [...traces];
-    // this.layout = {
-    //   width: 1600,
-    //   title: `Propability Time evolution`
-    // };
-    // //plot 2 mesi thesi over time
-    // this.avgData = [
-    //   {
-    //     x: time,
-    //     y: avgX,
-    //     marker: {
-    //       size: 1
-    //     },
-    //     mode: "lines+markers",
-    //     name: `time - ()`
-    //   }
-    // ];
-    // this.avgLayout = {
-    //   width: 1600,
-    //   title: `Mean position over time`
-    // };
-    // // plot 3 diaspora over time
-    // this.diasporaData = [
-    //   {
-    //     x: time,
-    //     y: diaspora,
-    //     marker: {
-    //       size: 1
-    //     },
-    //     mode: "lines+markers",
-    //     name: `time - ()`
-    //   }
-    // ];
-    // this.diasporaLayout = {
-    //   width: 1600,
-    //   title: `Diaspora over time`
-    // };
+    this.data = [...traces];
+    console.log("the data", this.data);
+    this.layout = {
+      width: 1600,
+      title: `Propability Time evolution`
+    };
+    //plot 2 mesi thesi over time
+    this.avgData = [
+      {
+        x: time,
+        y: avgX,
+        marker: {
+          size: 1
+        },
+        mode: "lines+markers",
+        name: `time - ()`
+      }
+    ];
+    this.avgLayout = {
+      width: 1600,
+      title: `Mean position over time`
+    };
+    // plot 3 diaspora over time
+    this.diasporaData = [
+      {
+        x: time,
+        y: diaspora,
+        marker: {
+          size: 1
+        },
+        mode: "lines+markers",
+        name: `time - ()`
+      }
+    ];
+    this.diasporaLayout = {
+      width: 1600,
+      title: `Diaspora over time`
+    };
   }
   selectNewData(index) {
     this.data = [this.traces[index]];

@@ -10,7 +10,6 @@ import {
   createVectorBase
 } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
-const fs = require("fs");
 @Injectable({
   providedIn: "root"
 })
@@ -26,6 +25,7 @@ export class EdCoreService {
 
   public start() {
     let initialVector = this._matrixHelper.generateRandomVector();
+    console.log(initialVector);
     initialVector = this._matrixHelper.normalizeVector(initialVector);
     const basisVectors = createVectorBase(); /** IMPORTANT - vectors are in columns in this matrix */
     let hamiltonianMatrix = this._hamiltonianService.generateHamiltonian(
@@ -52,11 +52,11 @@ export class EdCoreService {
 
   private constractParts() {
     /** Gia kathe xroniki stigmi. Exo ena array me tis pithanotites YR^2 + YI ^2. Kathe element toy array antistixi se mia idiokatastasi toy sistimatos */
-    // let finalDataForEachState = [];
-    // let deltaTimes = [];
-    // let realPosition = [];
-    // let avgX = [];
-    // let diaspora = [];
+    let finalDataForEachState = [];
+    let deltaTimes = [];
+    let realPosition = [];
+    let avgX = [];
+    let diaspora = [];
     let increment = 0;
     for (let dt = TIME_START; dt < TIME_END; dt += TIME_STEP) {
       console.log(performance.now() * 0.001 + "sec");
@@ -70,39 +70,27 @@ export class EdCoreService {
         avgsSquared += propability * Math.pow(k, 2);
       }
       const diasp = Math.sqrt(avgsSquared - Math.pow(avgs, 2));
-      // avgX.push(avgs);
-      // diaspora.push(diasp);
-      // finalDataForEachState.push(propabilityForAllStatesPerTime);
-      // deltaTimes.push(dt);
-      this.saveData(dt, avgs, diasp, propabilityForAllStatesPerTime, increment);
+      avgX.push(avgs);
+      diaspora.push(diasp);
+      finalDataForEachState.push(propabilityForAllStatesPerTime);
+      deltaTimes.push(dt);
       increment++;
     }
 
-    // for (let i = 0; i < N; i++) {
-    //   // realPosition.push(this._hamiltonianService.relalX(i));
-    //   realPosition.push(i);
-    // }
+    for (let i = 0; i < N; i++) {
+      // realPosition.push(this._hamiltonianService.relalX(i));
+      realPosition.push(i);
+    }
     return {
-      propabilities: "finalDataForEachState",
-      time: "deltaTimes",
-      space: "realPosition",
-      avgX: "avgX",
-      diaspora: "diaspora"
+      space: realPosition,
+      propabilities: finalDataForEachState,
+      time: deltaTimes,
+      space: realPosition,
+      avgX: avgX,
+      diaspora: diaspora
     };
   }
-  private saveData(dt, averageX, diaspora, propabilities, indexing) {
-    const savedData = {
-      time: dt,
-      averageX,
-      diaspora,
-      propabilities
-    };
-    const nsavedData = JSON.stringify(savedData);
-    fs.writeFile(`./ed-data/time${indexing}.json`, nsavedData, function(err) {
-      // file saved or err
-      console.log("save error", err);
-    });
-  }
+
   private getPropability(dt: number, state: number): number {
     let realPart = 0;
     let imageinaryPart = 0;
