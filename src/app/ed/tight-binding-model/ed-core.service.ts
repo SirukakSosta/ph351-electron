@@ -6,21 +6,22 @@ import { createDeltaTimes, createInitialVector } from "../methods";
 import { createVectorBase, N, TIME_END, TIME_START, TIME_STEP } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
 
+interface TimeStepResult {
+  propabilityForAllStates: number[];
+  diaspora: number;
+  avgs: number;
+}
+
 interface TimeStepComputationBucket {
   dt: number;
   worker: Worker;
   workerEvent$: Observable<EdComputationWorkerEvent>;
-  results: {
-    propabilityForAllStates: number[];
-    diaspora: number;
-    avgs: number;
-  }
 }
 
 type EdComputationWorkerEvent = {
   dt: number,
   progress: number,
-  results: Pick<TimeStepComputationBucket, 'results'>
+  result: TimeStepResult;
 }
 
 
@@ -33,6 +34,8 @@ export class EdCoreService {
 
   timeStepComputationBucketMap: Map<number, TimeStepComputationBucket> = new Map();
   finalResult$$: BehaviorSubject<{ propabilities: number[][]; time: number[]; space: number[], avgX: number, diaspora: number }>
+
+  // finalResult$= ;
 
   // edWorkers: Worker[] = [];
   // private initialVector: Array<any>;
@@ -64,7 +67,7 @@ export class EdCoreService {
 
       const results = undefined;
 
-      this.timeStepComputationBucketMap.set(dt, { worker, workerEvent$, results, dt })
+      this.timeStepComputationBucketMap.set(dt, { worker, workerEvent$, dt })
 
       // this.
 
