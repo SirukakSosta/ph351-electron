@@ -62,7 +62,7 @@
   </nz-sider>
   <nz-layout>
     <nz-content>
-      <div class="inner-content">
+      <div class="inner-content" id="inner-content">
         <div class="p-3">
           <h3>Project in Exact Diagonalization (ED)</h3>
 
@@ -90,8 +90,11 @@
           </div> -->
 
           <div class="progress-wrapper">
-            <nz-progress *ngFor="let progress of progresses" [nzPercent]="(progress | async)" nzType="circle"
-              [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }" [style.width]="  100 / progresses.length + '%'">
+            <div>
+
+            </div>
+            <nz-progress *ngFor="let progress of progresses" [nzWidth]="containerWidth / progresses.length"
+              [nzPercent]="(progress | async)" nzType="circle" [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }">
             </nz-progress>
           </div>
 

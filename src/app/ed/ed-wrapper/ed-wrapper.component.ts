@@ -2,8 +2,15 @@ import { Component, OnInit } from "@angular/core";
 import { Chart, Options } from "highcharts";
 import { Observable } from "rxjs";
 import { filter, map, startWith, tap } from "rxjs/operators";
-import { TIME_END, TIME_START, TIME_STEP } from "../tight-binding-model/defaults";
-import { EdComputationWorkerEvent, EdCoreService } from "../tight-binding-model/ed-core.service";
+import {
+  TIME_END,
+  TIME_START,
+  TIME_STEP
+} from "../tight-binding-model/defaults";
+import {
+  EdComputationWorkerEvent,
+  EdCoreService
+} from "../tight-binding-model/ed-core.service";
 // const fs = require("fs");
 interface extractedData {
   time: number;
@@ -17,11 +24,11 @@ interface extractedData {
   styleUrls: ["./ed-wrapper.component.scss"]
 })
 export class EdWrapperComponent implements OnInit {
-  // chart data observables 
+  // chart data observables
   diasporaData: Observable<any[]>;
   avgData: Observable<any[]>;
 
-  // chart layouts 
+  // chart layouts
   avgLayout: any;
   diasporaLayout: any;
   options: Options = {
@@ -76,11 +83,10 @@ export class EdWrapperComponent implements OnInit {
     series: []
   };
 
-
+  containerWidth: number = 0;
   isCollapsed = false;
   // states = [];
   // traces = [];
-
 
   public chart: Chart;
   // threeDdata: any;
@@ -98,13 +104,14 @@ export class EdWrapperComponent implements OnInit {
   timeEnd = TIME_END;
   timeStep = TIME_STEP;
 
+  progresses: Observable<number>[] = [];
 
-  progresses: Observable<number>[] = []
-
-
-  constructor(public _edCoreService: EdCoreService) { }
+  constructor(public _edCoreService: EdCoreService) {}
 
   ngOnInit(): void {
+    this.containerWidth =
+      document.getElementById("inner-content").offsetWidth - 500;
+
     // const children: Array<{ label: string; value: number; }> = [];
 
     // for (let i = 0; i < 10; i++) {
@@ -122,12 +129,9 @@ export class EdWrapperComponent implements OnInit {
 
     // this._edCoreService.start();
 
-
     // this._edCoreService.timeStepResultsAggregate$.pipe(
     //   // tap(e => console.log(e))
     // ).subscribe()
-
-
 
     // var t1 = performance.now();
     // console.log("Call to doSomething took " + (t1 - t0) * 0.001 + " seconds.");
@@ -148,8 +152,6 @@ export class EdWrapperComponent implements OnInit {
     //   }
     //   increment++;
     // }
-
-
 
     // return;
     // console.log("finaldata", states);
@@ -192,7 +194,7 @@ export class EdWrapperComponent implements OnInit {
           name: `time - ()`
         }
       ])
-    )
+    );
 
     // this.avgData = [
     //   {
@@ -211,7 +213,6 @@ export class EdWrapperComponent implements OnInit {
       title: `Mean position over time`
     };
 
-
     // this.diasporaData .subscribe(e => console.log(e))
     // plot 3 diaspora over time
     this.diasporaData = this._edCoreService.diaspora$.pipe(
@@ -227,7 +228,7 @@ export class EdWrapperComponent implements OnInit {
           name: `time - ()`
         }
       ])
-    )
+    );
 
     // this.diasporaData = [
     //   {
@@ -247,70 +248,72 @@ export class EdWrapperComponent implements OnInit {
     };
   }
 
-
   start() {
+    this._edCoreService.start(
+      this.size,
+      this.timeStart,
+      this.timeEnd,
+      this.timeStep
+    );
 
-    this._edCoreService.start(this.size, this.timeStart, this.timeEnd, this.timeStep);
-
-    this.progresses = Array.from(this._edCoreService.timeStepComputationBucketMap.values())
-      .map(e => e.workerEvent$
-        .pipe(filter(e => !!e.progress),
-          map(e => e.progress))
-      );
+    this.progresses = Array.from(
+      this._edCoreService.timeStepComputationBucketMap.values()
+    ).map(e =>
+      e.workerEvent$.pipe(
+        filter(e => !!e.progress),
+        map(e => e.progress)
+      )
+    );
   }
-
 
   // selectNewData(index) {
   //   this.data = [this.traces[index]];
   //   this.layout.title = `Propability Time evolution for state ${index + 1}`;
   // }
 
-
-
   public onLoad(evt) {
+    this._edCoreService.timeStepResultsAggregate$
+      .pipe(
+        startWith([] as EdComputationWorkerEvent[]),
+        tap(timestepResults => {
+          // console.log('timestepResults', timestepResults)
 
-    this._edCoreService.timeStepResultsAggregate$.pipe(
-      startWith([] as EdComputationWorkerEvent[]),
-      tap((timestepResults) => {
+          const space = this._edCoreService.realPosition;
+          const time = this._edCoreService.deltaTimes;
 
-        // console.log('timestepResults', timestepResults)
+          // let series = []
+          timestepResults
+            .filter(e => !!e.result && e.progress === 100)
+            .forEach((timestepResult, index) => {
+              // console.log(timestepResult, index)
 
-        const space = this._edCoreService.realPosition;
-        const time = this._edCoreService.deltaTimes;
+              const seriesName = `timestep${index}`;
+              const series = this.chart.get(seriesName);
+              if (!series) {
+                this.chart.addSeries({
+                  id: seriesName,
+                  type: "scatter",
+                  turboThreshold: 0,
+                  lineWidth: 2,
+                  data: []
+                });
+              }
+              // console.log([space, timestepResult.result.propabilityForAllStates, time])
+              const data = [
+                space,
+                timestepResult.result.propabilityForAllStates,
+                time
+              ];
+              console.log(data);
+              this.chart.get(seriesName).update({ data } as any, true);
+            });
 
-        // let series = []
-        timestepResults
-          .filter(e => !!e.result
-            && e.progress === 100
-          )
-          .forEach((timestepResult, index) => {
+          // this.chart.series = []
 
-            // console.log(timestepResult, index)
-
-            const seriesName = `timestep${index}`;
-            const series = this.chart.get(seriesName);
-            if (!series) {
-              this.chart.addSeries({
-                id: seriesName,
-                type: "scatter",
-                turboThreshold: 0,
-                lineWidth: 2,
-                data: []
-              });
-            }
-            // console.log([space, timestepResult.result.propabilityForAllStates, time])
-            const data = [space, timestepResult.result.propabilityForAllStates, time]
-              console.log(data)
-            this.chart.get(seriesName).update({ data } as any, true)
-          })
-
-        // this.chart.series = []
-
-        // this.chart.options.data. = timestepResults.map(timestepResult => timestepResult.result)
-
-      })
-    ).subscribe()
-
+          // this.chart.options.data. = timestepResults.map(timestepResult => timestepResult.result)
+        })
+      )
+      .subscribe();
 
     // .subscribe(e => console.log(e))
 
