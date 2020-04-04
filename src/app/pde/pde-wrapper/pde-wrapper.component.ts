@@ -4,7 +4,7 @@ import { Subscription } from "rxjs";
 import { filter, map, tap } from "rxjs/operators";
 import { AM } from "../interface";
 import { PdeLabService } from "../pde-lab.service";
-import { exerciseChargeEquationMap } from "../variable";
+import { exerciseChargeEquationMap, _chargeEquation } from "../variable";
 
 // constants
 @Component({
@@ -31,24 +31,47 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   chargeEquationLatex: string;
   constantY = 0;
   // derivtionForPlot = [];
-  chargeEquation: (i: number, j: number, h: number) => number;
+  // chargeEquation: (i: number, j: number, h: number) => number;
   exerciseSubscription: Subscription;
   voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(
     map(e => !!e[0] && !!e[0].length)
   );
+  chargeEquationStr: string;
+  chargeEquationStrValid: boolean;
 
   constructor(private route: ActivatedRoute, private lab: PdeLabService) { }
 
+  checkChargeEquationStrValidity(val: string) {
+    
+    const x = 1, y = 1, h = 1;
+    this.chargeEquationStrValid = true
+    try {
+      const ff = _chargeEquation(val, x, y, h)
+      if (Number.isNaN(ff)){
+        this.chargeEquationStrValid = false;
+      }
+    } catch (error) {
+      this.chargeEquationStrValid = false;
+       
+    }
+    
+  }
+  
   ngOnInit(): void {
+
+
+    console.log(this)
+
     this.exerciseSubscription = this.route.paramMap
       .pipe(
         filter(paramMap => paramMap.has("am")),
         tap(paramMap => {
           const exercise = paramMap.get("am") as AM;
           this.lab.resetVariables();
-          this.chargeEquation =
-            exerciseChargeEquationMap[exercise].chargeEquation;
-          this.chargeEquationLatex = exerciseChargeEquationMap[exercise].latex;
+          // this.chargeEquation = exerciseChargeEquationMap[exercise].chargeEquation;
+          // this.chargeEquationLatex = exerciseChargeEquationMap[exercise].latex;
+          this.chargeEquationStr = exerciseChargeEquationMap[exercise]
+          this.chargeEquationStrValid = true
         })
       )
       .subscribe();
@@ -300,7 +323,12 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     const y = this.getRealXY(j);
     // const result = Math.pow(this.H, 2) * (2.0 * ((1 - x) * x + (1 - y) * y));
     // const result = Math.pow(this.H, 2) * 12 * (Math.pow(x, 2));
-    const result = this.chargeEquation(x, y, this.H);
+
+
+    const result = _chargeEquation(this.chargeEquationStr, x, y, this.H) // this.chargeEquation(x, y, this.H);
+
+
+
     return result;
   }
   private getRandomValues(): number {

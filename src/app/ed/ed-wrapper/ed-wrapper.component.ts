@@ -3,6 +3,8 @@ import { PlotComponent, PlotlyService } from "angular-plotly.js";
 import { Chart, Options } from "highcharts";
 import { BehaviorSubject, Observable, timer } from "rxjs";
 import { map, sampleTime, take, tap } from "rxjs/operators";
+import { AM } from "../../pde/interface";
+import { createPotentialFunction, waveFunctionVal } from "../methods";
 import { TIME_END, TIME_START, TIME_STEP } from "../tight-binding-model/defaults";
 import { EdCoreService } from "../tight-binding-model/ed-core.service";
 // const fs = require("fs");
@@ -86,11 +88,54 @@ export class EdWrapperComponent implements OnInit {
   propabilityPlotlyData$ = this.propabilityPlotlyData$$.asObservable().pipe(
     // sampleTime(1000)
   )
+  potentialEquationStrValid: boolean = true;
+  waveEquationStrValid: boolean = true;
 
   constructor(
     public _edCoreService: EdCoreService,
     public plotly: PlotlyService
   ) { }
+
+  setPotentialFunctionByAM(e: AM) {
+
+    if (e === '3943') {
+      this.potentialFunction = `0.5 * x`
+    } else if (e === '3131') {
+      this.potentialFunction = `Math.pow(x,2)`
+    }
+    this.potentialEquationStrValid = true;
+    this.waveEquationStrValid = true;
+  }
+
+  checkWaveFunctionStrValidity(val: string) {
+
+    this.waveEquationStrValid = true
+    try {
+      const ff = waveFunctionVal(1, val)
+      if (Number.isNaN(ff)) {
+        this.waveEquationStrValid = false;
+      }
+    } catch (error) {
+      this.waveEquationStrValid = false;
+
+    }
+
+  }
+
+  checkPotentialFunctionStrValidity(val: string) {
+
+    this.potentialEquationStrValid = true
+    try {
+      const ff = createPotentialFunction(1, val)
+      if (Number.isNaN(ff)) {
+        this.potentialEquationStrValid = false;
+      }
+    } catch (error) {
+      this.potentialEquationStrValid = false;
+
+    }
+
+  }
 
   ngOnInit(): void {
 
@@ -276,7 +321,7 @@ export class EdWrapperComponent implements OnInit {
   plot3dAllTimeSteps() {
     this._edCoreService.timeStepResultsAggregate$
       .pipe(
-      
+
         sampleTime(100),
         // startWith([] as EdComputationWorkerEvent[]),
         tap(timestepResults => {
@@ -410,12 +455,12 @@ export class EdWrapperComponent implements OnInit {
       this.timeEnd,
       this.timeStep,
       this.startDxStep,
-        this.waveFunction,
-        this.potentialFunction
+      this.waveFunction,
+      this.potentialFunction
     );
 
     this.progresses1 = this._edCoreService.timeStepResultsAggregate$.pipe(
-     
+
       map(computationResults => {
         return computationResults.filter(computationResult => computationResult.progress < 100).length
       }),

@@ -1,3 +1,6 @@
+export function waveFunctionVal(x: number, waveFunctionStr: string) {
+    return eval(waveFunctionStr)
+}
 
 function generateRandomVector(N: number, waveFunction: string): Array<number> {
     let vector = [];
@@ -8,7 +11,7 @@ function generateRandomVector(N: number, waveFunction: string): Array<number> {
 
         const x = i;
         const exp_value = (-1 / 50) * Math.pow(x - 50, 2);
-        const c_i = eval(waveFunction) // Math.exp(exp_value);
+        const c_i = waveFunctionVal(i, waveFunction) // eval(waveFunction) // Math.exp(exp_value);
         vector.push(c_i);
     }
     return vector;
