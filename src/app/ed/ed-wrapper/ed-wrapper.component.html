@@ -122,9 +122,12 @@
 
 
             operations : {{progresses1 | async}}
-
-            <button type="button" (click)="plot3dAllTimeSteps()">Plot 3d all time steps</button>
-            <button type="button" (click)="plot3dTimeLapse()">Plot 3d time lapse</button>
+            <button nz-button nzType="primary" (click)="plot3dAllTimeSteps()">
+              Plot 3d all time steps
+            </button>
+            <button nz-button nzType="primary" (click)="plot3dTimeLapse()">
+              Plot 3d time lapse
+            </button>
 
             <!-- <nz-progress *ngFor="let progress of progresses" [nzWidth]="'100'" [nzPercent]="(progress | async)"
               nzType="circle" [nzStrokeColor]="{ '0%': '#108ee9', '100%': '#87d068' }">
@@ -132,13 +135,15 @@
           </div>
           <!-- <div id="chart"></div> -->
           <plotly-plot #propabilityPlotly [data]="propabilityPlotlyData$ | async" [layout]="layout"></plotly-plot>
+          <br>
           <!-- <div class="chart-container">
             <ngx-highchart [options]="options" [modules]="['highcharts-3d', 'highcharts-more']" (load)="onLoad($event)">
             </ngx-highchart>
           </div> -->
+          <plotly-plot [data]="avgData | async" [layout]="avgLayout"></plotly-plot>
+          <br>
+          <plotly-plot [data]="diasporaData | async" [layout]="diasporaLayout"></plotly-plot>
           <div class="d-flex mt-1">
-            <plotly-plot class="mr-1" [data]="avgData | async" [layout]="avgLayout"></plotly-plot>
-            <plotly-plot [data]="diasporaData | async" [layout]="diasporaLayout"></plotly-plot>
           </div>
 
         </div>

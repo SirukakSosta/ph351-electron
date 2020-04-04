@@ -5,11 +5,14 @@ import { BehaviorSubject, Observable, timer } from "rxjs";
 import { map, sampleTime, take, tap } from "rxjs/operators";
 import { AM } from "../../pde/interface";
 import { createPotentialFunction, waveFunctionVal } from "../methods";
-import { TIME_END, TIME_START, TIME_STEP } from "../tight-binding-model/defaults";
+import {
+  TIME_END,
+  TIME_START,
+  TIME_STEP,
+} from "../tight-binding-model/defaults";
 import { EdCoreService } from "../tight-binding-model/ed-core.service";
 // const fs = require("fs");
 interface extractedData {
-  time: number;
   averageX: number;
   diaspora: number;
   propabilities: Array<number>;
@@ -17,7 +20,7 @@ interface extractedData {
 @Component({
   selector: "app-ed-wrapper",
   templateUrl: "./ed-wrapper.component.html",
-  styleUrls: ["./ed-wrapper.component.scss"]
+  styleUrls: ["./ed-wrapper.component.scss"],
 })
 export class EdWrapperComponent implements OnInit {
   @ViewChild("propabilityPlotly") propabilityPlotly: PlotComponent;
@@ -25,7 +28,7 @@ export class EdWrapperComponent implements OnInit {
   // chart data observables
   diasporaData: Observable<any[]>;
   avgData: Observable<any[]>;
-
+  time: number;
   // chart layouts
   avgLayout: any;
   diasporaLayout: any;
@@ -40,21 +43,21 @@ export class EdWrapperComponent implements OnInit {
         beta: 15,
         depth: 1000,
         viewDistance: 25,
-        fitToPlot: true
-      }
+        fitToPlot: true,
+      },
     },
     title: {
-      text: "Electric Field"
+      text: "Electric Field",
     },
     plotOptions: {
       area: {
-        fillOpacity: 0.5
-      }
+        fillOpacity: 0.5,
+      },
     },
     credits: {
-      enabled: false
+      enabled: false,
     },
-    series: []
+    series: [],
   };
 
   containerWidth: number = 0;
@@ -78,68 +81,62 @@ export class EdWrapperComponent implements OnInit {
   timeEnd = TIME_END;
   timeStep = TIME_STEP;
   startDxStep = 30;
-  waveFunction: string = 'Math.exp((-1 / 50) * Math.pow(x - 50, 2))'
-  potentialFunction: string = '0.5 * x'
+  waveFunction: string = "Math.exp((-1 / 50) * Math.pow(x - 50, 2))";
+  potentialFunction: string = "0.5 * x";
 
   progresses: Observable<number>[] = [];
   progresses1: Observable<number>;
 
-  propabilityPlotlyData$$ = new BehaviorSubject([])
-  propabilityPlotlyData$ = this.propabilityPlotlyData$$.asObservable().pipe(
+  propabilityPlotlyData$$ = new BehaviorSubject([]);
+  propabilityPlotlyData$ = this.propabilityPlotlyData$$
+    .asObservable()
+    .pipe
     // sampleTime(1000)
-  )
+    ();
   potentialEquationStrValid: boolean = true;
   waveEquationStrValid: boolean = true;
 
   constructor(
     public _edCoreService: EdCoreService,
     public plotly: PlotlyService
-  ) { }
+  ) {}
 
   setPotentialFunctionByAM(e: AM) {
-
-    if (e === '3943') {
-      this.potentialFunction = `0.5 * x`
-    } else if (e === '3131') {
-      this.potentialFunction = `Math.pow(x,2)`
+    if (e === "3943") {
+      this.potentialFunction = `0.5 * x`;
+    } else if (e === "3131") {
+      this.potentialFunction = `Math.pow(x,2)`;
     }
     this.potentialEquationStrValid = true;
     this.waveEquationStrValid = true;
   }
 
   checkWaveFunctionStrValidity(val: string) {
-
-    this.waveEquationStrValid = true
+    this.waveEquationStrValid = true;
     try {
-      const ff = waveFunctionVal(1, val)
+      const ff = waveFunctionVal(1, val);
       if (Number.isNaN(ff)) {
         this.waveEquationStrValid = false;
       }
     } catch (error) {
       this.waveEquationStrValid = false;
-
     }
-
   }
 
   checkPotentialFunctionStrValidity(val: string) {
-
-    this.potentialEquationStrValid = true
+    this.potentialEquationStrValid = true;
     try {
-      const ff = createPotentialFunction(1, val)
+      const ff = createPotentialFunction(1, val);
       if (Number.isNaN(ff)) {
         this.potentialEquationStrValid = false;
       }
     } catch (error) {
       this.potentialEquationStrValid = false;
-
     }
-
   }
 
   ngOnInit(): void {
-
-    console.log(this)
+    console.log(this);
     // const update = {
     //   title: 'New Title',
     //   data: this.data
@@ -242,26 +239,30 @@ export class EdWrapperComponent implements OnInit {
     //plot 2 mesi thesi over time
     let traces1 = [];
 
-
     this.plot3dAllTimeSteps();
 
-
     this.layout = {
-      width: 1600,
-      title: `Propability Time evolution`
+      // width: 1600,
+      title: `P(x,t) - Propability Time evolution`,
+      xaxis: {
+        title: "x",
+      },
+      yaxis: {
+        title: "P(x)",
+      },
     };
     this.avgData = this._edCoreService.average$.pipe(
       sampleTime(100),
-      map(average => [
+      map((average) => [
         {
           x: this._edCoreService.deltaTimes,
           y: average,
           marker: {
-            size: 1
+            size: 1,
           },
           mode: "lines+markers",
-          name: `time - ()`
-        }
+          name: `time - ()`,
+        },
       ])
     );
 
@@ -277,9 +278,15 @@ export class EdWrapperComponent implements OnInit {
     //   }
     // ];
     this.avgLayout = {
-      width: 600,
+      // width: 600,
       responsive: true,
-      title: `Mean position over time`
+      title: `Mean over time`,
+      xaxis: {
+        title: "t",
+      },
+      yaxis: {
+        title: "<X>",
+      },
     };
 
     // this.diasporaData .subscribe(e => console.log(e))
@@ -287,16 +294,16 @@ export class EdWrapperComponent implements OnInit {
     this.diasporaData = this._edCoreService.diaspora$.pipe(
       // tap(e=> console.log(e)),
       sampleTime(100),
-      map(diaspora => [
+      map((diaspora) => [
         {
           x: this._edCoreService.deltaTimes,
           y: diaspora,
           marker: {
-            size: 1
+            size: 1,
           },
           mode: "lines+markers",
-          name: `time - ()`
-        }
+          name: `time - ()`,
+        },
       ])
     );
 
@@ -312,28 +319,36 @@ export class EdWrapperComponent implements OnInit {
     //   }
     // ];
     this.diasporaLayout = {
-      width: 600,
+      // width: 600,
       responsive: true,
-      title: `Diaspora over time`
+      title: `Standard deviation (σ) over time`,
+      xaxis: {
+        title: "t",
+      },
+      yaxis: {
+        title: "σ(t)",
+      },
     };
   }
 
   plot3dAllTimeSteps() {
     this._edCoreService.timeStepResultsAggregate$
       .pipe(
-
         sampleTime(100),
         // startWith([] as EdComputationWorkerEvent[]),
-        tap(timestepResults => {
+        tap((timestepResults) => {
           // console.log('timestepResults', timestepResults)
-
+          this.layout = {
+            // width: 1600,
+            title: `P(x,t) - Propability Time evolution`,
+          };
           const space = this._edCoreService.realPosition;
           const time = this._edCoreService.deltaTimes;
 
           // let series = []
           timestepResults
             .filter(
-              e => !!e.result
+              (e) => !!e.result
               // && (e.dtIndex % 10 === 0)
               // && (e.dtIndex === 0 || e.progress === 100)
               // && e.progress === 100
@@ -341,35 +356,34 @@ export class EdWrapperComponent implements OnInit {
             .forEach((timestepResult, index) => {
               // let traces = [];
 
-
               let trace = {
                 x: space,
                 y: timestepResult.result.propabilityForAllStates,
                 marker: {
-                  size: 1
+                  size: 1,
                 },
                 mode: "lines+markers",
-                name: `time - (${time[index]})`
+                name: `P(${time[index]}, x)`,
               };
               // this.data.push(trace);
-              this.propabilityPlotlyData$$.next([...this.propabilityPlotlyData$$.getValue(), trace])
+              this.propabilityPlotlyData$$.next([
+                ...this.propabilityPlotlyData$$.getValue(),
+                trace,
+              ]);
             });
         }),
-        sampleTime(400),
+        sampleTime(400)
       )
       .subscribe();
   }
 
   plot3dTimeLapse() {
-
-    this.propabilityPlotlyData$$.next([])
+    this.propabilityPlotlyData$$.next([]);
     this._edCoreService.timeStepResultsAggregate$
       .pipe(
         take(1),
-        tap(timestepResults => {
-
-          timestepResults.forEach(timestepResult => {
-
+        tap((timestepResults) => {
+          timestepResults.forEach((timestepResult) => {
             const space = this._edCoreService.realPosition;
             const time = this._edCoreService.deltaTimes;
 
@@ -377,25 +391,28 @@ export class EdWrapperComponent implements OnInit {
               x: space,
               y: timestepResult.result.propabilityForAllStates,
               marker: {
-                size: 1
+                size: 1,
               },
               mode: "lines+markers",
-              name: `time - (${time[timestepResult.dtIndex]})`
+              name: `time - (${time[timestepResult.dtIndex]})`,
             };
 
-            timer(timestepResult.dtIndex * 300).pipe(
-              tap(e => {
-                this.propabilityPlotlyData$$.next([trace])
-              }),
-              take(1)
-            ).subscribe()
-
-
-          })
+            timer(timestepResult.dtIndex * 300)
+              .pipe(
+                tap((e) => {
+                  this.layout = {
+                    // width: 1600,
+                    title: `P(x, ${timestepResult.dtIndex}) - Propability Time evolution`,
+                  };
+                  this.propabilityPlotlyData$$.next([trace]);
+                }),
+                take(1)
+              )
+              .subscribe();
+          });
         })
-
-      ).
-      subscribe()
+      )
+      .subscribe();
 
     // this._edCoreService.timeStepResultsAggregate$
     //   .pipe(
@@ -443,12 +460,10 @@ export class EdWrapperComponent implements OnInit {
     //     })
     //   )
     //   .subscribe();
-
   }
 
   start() {
-
-    this.propabilityPlotlyData$$.next([])
+    this.propabilityPlotlyData$$.next([]);
     this._edCoreService.start(
       this.size,
       this.timeStart,
@@ -460,12 +475,13 @@ export class EdWrapperComponent implements OnInit {
     );
 
     this.progresses1 = this._edCoreService.timeStepResultsAggregate$.pipe(
-
-      map(computationResults => {
-        return computationResults.filter(computationResult => computationResult.progress < 100).length
+      map((computationResults) => {
+        return computationResults.filter(
+          (computationResult) => computationResult.progress < 100
+        ).length;
       }),
-      sampleTime(100),
-    )
+      sampleTime(100)
+    );
 
     // this.progresses = Array.from(
     //   this._edCoreService.timeStepComputationBucketMap.values()
@@ -490,14 +506,14 @@ export class EdWrapperComponent implements OnInit {
       .pipe(
         sampleTime(100),
         // startWith([] as EdComputationWorkerEvent[]),
-        tap(timestepResults => {
+        tap((timestepResults) => {
           const space = this._edCoreService.realPosition;
           const time = this._edCoreService.deltaTimes;
 
           // let series = []
           timestepResults
             .filter(
-              e => !!e.result
+              (e) => !!e.result
               // && (e.dtIndex === 0 || e.progress === 100)
               // && e.progress === 100
             )
