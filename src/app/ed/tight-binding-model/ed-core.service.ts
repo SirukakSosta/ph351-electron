@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
-import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subscription, timer } from "rxjs";
+import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subject, Subscription, timer } from "rxjs";
 import { map, shareReplay, take, tap } from "rxjs/operators";
 import { createDeltaTimes, createInitialVector, createPosition } from "../methods";
 import { createVectorBase } from "./defaults";
@@ -47,6 +47,8 @@ export class EdCoreService {
   operationSubscription: Subscription;
   refreshLatency = 200;
 
+  private experimentNum$$: Subject<number>;
+
   constructor(private _hamiltonianService: HamiltonianService) {
 
   }
@@ -77,6 +79,7 @@ export class EdCoreService {
         // const timeSteps = computationEvents.map(computationEvent => computationEvent.result.propabilityForAllStates);
         this.timeStepResultsAggregate$$.next(computationEvents)
       }),
+      // takeUntil(this.experimentNum$$)
       // filter(computationEvents => !!computationEvents.filter(computationEvent => !!computationEvent.result).length),
 
 
@@ -85,7 +88,6 @@ export class EdCoreService {
 
     this.timeStepResultsAggregate$$.pipe(
       // set averages
-      // filter(computationEvents => !!computationEvents.filter(computationEvent => computationEvent.result.avgs).length),
       tap(computationEvents => {
         const average = computationEvents
           .filter(computationEvent => !!computationEvent.result && !!computationEvent.result.avgs)
@@ -97,13 +99,12 @@ export class EdCoreService {
     this.timeStepResultsAggregate$$.pipe(
 
       // set diaspora
-      // filter(computationEvents => !!computationEvents.filter(computationEvent => computationEvent.result.diaspora).length),
       tap(computationEvents => {
         const diaspora = computationEvents
           .filter(computationEvent => !!computationEvent.result && !!computationEvent.result.diaspora)
           .map(computationEvent => computationEvent.result.diaspora);
         this.diaspora$$.next(diaspora)
-      })
+      }),
     ).subscribe()
 
     this.operationSubscription = merge(...computationEvents$).subscribe()
@@ -122,6 +123,8 @@ export class EdCoreService {
   private startTimelapseComputations(initialVector: Array<any>, eigenValues: Array<any>, eigenVectors: Array<any>, basisVectors: Array<any>,
     start: number, end: number, step: number, size: number, startDxStep: number, postResultsDuringComputation: boolean) {
 
+    //   this.experimentNum$$ = new Subject()
+    // this.experimentNum$$.next(0)
     // clear buckets if already exist. terminates workers as well
     this.clearTimeStepComputationBucketMap();
     // construct new computation buckets for new space and time variables
