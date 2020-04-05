@@ -55,7 +55,7 @@ export function getPropability(dt: number, state: number, points: number, eigenV
 export function createPosition(N: number, startDxStep: number) {
     const positions: number[] = [];
     for (let i = 0; i < N; i++) {
-        positions.push(i + startDxStep);
+        positions.push(i);
     }
     return positions;
 }

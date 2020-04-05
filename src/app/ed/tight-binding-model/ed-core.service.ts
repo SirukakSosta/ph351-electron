@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subject, Subscription, timer } from "rxjs";
-import { map, shareReplay, take, takeUntil, tap } from "rxjs/operators";
+import { map, take, takeUntil, tap } from "rxjs/operators";
 import { createDeltaTimes, createInitialVector, createPosition, getDxTotalPoints } from "../methods";
 import { createVectorBase } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
@@ -41,7 +41,7 @@ export class EdCoreService {
   realPosition = [];
 
   private timeStepResultsAggregate$$ = new BehaviorSubject([] as EdComputationWorkerEvent[])
-  timeStepResultsAggregate$ = this.timeStepResultsAggregate$$.asObservable().pipe(shareReplay());
+  timeStepResultsAggregate$ = this.timeStepResultsAggregate$$.asObservable();
 
   resultCollectorSuscription: Subscription;
   operationSubscription: Subscription;
@@ -197,8 +197,11 @@ export class EdCoreService {
 
 
     const initialVector = createInitialVector(totalPoints, waveFunction);
+
     this.deltaTimes = createDeltaTimes(dtStart, dtEnd, dt);
+
     this.realPosition = createPosition(totalPoints, dxStart);
+
     console.log('realPosition',this.realPosition)
 
     this.startTimelapseComputations(dxStart, dxEnd, dx, initialVector, eigenValues, eigenVectors, basisVectors, dtStart, dtEnd, dt, postResultsDuringComputation)
