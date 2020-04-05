@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import * as math from "mathjs";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subject, Subscription, timer } from "rxjs";
 import { map, shareReplay, take, takeUntil, tap } from "rxjs/operators";
-import { createDeltaTimes, createInitialVector, createPosition } from "../methods";
+import { createDeltaTimes, createInitialVector, createPosition, getDxTotalPoints } from "../methods";
 import { createVectorBase } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
 
@@ -120,14 +120,15 @@ export class EdCoreService {
 
   }
 
-  private startTimelapseComputations(initialVector: Array<any>, eigenValues: Array<any>, eigenVectors: Array<any>, basisVectors: Array<any>,
-    start: number, end: number, step: number, size: number, startDxStep: number, postResultsDuringComputation: boolean) {
+  private startTimelapseComputations(dxStart: number, dxEnd: number, dx: number,
+    initialVector: Array<any>, eigenValues: Array<any>, eigenVectors: Array<any>, basisVectors: Array<any>,
+    dtStart: number, dtEnd: number, dt: number, postResultsDuringComputation: boolean) {
 
 
     // clear buckets if already exist. terminates workers as well
     this.clearTimeStepComputationBucketMap();
     // construct new computation buckets for new space and time variables
-    this.constructTimeStepComputationBucketMap(start, end, step);
+    this.constructTimeStepComputationBucketMap(dtStart, dtEnd, dt);
 
 
     // this.resetExistingWorkers();
@@ -139,7 +140,7 @@ export class EdCoreService {
 
       timer(i * 300).pipe(
         tap(() => {
-          bucket.worker.postMessage(JSON.stringify({ dt, dtIndex, initialVector, eigenValues, eigenVectors, basisVectors, size, startDxStep, postResultsDuringComputation }))
+          bucket.worker.postMessage(JSON.stringify({ dxStart, dxEnd, dx, dt, dtIndex, initialVector, eigenValues, eigenVectors, basisVectors, postResultsDuringComputation }))
         }),
         take(1)
       ).subscribe()
@@ -156,7 +157,7 @@ export class EdCoreService {
     if (this.destroyExp$) {
       this.destroyExp$.next(0)
       this.destroyExp$.complete()
- 
+
     }
     this.destroyExp$ = new Subject()
 
@@ -170,11 +171,14 @@ export class EdCoreService {
 
   }
 
-  public start(size: number, start: number, end: number, step: number, startDxStep: number, waveFunction: string, potentialFunction: string, postResultsDuringComputation: boolean) {
+  public start(dxStart: number, dxEnd: number, dx: number, dtStart: number, dtEnd: number, dt: number, waveFunction: string,
+    potentialFunction: string, postResultsDuringComputation: boolean) {
 
     this.reset();
+    const totalPoints = getDxTotalPoints(dxEnd, dx)
 
-    const basisVectors = createVectorBase(size); /** IMPORTANT - vectors are in columns in this matrix */
+    const basisVectors = createVectorBase(totalPoints); /** IMPORTANT - vectors are in columns in this matrix */
+    console.log(basisVectors)
     let hamiltonianMatrix = this._hamiltonianService.generateHamiltonian(basisVectors);
     let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(hamiltonianMatrix, potentialFunction);
 
@@ -189,12 +193,14 @@ export class EdCoreService {
     const eigenValues = values;
 
     const isOrthogonal = this.isOrthogonal(eigenVectors)
+    
+   
 
-    const initialVector = createInitialVector(size, waveFunction);
-    this.deltaTimes = createDeltaTimes(start, end, step);
-    this.realPosition = createPosition(size, startDxStep);
+    const initialVector = createInitialVector(totalPoints, waveFunction);
+    this.deltaTimes = createDeltaTimes(dtStart, dtEnd, dt);
+    this.realPosition = createPosition(totalPoints, dxStart);
 
-    this.startTimelapseComputations(initialVector, eigenValues, eigenVectors, basisVectors, start, end, step, size, startDxStep, postResultsDuringComputation)
+    this.startTimelapseComputations(dxStart, dxEnd, dx, initialVector, eigenValues, eigenVectors, basisVectors, dtStart, dtEnd, dt, postResultsDuringComputation)
   }
 
   isOrthogonal(eigenVectors: number[][]) {

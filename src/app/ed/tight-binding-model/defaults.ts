@@ -7,6 +7,7 @@ export const TIME_STEP = 1;
 
 export function createVectorBase(size: number): Array<Array<number>> {
   /** kathe sthlh toy pinaka eiai idiodianisma ths bashs */
+  
   let basisVectors = new Array(size).fill(0).map(() => new Array(size).fill(0));
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {

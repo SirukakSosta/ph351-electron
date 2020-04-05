@@ -21,16 +21,22 @@
         </div>
       </div>
       <div nz-row [nzGutter]="4" class="form">
-        <div nz-col [nzSpan]="24">
+              <div nz-col [nzSpan]="24">
           <div class="item">
-            <label for="">Points</label>
-            <input nz-input type="number" placeholder="Size" [(ngModel)]="size" />
+            <label for="">Start dx step</label>
+            <input nz-input type="number" placeholder="Start dx step" [(ngModel)]="startDx" />
           </div>
         </div>
         <div nz-col [nzSpan]="24">
           <div class="item">
-            <label for="">Start dx step</label>
-            <input nz-input type="number" placeholder="Start dx step" [(ngModel)]="startDxStep" />
+            <label for="">End dx step</label>
+            <input nz-input type="number" placeholder="End dx step" [(ngModel)]="endDx" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">dx</label>
+            <input nz-input type="number" placeholder="dx" [(ngModel)]="dx" />
           </div>
         </div>
         <div nz-col [nzSpan]="24">
@@ -128,8 +134,8 @@
               {{i}} - {{progress | async}} %
             </div> -->
 
-
-            Computations : {{progresses1 | async}}
+            <span *ngIf="(progresses1 | async) > 0"> computing... </span>
+            <!-- Computations : -->
             <button nz-button nzType="primary" (click)="plot3dAllTimeSteps()">
               Plot 3d all time steps
             </button>

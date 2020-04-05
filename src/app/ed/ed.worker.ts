@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { getPropability } from "./methods/method";
+import { getDxTotalPoints, getPropability } from "./methods/method";
 
 type input = {
   dt: number,
@@ -9,8 +9,9 @@ type input = {
   eigenValues: Array<any>,
   eigenVectors: Array<any>,
   basisVectors: Array<any>,
-  size: number
-  startDxStep: number
+  dxStart: number
+  dxEnd: number
+  dx: number
   postResultsDuringComputation: boolean
 }
 
@@ -38,10 +39,10 @@ addEventListener('message', ({ data }) => {
   let diaspora = 0;
   let propabilitySum = 0;
 
-  for (let k = input.startDxStep; k < input.size; k++) {
+  for (let k = input.dxStart; k < input.dxEnd; k += input.dx) {
 
 
-    const propability = getPropability(input.dt, k, input.size, input.eigenVectors, input.basisVectors, input.initialVector, input.eigenValues);
+    const propability = getPropability(input.dt, k, getDxTotalPoints(input.dxEnd, input.dx), input.eigenVectors, input.basisVectors, input.initialVector, input.eigenValues);
 
     propabilityForAllStates.push(propability);
     avgs += propability * k;
@@ -50,11 +51,11 @@ addEventListener('message', ({ data }) => {
     propabilitySum += propability;
 
     // async update on results
-    if ((k % (input.size / 20)) === 0) {
-      const result = input.postResultsDuringComputation ? { propabilityForAllStates, diaspora, avgs } : null // { propabilityForAllStates, diaspora: 0, avgs };
-      const output: output = { dtIndex: input.dtIndex, dt: input.dt, progress: (k * 100 / input.size), result }
-      postMessage(JSON.stringify(output))
-    }
+    // if ((k % (input.size / 20)) === 0) {
+    //   const result = input.postResultsDuringComputation ? { propabilityForAllStates, diaspora, avgs } : null // { propabilityForAllStates, diaspora: 0, avgs };
+    //   const output: output = { dtIndex: input.dtIndex, dt: input.dt, progress: (k * 100 / input.size), result }
+    //   postMessage(JSON.stringify(output))
+    // }
 
   }
 

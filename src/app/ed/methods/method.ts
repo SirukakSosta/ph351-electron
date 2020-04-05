@@ -67,3 +67,9 @@ export function createDeltaTimes(start: number, end: number, step: number) {
     }
     return deltaTimes;
 }
+
+export function getDxTotalPoints(dxEnd: number, dx: number) {
+
+    return Math.ceil(dxEnd / dx)
+
+}
