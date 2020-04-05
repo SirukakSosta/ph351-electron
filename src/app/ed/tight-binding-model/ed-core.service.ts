@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subject, Subscription, timer } from "rxjs";
-import { map, take, takeUntil, tap } from "rxjs/operators";
+import { map, shareReplay, take, takeUntil, tap } from "rxjs/operators";
 import { createDeltaTimes, createInitialVector, createPosition, getDxTotalPoints } from "../methods";
 import { createVectorBase } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
@@ -41,7 +41,7 @@ export class EdCoreService {
   realPosition = [];
 
   private timeStepResultsAggregate$$ = new BehaviorSubject([] as EdComputationWorkerEvent[])
-  timeStepResultsAggregate$ = this.timeStepResultsAggregate$$.asObservable();
+  timeStepResultsAggregate$ = this.timeStepResultsAggregate$$.asObservable().pipe(shareReplay());
 
   resultCollectorSuscription: Subscription;
   operationSubscription: Subscription;
