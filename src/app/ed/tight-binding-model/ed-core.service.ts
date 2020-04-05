@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
 import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subject, Subscription, timer } from "rxjs";
-import { map, shareReplay, take, tap } from "rxjs/operators";
+import { map, shareReplay, take, takeUntil, tap } from "rxjs/operators";
 import { createDeltaTimes, createInitialVector, createPosition } from "../methods";
 import { createVectorBase } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
@@ -47,7 +47,7 @@ export class EdCoreService {
   operationSubscription: Subscription;
   refreshLatency = 200;
 
-  private experimentNum$$: Subject<number>;
+  private destroyExp$: Subject<number>;
 
   constructor(private _hamiltonianService: HamiltonianService) {
 
@@ -79,7 +79,7 @@ export class EdCoreService {
         // const timeSteps = computationEvents.map(computationEvent => computationEvent.result.propabilityForAllStates);
         this.timeStepResultsAggregate$$.next(computationEvents)
       }),
-      // takeUntil(this.experimentNum$$)
+      takeUntil(this.destroyExp$)
       // filter(computationEvents => !!computationEvents.filter(computationEvent => !!computationEvent.result).length),
 
 
@@ -123,8 +123,7 @@ export class EdCoreService {
   private startTimelapseComputations(initialVector: Array<any>, eigenValues: Array<any>, eigenVectors: Array<any>, basisVectors: Array<any>,
     start: number, end: number, step: number, size: number, startDxStep: number, postResultsDuringComputation: boolean) {
 
-    //   this.experimentNum$$ = new Subject()
-    // this.experimentNum$$.next(0)
+
     // clear buckets if already exist. terminates workers as well
     this.clearTimeStepComputationBucketMap();
     // construct new computation buckets for new space and time variables
@@ -153,6 +152,13 @@ export class EdCoreService {
   }
 
   public reset() {
+
+    if (this.destroyExp$) {
+      this.destroyExp$.next(0)
+      this.destroyExp$.complete()
+ 
+    }
+    this.destroyExp$ = new Subject()
 
     this.clearTimeStepComputationBucketMap();
     if (this.operationSubscription) {

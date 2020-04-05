@@ -92,11 +92,44 @@ export class EdWrapperComponent implements OnInit {
   potentialEquationStrValid: boolean = true;
   waveEquationStrValid: boolean = true;
   postResultsDuringComputation = true;
+  potentialOverDistanceLayout: any;
+  potentialOverDistanceData: any;
+  waveOverDistanceLayout: any;
+  waveOverDistanceData: any;
 
-  constructor(
-    public _edCoreService: EdCoreService,
-    public plotly: PlotlyService
-  ) { }
+  constructor(public _edCoreService: EdCoreService, public plotly: PlotlyService) { }
+
+
+  ngOnInit(): void {
+    console.log(this);
+
+    this.containerWidth =
+      document.getElementById("inner-content").offsetWidth - 500;
+
+    //plot 2 mesi thesi over time
+    let traces1 = [];
+
+    this.plotPotentialOverDistance()
+    this.plotWaveOverDistance()
+
+    this.createDiasporaChart();
+    this.createAvgsChart()
+    this.plot3dAllTimeSteps();
+
+    this.layout = {
+      // width: 1600,
+      title: `P(x,t) - Propability Time evolution`,
+      xaxis: {
+        title: "x",
+      },
+      yaxis: {
+        title: "P(x)",
+      },
+    };
+
+
+
+  }
 
   setPotentialFunctionByAM(e: AM) {
     if (e === "3943") {
@@ -118,6 +151,9 @@ export class EdWrapperComponent implements OnInit {
     } catch (error) {
       this.waveEquationStrValid = false;
     }
+    if (this.waveEquationStrValid) {
+      this.plotWaveOverDistance()
+    }
   }
 
   checkPotentialFunctionStrValidity(val: string) {
@@ -130,36 +166,83 @@ export class EdWrapperComponent implements OnInit {
     } catch (error) {
       this.potentialEquationStrValid = false;
     }
+    if (this.potentialEquationStrValid) {
+      this.plotPotentialOverDistance()
+    }
   }
 
-  ngOnInit(): void {
-    console.log(this);
+  plotPotentialOverDistance() {
 
-    this.containerWidth =
-      document.getElementById("inner-content").offsetWidth - 500;
-
-    //plot 2 mesi thesi over time
-    let traces1 = [];
-
-
-    this.createDiasporaChart();
-    this.createAvgsChart()
-    this.plot3dAllTimeSteps();
-
-    this.layout = {
-      // width: 1600,
-      title: `P(x,t) - Propability Time evolution`,
+    this.potentialOverDistanceLayout = {
+      // width: 600,
+      responsive: true,
+      title: `Potential over distance`,
       xaxis: {
         title: "x",
       },
       yaxis: {
-        title: "P(x)",
+        title: "Potential",
       },
     };
 
+    let xData: number[] = [];
+    let yData: number[] = [];
+    for (let i = this.startDxStep; i < this.size; i++) {
+      const potential = createPotentialFunction(i, this.potentialFunction);
+      xData.push(i);
+      yData.push(potential);
+    }
 
+    this.potentialOverDistanceData = [
+      {
+        x: xData,
+        y: yData,
+        marker: {
+          size: 1,
+        },
+        mode: "lines+markers",
+        name: `time - ()`,
+      },
+    ]
 
   }
+
+  plotWaveOverDistance() {
+
+    this.waveOverDistanceLayout = {
+      // width: 600,
+      responsive: true,
+      title: `Wave over distance`,
+      xaxis: {
+        title: "x",
+      },
+      yaxis: {
+        title: "Wave",
+      },
+    };
+
+    let xData: number[] = [];
+    let yData: number[] = [];
+    for (let i = this.startDxStep; i < this.size; i++) {
+      const val = waveFunctionVal(i, this.waveFunction);
+      xData.push(i);
+      yData.push(val);
+    }
+
+    this.waveOverDistanceData = [
+      {
+        x: xData,
+        y: yData,
+        marker: {
+          size: 1,
+        },
+        mode: "lines+markers",
+        name: `time - ()`,
+      },
+    ]
+
+  }
+
 
   createAvgsChart() {
     this.avgData = this._edCoreService.average$.pipe(
@@ -239,9 +322,9 @@ export class EdWrapperComponent implements OnInit {
           timestepResults
             .filter(
               (e) => !!e.result
-                // && (e.dtIndex % 10 === 0)
-                // && (e.dtIndex === 0 || e.progress === 100)
-                // && e.progress === 100
+              // && (e.dtIndex % 10 === 0)
+              // && (e.dtIndex === 0 || e.progress === 100)
+              // && e.progress === 100
             )
             .forEach((timestepResult, index) => {
               // let traces = [];
@@ -268,10 +351,11 @@ export class EdWrapperComponent implements OnInit {
   }
 
   plot3dTimeLapse() {
+
     this.propabilityPlotlyData$$.next([]);
     this._edCoreService.timeStepResultsAggregate$
       .pipe(
-        take(1),
+        // take(1),
         tap((timestepResults) => {
           timestepResults.forEach((timestepResult) => {
             const space = this._edCoreService.realPosition;
