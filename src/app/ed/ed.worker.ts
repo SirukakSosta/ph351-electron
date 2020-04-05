@@ -38,11 +38,12 @@ addEventListener('message', ({ data }) => {
   let avgsSquared = 0;
   let diaspora = 0;
   let propabilitySum = 0;
+  const totalPoints = getDxTotalPoints(input.dxEnd, input.dx)
 
-  for (let k = input.dxStart; k < input.dxEnd; k += input.dx) {
+  for (let k = 0; k <totalPoints; k ++) {
 
 
-    const propability = getPropability(input.dt, k, getDxTotalPoints(input.dxEnd, input.dx), input.eigenVectors, input.basisVectors, input.initialVector, input.eigenValues);
+    const propability = getPropability(input.dt, k,totalPoints, input.eigenVectors, input.basisVectors, input.initialVector, input.eigenValues);
 
     propabilityForAllStates.push(propability);
     avgs += propability * k;
