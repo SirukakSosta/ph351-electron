@@ -5,11 +5,7 @@ import { BehaviorSubject, Observable, timer } from "rxjs";
 import { map, sampleTime, take, tap } from "rxjs/operators";
 import { AM } from "../../pde/interface";
 import { createPotentialFunction, waveFunctionVal } from "../methods";
-import {
-  TIME_END,
-  TIME_START,
-  TIME_STEP,
-} from "../tight-binding-model/defaults";
+import { TIME_END, TIME_START, TIME_STEP } from "../tight-binding-model/defaults";
 import { EdCoreService } from "../tight-binding-model/ed-core.service";
 // const fs = require("fs");
 interface extractedData {
@@ -95,11 +91,12 @@ export class EdWrapperComponent implements OnInit {
     ();
   potentialEquationStrValid: boolean = true;
   waveEquationStrValid: boolean = true;
+  postResultsDuringComputation = true;
 
   constructor(
     public _edCoreService: EdCoreService,
     public plotly: PlotlyService
-  ) {}
+  ) { }
 
   setPotentialFunctionByAM(e: AM) {
     if (e === "3943") {
@@ -349,9 +346,9 @@ export class EdWrapperComponent implements OnInit {
           timestepResults
             .filter(
               (e) => !!e.result
-              // && (e.dtIndex % 10 === 0)
-              // && (e.dtIndex === 0 || e.progress === 100)
-              // && e.progress === 100
+                && (e.dtIndex % 10 === 0)
+                // && (e.dtIndex === 0 || e.progress === 100)
+                && e.progress === 100
             )
             .forEach((timestepResult, index) => {
               // let traces = [];
@@ -471,16 +468,18 @@ export class EdWrapperComponent implements OnInit {
       this.timeStep,
       this.startDxStep,
       this.waveFunction,
-      this.potentialFunction
+      this.potentialFunction,
+      this.postResultsDuringComputation
     );
 
     this.progresses1 = this._edCoreService.timeStepResultsAggregate$.pipe(
       map((computationResults) => {
-        return computationResults.filter(
-          (computationResult) => computationResult.progress < 100
-        ).length;
+        console.log(computationResults)
+        return computationResults.filter((computationResult) => computationResult.progress < 100).length;
       }),
-      sampleTime(100)
+      // delay(1000),
+      // startWith(this._edCoreService.timeStepComputationBucketMap.size),
+      // sampleTime(100)
     );
 
     // this.progresses = Array.from(

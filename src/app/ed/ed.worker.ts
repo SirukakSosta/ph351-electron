@@ -11,6 +11,7 @@ type input = {
   basisVectors: Array<any>,
   size: number
   startDxStep: number
+  postResultsDuringComputation: boolean
 }
 
 type output = {
@@ -50,7 +51,8 @@ addEventListener('message', ({ data }) => {
 
     // async update on results
     if ((k % (input.size / 20)) === 0) {
-      const output: output = { dtIndex: input.dtIndex, dt: input.dt, progress: (k * 100 / input.size), result: { propabilityForAllStates, diaspora: 0, avgs } }
+      const result = input.postResultsDuringComputation ? { propabilityForAllStates, diaspora, avgs } : null // { propabilityForAllStates, diaspora: 0, avgs };
+      const output: output = { dtIndex: input.dtIndex, dt: input.dt, progress: (k * 100 / input.size), result }
       postMessage(JSON.stringify(output))
     }
 

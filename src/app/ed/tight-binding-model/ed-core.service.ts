@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
-import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subscription } from "rxjs";
-import { map, sampleTime, tap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subscription, timer } from "rxjs";
+import { map, shareReplay, take, tap } from "rxjs/operators";
 import { createDeltaTimes, createInitialVector, createPosition } from "../methods";
 import { createVectorBase } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
@@ -41,7 +41,7 @@ export class EdCoreService {
   realPosition = [];
 
   private timeStepResultsAggregate$$ = new BehaviorSubject([] as EdComputationWorkerEvent[])
-  timeStepResultsAggregate$ = this.timeStepResultsAggregate$$.asObservable();
+  timeStepResultsAggregate$ = this.timeStepResultsAggregate$$.asObservable().pipe(shareReplay());
 
   resultCollectorSuscription: Subscription;
   operationSubscription: Subscription;
@@ -51,7 +51,7 @@ export class EdCoreService {
 
   }
 
-  constructTimeStepComputationBucketMap(start: number, end: number, step: number, startDxStep: number) {
+  constructTimeStepComputationBucketMap(start: number, end: number, step: number) {
 
     let dtIndex = 0;
     for (let dt = start; dt < end; dt += step) {
@@ -71,24 +71,40 @@ export class EdCoreService {
     const computationEvents$ = Array.from(this.timeStepComputationBucketMap.values()).map(e => e.workerEvent$);
 
     this.resultCollectorSuscription = combineLatest(computationEvents$).pipe(
-      sampleTime(this.refreshLatency),
+      // sampleTime(this.refreshLatency),
       // set time steps
       tap(computationEvents => {
         // const timeSteps = computationEvents.map(computationEvent => computationEvent.result.propabilityForAllStates);
         this.timeStepResultsAggregate$$.next(computationEvents)
       }),
+      // filter(computationEvents => !!computationEvents.filter(computationEvent => !!computationEvent.result).length),
+
+
+    ).subscribe()
+
+
+    this.timeStepResultsAggregate$$.pipe(
       // set averages
+      // filter(computationEvents => !!computationEvents.filter(computationEvent => computationEvent.result.avgs).length),
       tap(computationEvents => {
-        const average = computationEvents.map(computationEvent => computationEvent.result.avgs);
+        const average = computationEvents
+          .filter(computationEvent => !!computationEvent.result && !!computationEvent.result.avgs)
+          .map(computationEvent => computationEvent.result.avgs);
         this.average$$.next(average)
       }),
+    ).subscribe()
+
+    this.timeStepResultsAggregate$$.pipe(
+
       // set diaspora
+      // filter(computationEvents => !!computationEvents.filter(computationEvent => computationEvent.result.diaspora).length),
       tap(computationEvents => {
-        const diaspora = computationEvents.map(computationEvent => computationEvent.result.diaspora);
+        const diaspora = computationEvents
+          .filter(computationEvent => !!computationEvent.result && !!computationEvent.result.diaspora)
+          .map(computationEvent => computationEvent.result.diaspora);
         this.diaspora$$.next(diaspora)
       })
     ).subscribe()
-
 
     this.operationSubscription = merge(...computationEvents$).subscribe()
 
@@ -104,22 +120,32 @@ export class EdCoreService {
   }
 
   private startTimelapseComputations(initialVector: Array<any>, eigenValues: Array<any>, eigenVectors: Array<any>, basisVectors: Array<any>,
-    start: number, end: number, step: number, size: number, startDxStep: number) {
+    start: number, end: number, step: number, size: number, startDxStep: number, postResultsDuringComputation: boolean) {
 
     // clear buckets if already exist. terminates workers as well
     this.clearTimeStepComputationBucketMap();
     // construct new computation buckets for new space and time variables
-    this.constructTimeStepComputationBucketMap(start, end, step, startDxStep);
-    // construct final result observable by merging all the step computations
-    this.constructResultObservables();
+    this.constructTimeStepComputationBucketMap(start, end, step);
+
+
     // this.resetExistingWorkers();
     // start parallel computations 
-    Array.from(this.timeStepComputationBucketMap.values()).forEach(bucket => {
+    Array.from(this.timeStepComputationBucketMap.values()).forEach((bucket, i) => {
       const dt = bucket.dt;
       const dtIndex = bucket.dtIndex;
       // post to web worker
-      bucket.worker.postMessage(JSON.stringify({ dt, dtIndex, initialVector, eigenValues, eigenVectors, basisVectors, size, startDxStep }))
+
+      timer(i * 300).pipe(
+        tap(() => {
+          bucket.worker.postMessage(JSON.stringify({ dt, dtIndex, initialVector, eigenValues, eigenVectors, basisVectors, size, startDxStep, postResultsDuringComputation }))
+        }),
+        take(1)
+      ).subscribe()
+
     })
+
+    // construct final result observable by merging all the step computations
+    this.constructResultObservables();
 
   }
 
@@ -135,7 +161,7 @@ export class EdCoreService {
 
   }
 
-  public start(size: number, start: number, end: number, step: number, startDxStep: number, waveFunction: string, potentialFunction: string) {
+  public start(size: number, start: number, end: number, step: number, startDxStep: number, waveFunction: string, potentialFunction: string, postResultsDuringComputation: boolean) {
 
     this.reset();
 
@@ -143,13 +169,13 @@ export class EdCoreService {
     let hamiltonianMatrix = this._hamiltonianService.generateHamiltonian(basisVectors);
     let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(hamiltonianMatrix, potentialFunction);
 
-console.log(hamiltonianMatrixWithPotential)
+    console.log(hamiltonianMatrixWithPotential)
 
     const ans = (<any>math).eigs(hamiltonianMatrixWithPotential);
     const { values, vectors } = ans;
     const eigenVectors = vectors;
 
-    console.log('eigenVectors', eigenVectors)
+    // console.log('eigenVectors', eigenVectors)
 
     const eigenValues = values;
 
@@ -159,7 +185,7 @@ console.log(hamiltonianMatrixWithPotential)
     this.deltaTimes = createDeltaTimes(start, end, step);
     this.realPosition = createPosition(size, startDxStep);
 
-    this.startTimelapseComputations(initialVector, eigenValues, eigenVectors, basisVectors, start, end, step, size, startDxStep)
+    this.startTimelapseComputations(initialVector, eigenValues, eigenVectors, basisVectors, start, end, step, size, startDxStep, postResultsDuringComputation)
   }
 
   isOrthogonal(eigenVectors: number[][]) {

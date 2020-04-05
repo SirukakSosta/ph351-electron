@@ -79,6 +79,13 @@
       <hr />
       <div nz-col [nzSpan]="24">
         <div class="item">
+          <label for="real_time_results">Results during Computation</label>
+          <input nz-input name="real_time_results"  id="real_time_results" type="checkbox" placeholder="Time Step" [(ngModel)]="postResultsDuringComputation" />
+        </div>
+
+      </div>
+      <div nz-col [nzSpan]="24">
+        <div class="item">
           <label for="">Refresh Latency</label>
           <input nz-input type="number" placeholder="Time Step" [(ngModel)]="_edCoreService.refreshLatency" />
         </div>
@@ -121,7 +128,7 @@
             </div> -->
 
 
-            operations : {{progresses1 | async}}
+            Computations : {{progresses1 | async}}
             <button nz-button nzType="primary" (click)="plot3dAllTimeSteps()">
               Plot 3d all time steps
             </button>
