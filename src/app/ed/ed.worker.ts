@@ -40,10 +40,10 @@ addEventListener('message', ({ data }) => {
   let propabilitySum = 0;
   const totalPoints = getDxTotalPoints(input.dxEnd, input.dx)
 
-  for (let k = 0; k <totalPoints; k ++) {
+  for (let k = 0; k < totalPoints; k++) {
 
 
-    const propability = getPropability(input.dt, k,totalPoints, input.eigenVectors, input.basisVectors, input.initialVector, input.eigenValues);
+    const propability = getPropability(input.dt, k, totalPoints, input.eigenVectors, input.basisVectors, input.initialVector, input.eigenValues);
 
     propabilityForAllStates.push(propability);
     avgs += propability * k;
@@ -52,11 +52,11 @@ addEventListener('message', ({ data }) => {
     propabilitySum += propability;
 
     // async update on results
-    // if ((k % (input.size / 20)) === 0) {
-    //   const result = input.postResultsDuringComputation ? { propabilityForAllStates, diaspora, avgs } : null // { propabilityForAllStates, diaspora: 0, avgs };
-    //   const output: output = { dtIndex: input.dtIndex, dt: input.dt, progress: (k * 100 / input.size), result }
-    //   postMessage(JSON.stringify(output))
-    // }
+    if ((k % (totalPoints / 20)) === 0) {
+      const result = input.postResultsDuringComputation ? { propabilityForAllStates, diaspora, avgs } : null // { propabilityForAllStates, diaspora: 0, avgs };
+      const output: output = { dtIndex: input.dtIndex, dt: input.dt, progress: (k * 100 / totalPoints), result }
+      postMessage(JSON.stringify(output))
+    }
 
   }
 

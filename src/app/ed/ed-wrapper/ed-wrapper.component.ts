@@ -64,7 +64,7 @@ export class EdWrapperComponent implements OnInit {
   timeStart = TIME_START;
   timeEnd = TIME_END;
   timeStep = TIME_STEP;
-  
+
   startDx = 30;
   endDx = 70;
   dx = 1;
@@ -83,7 +83,7 @@ export class EdWrapperComponent implements OnInit {
     ();
   potentialEquationStrValid: boolean = true;
   waveEquationStrValid: boolean = true;
-  postResultsDuringComputation = true;
+  postResultsDuringComputation = false;
   potentialOverDistanceLayout: any;
   potentialOverDistanceData: any;
   waveOverDistanceLayout: any;
@@ -95,12 +95,9 @@ export class EdWrapperComponent implements OnInit {
   ngOnInit(): void {
     console.log(this);
 
-    this.containerWidth =
-      document.getElementById("inner-content").offsetWidth - 500;
+    this.containerWidth = document.getElementById("inner-content").offsetWidth - 500;
 
     //plot 2 mesi thesi over time
-    let traces1 = [];
-
     this.plotPotentialOverDistance()
     this.plotWaveOverDistance()
 
@@ -119,7 +116,14 @@ export class EdWrapperComponent implements OnInit {
       },
     };
 
-
+    this.progresses1 = this._edCoreService.timeStepResultsAggregate$.pipe(
+      map(computationResults => {
+        const pendingComputations = computationResults.filter(computationResult => computationResult.progress < 100).length
+        const allComputations = this._edCoreService.timeStepComputationBucketMap.size;
+        const remaining = (allComputations - pendingComputations) * 100 / allComputations
+        return remaining;
+      })
+    );
 
   }
 
@@ -179,7 +183,7 @@ export class EdWrapperComponent implements OnInit {
 
     let xData: number[] = [];
     let yData: number[] = [];
-    for (let i = this.startDx; i < this.endDx; i+= this.dx) {
+    for (let i = this.startDx; i < this.endDx; i += this.dx) {
       const potential = createPotentialFunction(i, this.potentialFunction);
       xData.push(i);
       yData.push(potential);
@@ -218,7 +222,7 @@ export class EdWrapperComponent implements OnInit {
 
     let xData: number[] = [];
     let yData: number[] = [];
-    for (let i = this.startDx; i < this.endDx; i+= this.dx) {
+    for (let i = this.startDx; i < this.endDx; i += this.dx) {
       const val = waveFunctionVal(i, this.waveFunction);
       xData.push(i);
       yData.push(val);
@@ -393,17 +397,6 @@ export class EdWrapperComponent implements OnInit {
       this.postResultsDuringComputation
     );
 
-    this.progresses1 = this._edCoreService.timeStepResultsAggregate$.pipe(
-      map(computationResults => {
-        console.log(computationResults);
-        return computationResults.filter(
-          computationResult => computationResult.progress < 100
-        ).length;
-      })
-      // delay(1000),
-      // startWith(this._edCoreService.timeStepComputationBucketMap.size),
-      // sampleTime(100)
-    );
 
     // this.progresses = Array.from(
     //   this._edCoreService.timeStepComputationBucketMap.values()

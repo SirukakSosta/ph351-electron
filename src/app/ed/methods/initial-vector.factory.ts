@@ -43,14 +43,16 @@ export function createInitialVector(N: number, waveFunction: string) {
 
 export function createPotentialFunction(i: number, potentialFunction: string): number {
     // const x = this.relalX(i);
-    const x = i;
+    // const x = i;
     // const factor = 1;
     // const harmonicOscilator = factor * Math.pow(x, 2);
     // const exam = Math.sin((2 * Math.PI * x) / 10);
     // const tanoglidis =  0.5 * i // Math.sign(sin(2 * Math.PI * x));
 
+    const x = i
+
     const potential = eval(potentialFunction)
-    console.log(x,potential)
+    console.log(x, potential)
 
     return potential;
     // x = transform i to real x

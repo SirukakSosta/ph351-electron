@@ -134,7 +134,7 @@
               {{i}} - {{progress | async}} %
             </div> -->
 
-            <span *ngIf="(progresses1 | async) > 0"> computing... </span>
+            <span *ngIf="(progresses1 | async)"> computing... ({{progresses1 | async}}) % </span>
             <!-- Computations : -->
             <button nz-button nzType="primary" (click)="plot3dAllTimeSteps()">
               Plot 3d all time steps

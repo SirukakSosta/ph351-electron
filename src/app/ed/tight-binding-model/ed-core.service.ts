@@ -180,7 +180,7 @@ export class EdCoreService {
     const basisVectors = createVectorBase(totalPoints); /** IMPORTANT - vectors are in columns in this matrix */
     console.log(basisVectors)
     let hamiltonianMatrix = this._hamiltonianService.generateHamiltonian(basisVectors);
-    let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(hamiltonianMatrix, potentialFunction);
+    let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(hamiltonianMatrix, potentialFunction, dxEnd, dx);
 
     console.log(hamiltonianMatrixWithPotential)
 
@@ -193,12 +193,13 @@ export class EdCoreService {
     const eigenValues = values;
 
     const isOrthogonal = this.isOrthogonal(eigenVectors)
-    
-   
+
+
 
     const initialVector = createInitialVector(totalPoints, waveFunction);
     this.deltaTimes = createDeltaTimes(dtStart, dtEnd, dt);
     this.realPosition = createPosition(totalPoints, dxStart);
+    console.log('realPosition',this.realPosition)
 
     this.startTimelapseComputations(dxStart, dxEnd, dx, initialVector, eigenValues, eigenVectors, basisVectors, dtStart, dtEnd, dt, postResultsDuringComputation)
   }

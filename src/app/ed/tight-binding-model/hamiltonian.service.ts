@@ -52,20 +52,30 @@ export class HamiltonianService {
 
     return hamiltonian;
   }
-  public addPotential(oldHamiltonian: Array<Array<number>>, potentialFunction: string): Array<Array<number>> {
+  public addPotential(oldHamiltonian: Array<Array<number>>, potentialFunction: string, dxEnd: number, dx: number): Array<Array<number>> {
     const N = oldHamiltonian.length;
     let newHamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
-    for (let row = 0; row < N; row++) {
-      for (let col = 0; col < N; col++) {
-        //  prostheto stixia mono sth diagonio
-        if (row === col) {
-          newHamiltonian[row][col] =
-            oldHamiltonian[row][col] + createPotentialFunction(row, potentialFunction);
-        } else {
-          newHamiltonian[row][col] = oldHamiltonian[row][col];
-        }
-      }
+
+    console.log('N', N)
+    for (let point = 0; point < N; point++) {
+
+      const scaledPoint = Math.ceil(dx * point);
+      const potential = createPotentialFunction(scaledPoint, potentialFunction)
+
+      console.log(point, scaledPoint, potential)
+      newHamiltonian[point][point] = oldHamiltonian[point][point] + potential
     }
+
+    // for (let row = 0; row < N; row++) {
+    //   for (let col = 0; col < N; col++) {
+    //     //  prostheto stixia mono sth diagonio
+    //     if (row === col) {
+    //       newHamiltonian[row][col] = oldHamiltonian[row][col] + createPotentialFunction(row * (dx / dxEnd), potentialFunction);
+    //     } else {
+    //       newHamiltonian[row][col] = oldHamiltonian[row][col];
+    //     }
+    //   }
+    // }
     return newHamiltonian;
     return oldHamiltonian;
   }
