@@ -54,7 +54,7 @@ export class HamiltonianService {
   }
   public addPotential(oldHamiltonian: Array<Array<number>>, potentialFunction: string, dxEnd: number, dx: number): Array<Array<number>> {
     const N = oldHamiltonian.length;
-    let newHamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
+    // let newHamiltonian = new Array(N).fill(0).map(() => new Array(N).fill(0));
 
     console.log('N', N)
     for (let point = 0; point < N; point++) {
@@ -63,7 +63,7 @@ export class HamiltonianService {
       const potential = createPotentialFunction(scaledPoint, potentialFunction)
 
       console.log(point, scaledPoint, potential)
-      newHamiltonian[point][point] = oldHamiltonian[point][point] + potential
+      oldHamiltonian[point][point] = oldHamiltonian[point][point] + potential
     }
 
     // for (let row = 0; row < N; row++) {
@@ -76,7 +76,7 @@ export class HamiltonianService {
     //     }
     //   }
     // }
-    return newHamiltonian;
+    // return newHamiltonian;
     return oldHamiltonian;
   }
   // public potentialFunction(i: number): number {
