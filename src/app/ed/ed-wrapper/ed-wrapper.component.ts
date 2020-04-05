@@ -310,20 +310,20 @@ export class EdWrapperComponent implements OnInit {
         tap(timestepResults => {
           // console.log('timestepResults', timestepResults)
           this.layout.title = `P(x,t) - Propability Time evolution`;
-          const space = this._edCoreService.realPosition;
-          const time = this._edCoreService.deltaTimes;
+          const space = this._edCoreService.realPosition
+          const time = this._edCoreService.deltaTimes
 
-          // let series = []
+          let traces = [];
           timestepResults
             .filter(
               (e) => !!e.result
-              // e => !!e.result
-              // && (e.dtIndex % 10 === 0)
-              // && (e.dtIndex === 0 || e.progress === 100)
-              // && e.progress === 100
+                // e => !!e.result
+                // && (e.dtIndex % 10 === 0)
+                // && (e.dtIndex === 0 || e.progress === 100)
+                && e.progress === 100
             )
             .forEach((timestepResult, index) => {
-              // let traces = [];
+
 
               let trace = {
                 x: space,
@@ -334,10 +334,9 @@ export class EdWrapperComponent implements OnInit {
                 mode: "lines+markers",
                 name: `P(${time[index]}, x)`
               };
-              // this.data.push(trace);
+              traces.push(trace);
               this.propabilityPlotlyData$$.next([
-                ...this.propabilityPlotlyData$$.getValue(),
-                trace
+                ...traces
               ]);
             });
         }),

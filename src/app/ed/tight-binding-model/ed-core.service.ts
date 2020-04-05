@@ -197,8 +197,11 @@ export class EdCoreService {
 
 
     const initialVector = createInitialVector(totalPoints, waveFunction);
+
     this.deltaTimes = createDeltaTimes(dtStart, dtEnd, dt);
+
     this.realPosition = createPosition(totalPoints, dxStart);
+
     console.log('realPosition',this.realPosition)
 
     this.startTimelapseComputations(dxStart, dxEnd, dx, initialVector, eigenValues, eigenVectors, basisVectors, dtStart, dtEnd, dt, postResultsDuringComputation)
