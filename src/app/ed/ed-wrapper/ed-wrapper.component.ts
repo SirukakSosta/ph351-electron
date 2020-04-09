@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { PlotComponent, PlotlyService } from "angular-plotly.js";
 import { Chart, Options } from "highcharts";
 import { BehaviorSubject, Observable, timer } from "rxjs";
-import { map, sampleTime, take, tap } from "rxjs/operators";
+import { filter, map, sampleTime, take, tap } from "rxjs/operators";
 import { AM } from "../../pde/interface";
 import { createPotentialFunction, waveFunctionVal } from "../methods";
 import { TIME_END, TIME_START, TIME_STEP } from "../tight-binding-model/defaults";
@@ -71,10 +71,6 @@ export class EdWrapperComponent implements OnInit {
 
   waveFunction: string = "Math.exp((-1 / 50) * Math.pow(x - 50, 2))";
   potentialFunction: string = "0.5 * x";
-
-  progresses: Observable<number>[] = [];
-  progresses1: Observable<number>;
-
   propabilityPlotlyData$$ = new BehaviorSubject([]);
   propabilityPlotlyData$ = this.propabilityPlotlyData$$
     .asObservable()
@@ -88,6 +84,8 @@ export class EdWrapperComponent implements OnInit {
   potentialOverDistanceData: any;
   waveOverDistanceLayout: any;
   waveOverDistanceData: any;
+  waveOverDistanceVisible: boolean = true;
+  potentialOverDistanceVisible: boolean = true;
 
   constructor(public _edCoreService: EdCoreService, public plotly: PlotlyService) { }
 
@@ -115,15 +113,6 @@ export class EdWrapperComponent implements OnInit {
         title: "P(x)",
       },
     };
-
-    this.progresses1 = this._edCoreService.timeStepResultsAggregate$.pipe(
-      map(computationResults => {
-        const pendingComputations = computationResults.filter(computationResult => computationResult.progress < 100).length
-        const allComputations = this._edCoreService.timeStepComputationBucketMap.size;
-        const remaining = (allComputations - pendingComputations) * 100 / allComputations
-        return remaining;
-      })
-    );
 
   }
 
@@ -303,9 +292,11 @@ export class EdWrapperComponent implements OnInit {
   }
 
   plot3dAllTimeSteps() {
+
     this._edCoreService.timeStepResultsAggregate$
       .pipe(
         sampleTime(100),
+
         // startWith([] as EdComputationWorkerEvent[]),
         tap(timestepResults => {
           // console.log('timestepResults', timestepResults)
@@ -315,15 +306,8 @@ export class EdWrapperComponent implements OnInit {
 
           let traces = [];
           timestepResults
-            .filter(
-              (e) => !!e.result
-                // e => !!e.result
-                // && (e.dtIndex % 10 === 0)
-                // && (e.dtIndex === 0 || e.progress === 100)
-                && e.progress === 100
-            )
+            .filter((e) => (!!e.result && e.progress === 100))
             .forEach((timestepResult, index) => {
-
 
               let trace = {
                 x: space,
@@ -350,9 +334,14 @@ export class EdWrapperComponent implements OnInit {
     this.propabilityPlotlyData$$.next([]);
     this._edCoreService.timeStepResultsAggregate$
       .pipe(
+
         // take(1),
+        filter(e => !!e.length),
         tap((timestepResults) => {
-          timestepResults.forEach((timestepResult) => {
+
+          console.log(timestepResults)
+
+          timestepResults.filter((e) => (!!e.result && e.progress === 100)).forEach((timestepResult) => {
             const space = this._edCoreService.realPosition;
             const time = this._edCoreService.deltaTimes;
 

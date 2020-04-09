@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
-import { filter, map, tap } from "rxjs/operators";
+import { map, tap } from "rxjs/operators";
 import { AM } from "../interface";
 import { PdeLabService } from "../pde-lab.service";
 import { exerciseChargeEquationMap, _chargeEquation } from "../variable";
@@ -37,26 +37,26 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     map(e => !!e[0] && !!e[0].length)
   );
   chargeEquationStr: string;
-  chargeEquationStrValid: boolean;
+  chargeEquationStrValid: boolean
 
-  constructor(private route: ActivatedRoute, private lab: PdeLabService) { }
+  constructor(private route: ActivatedRoute, private lab: PdeLabService, private router: Router) { }
 
   checkChargeEquationStrValidity(val: string) {
-    
+
     const x = 1, y = 1, h = 1;
     this.chargeEquationStrValid = true
     try {
       const ff = _chargeEquation(val, x, y, h)
-      if (Number.isNaN(ff)){
+      if (Number.isNaN(ff)) {
         this.chargeEquationStrValid = false;
       }
     } catch (error) {
       this.chargeEquationStrValid = false;
-       
+
     }
-    
+
   }
-  
+
   ngOnInit(): void {
 
 
@@ -64,25 +64,28 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
 
     this.exerciseSubscription = this.route.paramMap
       .pipe(
-        filter(paramMap => paramMap.has("am")),
+        // filter(paramMap => paramMap.has("am")),
         tap(paramMap => {
-          const exercise = paramMap.get("am") as AM;
-          this.lab.resetVariables();
-          // this.chargeEquation = exerciseChargeEquationMap[exercise].chargeEquation;
-          // this.chargeEquationLatex = exerciseChargeEquationMap[exercise].latex;
-          this.chargeEquationStr = exerciseChargeEquationMap[exercise]
-          this.chargeEquationStrValid = true
+
+          console.log(this)
+
+          if (paramMap.has("am")) {
+            const exercise = paramMap.get("am") as AM;
+            this.lab.resetVariables();
+            // this.chargeEquation = exerciseChargeEquationMap[exercise].chargeEquation;
+            // this.chargeEquationLatex = exerciseChargeEquationMap[exercise].latex;
+            this.chargeEquationStr = exerciseChargeEquationMap[exercise]
+            this.chargeEquationStrValid = true
+          } else {
+            this.router.navigate(['eq', '3943'], { relativeTo: this.route })
+          }
+
+
         })
       )
       .subscribe();
 
-    let test = [0, 1, 2, 1, 3, 2, 2, 2, 3, 0];
     this.H = 1 / 10;
-    // const lk = this.calculateDerivative(test);
-    // console.log(test);
-    // console.log(lk);
-
-    // this.start()
   }
   public start() {
     this.ready = false;
@@ -169,84 +172,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       }
     }
   }
-  // private calculateDerivativeMatrices() {
-  //   // Start Calculate y derivative
-  //   let tempY = [];
-  //   for (let i = 0; i < this.SIZE; i++) {
-  //     // tempY = [];
-  //     // for (let j = 0; j < this.SIZE; j++) {
-  //     //   tempY.push(this.lab.voltageMatrix[i][j]);
-  //     // }
-  //     tempY = getColumnFrom2dArray(this.lab.voltageMatrix, i);
-  //     let calculatedDerivativeY = this.calculateDerivative(tempY);
 
-  //     for (let k = 0; k < this.SIZE; k++) {
-  //       this.xDerivativesMatrix[i][k] = calculatedDerivativeY[k];
-  //     }
-  //   }
-  //   //End  Calculate y derivative
-  //   // Start Calculate x derivative
-
-  //   let tempX = [];
-  //   for (let j = 0; j < this.SIZE; j++) {
-  //     tempX = [];
-  //     for (let i = 0; i < this.SIZE; i++) {
-  //       tempX.push(this.lab.voltageMatrix[i][j]);
-  //     }
-
-  //     let calculatedDerivativeX = this.calculateDerivative(tempX);
-  //     for (let p = 0; p < this.SIZE; p++) {
-  //       this.yDerivativesMatrix[p][j] = calculatedDerivativeX[p];
-  //     }
-  //   }
-  //   //End  Calculate x derivative
-  // }
-  // private createElectricFieldData() {
-  //   let _this = this;
-  //   const constantY = 1;
-  //   this.derivtionForPlot = [];
-  //   // TODO: we need constant i or j (ask zotos)
-  //   for (let i = 0; i < this.SIZE; i++) {
-  //     for (let j = 0; j < this.SIZE; j++) {
-  //       let x = _this.getRealXY(i);
-  //       let y = _this.getRealXY(j);
-
-  //       const eX = this.xDerivativesMatrix[i][j];
-  //       const eY = this.yDerivativesMatrix[i][j];
-  //       // const eX = getEx(x, y);
-  //       // const eY = getEy(x, y);
-  //       // const axisPoint = this.lab.axis[j];
-  //       this.derivtionForPlot.push([x, y, magnitude(eX, eY), radians(eX, eY)]);
-  //     }
-  //   }
-
-  //   function roundMe(val) {
-  //     return Math.round((val + Number.EPSILON) * 10000) / 10000;
-  //   }
-  //   function getEx(x, y) {
-  //     let eq = (1 - 2 * x) * y * (1 - y);
-  //     return eq;
-  //   }
-  //   function getEy(x, y) {
-  //     let eq = (1 - 2 * y) * x * (1 - x);
-  //     return eq;
-  //   }
-  //   function magnitude(i, j) {
-  //     const sum = Math.pow(i, 2) + Math.pow(j, 2);
-  //     return Math.sqrt(sum);
-  //   }
-  //   function radians(i, j) {
-  //     if (i == 0) {
-  //       return 0;
-  //     } else {
-  //       let rads = (Math.atan(j / i) * 180) / Math.PI;
-  //       let mapToChats = (-1 * rads + 270) % 360;
-
-  //       // if (rads < 0) return -1 * rads;
-  //       return mapToChats;
-  //     }
-  //   }
-  // }
   private calculateTotalEnergy(a: any): number {
     let sumOne = 0.0;
     let sumTwo = 0.0;
@@ -264,36 +190,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     let final = (1.0 / 2.0) * sumOne - Math.pow(this.H, 2) * sumTwo;
     return final;
   }
-  // private calculateDerivative(matrix: any): Array<number> {
-  //   let temp = matrix;
-  //   let derivatives = [];
-  //   const _H = this.H;
-  //   for (let i = 0; i < temp.length; i++) {
-  //     if (i === 0) {
-  //       derivatives.push(frontDerivative(i));
-  //     } else if (i === temp.length - 1) {
-  //       derivatives.push(backDerivative(i));
-  //     } else {
-  //       derivatives.push(commonDerivative(i));
-  //     }
-  //   }
 
-  //   return derivatives;
-
-  //   function commonDerivative(i: number) {
-  //     let value = (temp[i + 1] - temp[i - 1]) / (2 * _H);
-
-  //     return value;
-  //   }
-  //   function frontDerivative(i: number) {
-  //     let value = (temp[i + 1] - temp[i]) / _H;
-  //     return value;
-  //   }
-  //   function backDerivative(i: number) {
-  //     let value = (temp[i] - temp[i - 1]) / _H;
-  //     return value;
-  //   }
-  // }
   private getVoltage(i: number, j: number) {
     const isBound = this.isAtBoundaries(i, j);
     if (isBound) return 0.0;
@@ -321,14 +218,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   private calculateCharge(i: number, j: number): number {
     const x = this.getRealXY(i);
     const y = this.getRealXY(j);
-    // const result = Math.pow(this.H, 2) * (2.0 * ((1 - x) * x + (1 - y) * y));
-    // const result = Math.pow(this.H, 2) * 12 * (Math.pow(x, 2));
-
-
     const result = _chargeEquation(this.chargeEquationStr, x, y, this.H) // this.chargeEquation(x, y, this.H);
-
-
-
     return result;
   }
   private getRandomValues(): number {

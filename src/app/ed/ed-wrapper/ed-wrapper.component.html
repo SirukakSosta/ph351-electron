@@ -21,7 +21,7 @@
         </div>
       </div>
       <div nz-row [nzGutter]="4" class="form">
-              <div nz-col [nzSpan]="24">
+        <div nz-col [nzSpan]="24">
           <div class="item">
             <label for="">Start dx step</label>
             <input nz-input type="number" placeholder="Start dx step" [(ngModel)]="startDx" />
@@ -83,21 +83,21 @@
         </button>
       </div>
       <hr />
-      <div nz-col [nzSpan]="24">
+      <!-- <div nz-col [nzSpan]="24">
         <div class="item">
           <label for="real_time_results">Results during Computation</label>
           <input nz-input name="real_time_results" id="real_time_results" type="checkbox" placeholder="Time Step"
             [(ngModel)]="postResultsDuringComputation" />
         </div>
 
-      </div>
-      <div nz-col [nzSpan]="24">
+      </div> -->
+      <!-- <div nz-col [nzSpan]="24">
         <div class="item">
           <label for="">Refresh Latency</label>
           <input nz-input type="number" placeholder="Time Step" [(ngModel)]="_edCoreService.refreshLatency" />
         </div>
 
-      </div>
+      </div> -->
     </div>
   </nz-sider>
   <nz-layout>
@@ -106,40 +106,26 @@
         <div class="p-3">
           <h3>Project in Exact Diagonalization (ED)</h3>
 
-          <!-- <ul>
-                        <li>
-                            <a href="#" [routerLink]="['/', 'core', 'ed', 'eq', '3943']">ph3943</a>
-                        </li>
-                        <li>
-                            <a href="#" [routerLink]="['/', 'core', 'ed', 'eq', '3131']">ph3131</a>
-                        </li>
-                    </ul> -->
-          <!-- <div class="state-container">
-            <ng-container *ngFor="let s of states">
-              <div class="item">
-                <plotly-plot [data]="s.data" [layout]="s.layout"></plotly-plot>
-              </div>
-            </ng-container>
-          </div> -->
 
-          <!-- <div class="selection">Select a state: <nz-select [(ngModel)]="singleValue" [nzSize]="size"
-              (ngModelChange)="selectNewData(singleValue)">
-              <nz-option *ngFor="let option of listOfOption" [nzLabel]="option.label" [nzValue]="option.value">
-              </nz-option>
-            </nz-select>
-          </div> -->
-
+          <span> progress: {{_edCoreService.progress$ | async}} % </span>
           <div class="progress-wrapper">
-            <!-- <div *ngFor="let progress of progresses; let i =index">
-              {{i}} - {{progress | async}} %
-            </div> -->
-
-            <span *ngIf="(progresses1 | async)"> computing... ({{progresses1 | async}}) % </span>
+            <div>
+              <label for="plot_wave">Wave Plot</label>
+              <input nz-input name="plot_wave" id="plot_wave" type="checkbox" placeholder="Plot wave"
+                [(ngModel)]="waveOverDistanceVisible" />
+            </div>
+            <div>
+              <label for="plot_potential">Potential Plot</label>
+              <input nz-input name="plot_potential" id="plot_potential" type="checkbox" placeholder="Plot potential"
+                [(ngModel)]="potentialOverDistanceVisible" />
+            </div>
+           
             <!-- Computations : -->
             <button nz-button nzType="primary" (click)="plot3dAllTimeSteps()">
               Plot 3d all time steps
             </button>
-            <button nz-button nzType="primary" (click)="plot3dTimeLapse()">
+            <button nz-button nzType="primary" *ngIf="(_edCoreService.progress$ | async) === 100"
+              (click)="plot3dTimeLapse()">
               Plot 3d time lapse
             </button>
 
@@ -148,9 +134,11 @@
             </nz-progress> -->
           </div>
 
-          <plotly-plot [data]="waveOverDistanceData" [layout]="waveOverDistanceLayout"></plotly-plot>
+          <plotly-plot [data]="waveOverDistanceData" *ngIf="waveOverDistanceVisible" [layout]="waveOverDistanceLayout">
+          </plotly-plot>
 
-          <plotly-plot [data]="potentialOverDistanceData" [layout]="potentialOverDistanceLayout"></plotly-plot>
+          <plotly-plot [data]="potentialOverDistanceData" *ngIf="potentialOverDistanceVisible"
+            [layout]="potentialOverDistanceLayout"></plotly-plot>
 
           <!-- <div id="chart"></div> -->
           <plotly-plot #propabilityPlotly [data]="propabilityPlotlyData$ | async" [layout]="layout"></plotly-plot>

@@ -52,7 +52,7 @@ export function createPotentialFunction(i: number, potentialFunction: string): n
     const x = i
 
     const potential = eval(potentialFunction)
-    console.log(x, potential)
+    // console.log(x, potential)
 
     return potential;
     // x = transform i to real x

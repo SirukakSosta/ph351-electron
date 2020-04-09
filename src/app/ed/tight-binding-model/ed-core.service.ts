@@ -1,7 +1,8 @@
 import { Injectable } from "@angular/core";
 import * as math from "mathjs";
-import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subject, Subscription, timer } from "rxjs";
-import { map, shareReplay, take, takeUntil, tap } from "rxjs/operators";
+import { BehaviorSubject, combineLatest, fromEvent, merge, Observable, Subject, Subscription } from "rxjs";
+import { filter, map, shareReplay, startWith, takeUntil, tap, withLatestFrom } from "rxjs/operators";
+import { chunkArray } from "../../math-common/method";
 import { createDeltaTimes, createInitialVector, createPosition, getDxTotalPoints } from "../methods";
 import { createVectorBase } from "./defaults";
 import { HamiltonianService } from "./hamiltonian.service";
@@ -17,6 +18,18 @@ interface TimeStepComputationBucket {
   dt: number;
   worker: Worker;
   workerEvent$: Observable<EdComputationWorkerEvent>;
+}
+
+type WorkerInput = {
+  dt: { index: number, value: number }[],
+  initialVector: Array<any>,
+  eigenValues: Array<any>,
+  eigenVectors: Array<any>,
+  basisVectors: Array<any>,
+  dxStart: number
+  dxEnd: number
+  dx: number
+  postResultsDuringComputation: boolean
 }
 
 export type EdComputationWorkerEvent = {
@@ -46,36 +59,29 @@ export class EdCoreService {
   resultCollectorSuscription: Subscription;
   operationSubscription: Subscription;
   refreshLatency = 200;
+  workerCount = 2;
+  progress$: Observable<number>;
 
   private destroyExp$: Subject<number>;
 
   constructor(private _hamiltonianService: HamiltonianService) {
 
-  }
 
-  constructTimeStepComputationBucketMap(start: number, end: number, step: number) {
-
-    let dtIndex = 0;
-    for (let dt = start; dt < end; dt += step) {
-
-      const worker = new Worker('../ed.worker', { type: 'module' });
-      const workerEvent$ = fromEvent<MessageEvent>(worker, 'message')
-        .pipe(map(e => JSON.parse(e.data) as EdComputationWorkerEvent));
-
-      this.timeStepComputationBucketMap.set(dt, { worker, workerEvent$, dt, dtIndex })
-      dtIndex++;
-    }
 
   }
 
   private constructResultObservables() {
 
-    const computationEvents$ = Array.from(this.timeStepComputationBucketMap.values()).map(e => e.workerEvent$);
+    const buckets = Array.from(this.timeStepComputationBucketMap.values())
+    const computationEvents$ = buckets.map(bucket => bucket.workerEvent$.pipe(startWith({ dt: bucket.dt, dtIndex: bucket.dtIndex, progress: 0, result: null })));
+
 
     this.resultCollectorSuscription = combineLatest(computationEvents$).pipe(
       // sampleTime(this.refreshLatency),
       // set time steps
+
       tap(computationEvents => {
+        console.log(computationEvents)
         // const timeSteps = computationEvents.map(computationEvent => computationEvent.result.propabilityForAllStates);
         this.timeStepResultsAggregate$$.next(computationEvents)
       }),
@@ -86,35 +92,59 @@ export class EdCoreService {
     ).subscribe()
 
 
-    this.timeStepResultsAggregate$$.pipe(
-      // set averages
-      tap(computationEvents => {
+    this.progress$ = this.timeStepResultsAggregate$$.pipe(
+      map(computationEvents => {
+
+        let progress = 0;
+        const progressArray = computationEvents.map(computationEvent => computationEvent.progress);
+        if (progressArray.length) {
+          progress = progressArray.reduce((a, b) => a + b) / computationEvents.length;
+        }
+        return progress
+
+      }),
+      takeUntil(this.destroyExp$)
+    )
+
+    this.progress$.pipe(
+      filter(e => e === 100),
+      withLatestFrom(this.timeStepResultsAggregate$),
+      tap(([progress, computationEvents]) => {
         const average = computationEvents
           .filter(computationEvent => !!computationEvent.result && !!computationEvent.result.avgs)
           .map(computationEvent => computationEvent.result.avgs);
         this.average$$.next(average)
       }),
+      takeUntil(this.destroyExp$)
     ).subscribe()
 
-    this.timeStepResultsAggregate$$.pipe(
-
-      // set diaspora
-      tap(computationEvents => {
+    this.progress$.pipe(
+      filter(e => e === 100),
+      withLatestFrom(this.timeStepResultsAggregate$),
+      tap(([progress, computationEvents]) => {
+        // set diaspora
         const diaspora = computationEvents
           .filter(computationEvent => !!computationEvent.result && !!computationEvent.result.diaspora)
           .map(computationEvent => computationEvent.result.diaspora);
         this.diaspora$$.next(diaspora)
       }),
+      takeUntil(this.destroyExp$)
     ).subscribe()
 
-    this.operationSubscription = merge(...computationEvents$).subscribe()
+    this.operationSubscription = merge(...computationEvents$).pipe(
+      takeUntil(this.destroyExp$)
+    ).subscribe(e => {
+      // console.log(e)
+    })
 
   }
 
   private clearTimeStepComputationBucketMap() {
 
     this.timeStepComputationBucketMap.forEach(e => {
-      e.worker.terminate();
+      if (e.worker) {
+        e.worker.terminate();
+      }
     })
     this.timeStepComputationBucketMap.clear()
 
@@ -122,28 +152,48 @@ export class EdCoreService {
 
   private startTimelapseComputations(dxStart: number, dxEnd: number, dx: number,
     initialVector: Array<any>, eigenValues: Array<any>, eigenVectors: Array<any>, basisVectors: Array<any>,
-    dtStart: number, dtEnd: number, dt: number, postResultsDuringComputation: boolean) {
-
+    dtStart: number, dtEnd: number, dtStep: number, postResultsDuringComputation: boolean) {
 
     // clear buckets if already exist. terminates workers as well
     this.clearTimeStepComputationBucketMap();
     // construct new computation buckets for new space and time variables
-    this.constructTimeStepComputationBucketMap(dtStart, dtEnd, dt);
 
 
-    // this.resetExistingWorkers();
-    // start parallel computations 
-    Array.from(this.timeStepComputationBucketMap.values()).forEach((bucket, i) => {
-      const dt = bucket.dt;
-      const dtIndex = bucket.dtIndex;
-      // post to web worker
 
-      timer(i * 300).pipe(
-        tap(() => {
-          bucket.worker.postMessage(JSON.stringify({ dxStart, dxEnd, dx, dt, dtIndex, initialVector, eigenValues, eigenVectors, basisVectors, postResultsDuringComputation }))
-        }),
-        take(1)
-      ).subscribe()
+    let dtIndex = 0;
+    for (let dt = dtStart; dt < dtEnd; dt += dtStep) {
+      this.timeStepComputationBucketMap.set(dt, { worker: undefined, workerEvent$: undefined, dt, dtIndex })
+      dtIndex++
+    }
+
+    // split Dt computation buckets in chunks. chunk total number is worker count.
+    const buckets = Array.from(this.timeStepComputationBucketMap.values());
+    const bucketSlices = chunkArray(buckets, Math.ceil(buckets.length / this.workerCount));
+
+    bucketSlices.forEach(bucketSlice => {
+
+      console.log(bucketSlice)
+
+      const worker = new Worker('../ed.worker', { type: 'module' });
+
+      // set computation worker event 
+      bucketSlice.forEach(bucket => {
+        const workerEvent$ = fromEvent<MessageEvent>(worker, 'message')
+          .pipe(
+            map(e => JSON.parse(e.data) as EdComputationWorkerEvent),
+            filter(computationEvent => computationEvent.dtIndex === bucket.dtIndex)
+          );
+
+        this.timeStepComputationBucketMap.set(bucket.dt, { worker, workerEvent$, dt: bucket.dt, dtIndex: bucket.dtIndex })
+      })
+
+      const dt = bucketSlice.map(bucket => ({ index: bucket.dtIndex, value: bucket.dt }))
+
+      const workerInput: WorkerInput = {
+        dxStart, dxEnd, dx, dt, initialVector, eigenValues, eigenVectors, basisVectors, postResultsDuringComputation
+      }
+
+      worker.postMessage(JSON.stringify(workerInput))
 
     })
 
@@ -157,32 +207,27 @@ export class EdCoreService {
     if (this.destroyExp$) {
       this.destroyExp$.next(0)
       this.destroyExp$.complete()
-
     }
     this.destroyExp$ = new Subject()
-
     this.clearTimeStepComputationBucketMap();
-    if (this.operationSubscription) {
-      this.operationSubscription.unsubscribe();
-    }
-    if (this.resultCollectorSuscription) {
-      this.resultCollectorSuscription.unsubscribe();
-    }
 
   }
 
   public start(dxStart: number, dxEnd: number, dx: number, dtStart: number, dtEnd: number, dt: number, waveFunction: string,
     potentialFunction: string, postResultsDuringComputation: boolean) {
 
+    console.log('Experiment start')
     this.reset();
+    console.log('Previous experiments cleared')
+
     const totalPoints = getDxTotalPoints(dxEnd, dx)
 
     const basisVectors = createVectorBase(totalPoints); /** IMPORTANT - vectors are in columns in this matrix */
-    console.log(basisVectors)
+    console.log('basisVectors created', basisVectors)
     let hamiltonianMatrix = this._hamiltonianService.generateHamiltonian(basisVectors);
     let hamiltonianMatrixWithPotential = this._hamiltonianService.addPotential(hamiltonianMatrix, potentialFunction, dxEnd, dx);
 
-    console.log(hamiltonianMatrixWithPotential)
+    console.log('hamiltonian created', hamiltonianMatrixWithPotential)
 
     const ans = (<any>math).eigs(hamiltonianMatrixWithPotential);
     const { values, vectors } = ans;
@@ -191,19 +236,13 @@ export class EdCoreService {
     // console.log('eigenVectors', eigenVectors)
 
     const eigenValues = values;
-
     const isOrthogonal = this.isOrthogonal(eigenVectors)
 
-
-
     const initialVector = createInitialVector(totalPoints, waveFunction);
-
     this.deltaTimes = createDeltaTimes(dtStart, dtEnd, dt);
-
     this.realPosition = createPosition(totalPoints, dxStart);
 
-    console.log('realPosition',this.realPosition)
-
+    console.log('Start of timelapse computations')
     this.startTimelapseComputations(dxStart, dxEnd, dx, initialVector, eigenValues, eigenVectors, basisVectors, dtStart, dtEnd, dt, postResultsDuringComputation)
   }
 

@@ -99,6 +99,7 @@
     "@ng-bootstrap/ng-bootstrap": "6.0.0",
     "@types/mathjs": "6.0.4",
     "@types/numeric": "1.2.0",
+    "@types/sharedworker": "0.0.29",
     "angular-plotly.js": "2.0.0",
     "highcharts": "8.0.4",
     "mathjax": "3.0.1",
