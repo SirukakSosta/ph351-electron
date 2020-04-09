@@ -59,7 +59,7 @@ export class EdCoreService {
   resultCollectorSuscription: Subscription;
   operationSubscription: Subscription;
   refreshLatency = 200;
-  workerCount = 2;
+  workerCount = 5;
   progress$: Observable<number>;
 
   private destroyExp$: Subject<number>;
