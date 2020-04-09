@@ -26,7 +26,7 @@ type output = {
 addEventListener('message', ({ data }) => {
 
   const input = JSON.parse(data) as input;
-  console.log('input', input)
+  // console.log('input', input)
   const totalPoints = getDxTotalPoints(input.dxEnd, input.dx)
   const results: ResultOutput[] = input.dt.map(e => ({ avgs: 0, diaspora: 0, propabilityForAllStates: [] }))
 
@@ -56,7 +56,7 @@ addEventListener('message', ({ data }) => {
       if (progress === 100) {
         const result = results[index]
         const output: output = { dtIndex: dt.index, dt: dt.value, progress, result }
-        console.log(dt.value, 'final posting')
+        // console.log(dt.value, 'final posting')
         postMessage(JSON.stringify(output))
       }
 

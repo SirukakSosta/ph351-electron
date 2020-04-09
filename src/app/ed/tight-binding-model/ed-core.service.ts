@@ -81,7 +81,7 @@ export class EdCoreService {
       // set time steps
 
       tap(computationEvents => {
-        console.log(computationEvents)
+        // console.log(computationEvents)
         // const timeSteps = computationEvents.map(computationEvent => computationEvent.result.propabilityForAllStates);
         this.timeStepResultsAggregate$$.next(computationEvents)
       }),
@@ -172,7 +172,7 @@ export class EdCoreService {
 
     bucketSlices.forEach(bucketSlice => {
 
-      console.log(bucketSlice)
+      // console.log(bucketSlice)
 
       const worker = new Worker('../ed.worker', { type: 'module' });
 
