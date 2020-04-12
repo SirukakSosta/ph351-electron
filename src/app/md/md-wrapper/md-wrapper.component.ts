@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { PlotlyService } from "angular-plotly.js";
+import { createArrayWithRandomNumbers } from "../../math-common/method";
 import { MdCoreService } from "../md-core.service";
-
 
 @Component({
   selector: "app-md-wrapper",
@@ -16,6 +16,11 @@ export class MdWrapperComponent implements OnInit {
 
 
   ngOnInit(): void {
+
+
+    const displacementInitialMatrix = createArrayWithRandomNumbers(10, 0, 1)
+    console.log(displacementInitialMatrix)
+
   }
 
 }
