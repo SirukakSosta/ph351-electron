@@ -24,9 +24,9 @@ export class MdWrapperComponent implements OnInit {
     const dxEnd = 1;
 
     const particleCount = 10;
-    const dt = 0.1;
+    const dt = 1;
     const dtStart = 0;
-    const dtEnd = 1;
+    const dtEnd = 20;
 
     const particleArray = new Array(particleCount).fill(0); // mock array used for particle mappings
     const massMatrix = createArrayWithRandomNumbers(particleCount, 1, 1, false); // mass for each particle
@@ -56,6 +56,7 @@ export class MdWrapperComponent implements OnInit {
       return acceleration(particleDisplacement, massMatrix[i], constants);
     }
     );
+
     accelerationTimeline.set(dtStart, dtStartAcceleration);
 
     //  Map that pairs dt with particles' kinetic energy. 
@@ -66,16 +67,18 @@ export class MdWrapperComponent implements OnInit {
     //  Map that pairs dt with particles' potential energy. 
     const potentialEnergyTimeline: Map<number, number[]> = new Map();
     const dtStartpotentialEnergy = particleArray.map((e, i) =>
-      potentialEnergy({ currentParticle: displacementInitialMatrix[i], nextParticle: displacementInitialMatrix[i + 1] || displacementInitialMatrix[0] }, constants));
+      potentialEnergy({ currentParticle: displacementInitialMatrix[i], nextParticle: displacementInitialMatrix[i + 1] || displacementInitialMatrix[0] }, constants)
+    );
     potentialEnergyTimeline.set(dtStart, dtStartpotentialEnergy);
 
 
-
+    // start of timelines' calculation
     for (let t = dtStart; t < dtEnd; t += dt) {
 
       // javascript decimal addition adds points... normalizing
       t = roundDecimal(t);
       const dtNext = roundDecimal(t + dt);
+      ///
 
       // calculate t + dt displacement for all particles 
       const _displacementNextDt = particleArray.map((e, i) => {
@@ -123,7 +126,7 @@ export class MdWrapperComponent implements OnInit {
 
       kineticEnergyTimeline.set(dtNext, _kineticEnergyNextDt);
 
-      console.log('displacementTimelineNextDt', displacementTimeline.get(dtNext))
+      // console.log('displacementTimelineNextDt', displacementTimeline.get(dtNext))
       // calculate t + dt potential energy for all particles
       const _potentialEnergyNextDt = particleArray.map((e, i) => {
 
@@ -144,7 +147,8 @@ export class MdWrapperComponent implements OnInit {
       t = roundDecimal(t);
       const totalKineticEnergyForDt = kineticEnergyTimeline.get(t).reduce((a, b) => a + b)
       const totalPotentialEnergyForDt = potentialEnergyTimeline.get(t).reduce((a, b) => a + b)
-      console.log(t, 'kinetic', totalKineticEnergyForDt, 'potential ', totalPotentialEnergyForDt, 'total energy', totalKineticEnergyForDt + totalPotentialEnergyForDt)
+      // console.log(t, 'kinetic', totalKineticEnergyForDt, 'potential ', totalPotentialEnergyForDt, 'total energy', totalKineticEnergyForDt + totalPotentialEnergyForDt)
+      console.log('total energy', totalKineticEnergyForDt + totalPotentialEnergyForDt)
 
     }
 
