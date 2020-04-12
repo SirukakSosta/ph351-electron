@@ -16,3 +16,7 @@ export function randomInteger(min: number, max: number) {
 export function createArrayWithRandomNumbers(length: number, min: number, max: number, decimal = false) {
     return new Array(length).fill(0).map(() => decimal ? randomDecimal(min, max) : randomInteger(min, max));
 }
+
+export function roundDecimal(number: number) {
+    return Math.round(number * 10) / 10
+}
