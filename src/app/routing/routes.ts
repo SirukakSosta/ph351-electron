@@ -15,8 +15,11 @@ export const routes: Routes = [
                     path: 'ed', loadChildren: () => import('../ed/ed.module').then(e => e.EdModule)
                 },
                 {
+                    path: 'md', loadChildren: () => import('../md/md.module').then(e => e.MdModule)
+                },
+                {
                     path: '',
-                    redirectTo: '/core/pde',
+                    redirectTo: '/core/md',
                     pathMatch: 'full'
                 },
 
@@ -24,7 +27,7 @@ export const routes: Routes = [
         },
         {
             path: '',
-            redirectTo: '/core/pde',
+            redirectTo: '/core/md',
             pathMatch: 'full'
         },
         ]
