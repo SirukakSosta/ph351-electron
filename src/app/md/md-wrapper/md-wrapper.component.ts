@@ -118,15 +118,15 @@ export class MdWrapperComponent implements OnInit {
       displacementTimeline.set(dtNext, _displacementNextDt);
       // calculate t + dt acceleration for all particles
       const _accelerationNextDt = particleArray.map((e, i) => {
-        const displacementTimelineCurrentDt = displacementTimeline.get(t);
+        const displacementTimelineNextDt = displacementTimeline.get(dtNext);
         const particleDisplacement = {
           previousParticle:
-            displacementTimelineCurrentDt[i - 1] ||
-            displacementTimelineCurrentDt[particleCount - 1],
-          currentParticle: displacementTimelineCurrentDt[i],
+          displacementTimelineNextDt[i - 1] ||
+          displacementTimelineNextDt[particleCount - 1],
+          currentParticle: displacementTimelineNextDt[i],
           nextParticle:
-            displacementTimelineCurrentDt[i + 1] ||
-            displacementTimelineCurrentDt[0],
+          displacementTimelineNextDt[i + 1] ||
+            displacementTimelineNextDt[0],
         };
         const accelerationNextDtForParticle_i = acceleration(
           particleDisplacement,
