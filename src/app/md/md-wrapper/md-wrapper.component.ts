@@ -1,18 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { PlotlyService } from "angular-plotly.js";
-import {
-  createArrayWithRandomNumbers,
-  roundDecimal,
-} from "../../math-common/method";
-import { ExperimentConstant } from "../interface";
+import { fromEvent } from "rxjs";
+import { filter, map, tap } from "rxjs/operators";
+import { createArrayWithRandomNumbers } from "../../math-common/method";
+import { ExperimentConstant, MdWorkerInput, MdWorkerOutput } from "../interface";
 import { MdCoreService } from "../md-core.service";
-import {
-  acceleration,
-  displacementNextDt,
-  kineticEnergy,
-  potentialEnergy,
-  velocityNextDt,
-} from "../methods";
+import { calculateAcceleration, calculateKineticEnergy, calculatePotentialEnergy } from "../methods";
 
 @Component({
   selector: "app-md-wrapper",
@@ -21,202 +14,81 @@ import {
 })
 export class MdWrapperComponent implements OnInit {
   isCollapsed = false;
+  dt = 0.1;
+  dtStart = 0;
+  dtEnd = 100;
+  particleCount = 200;
+  worker = new Worker('../md.worker', { type: 'module' });
+  workerEvent$ = fromEvent<MessageEvent>(this.worker, 'message').pipe(tap((e) => console.log(e)),
+    map(e => e.data as MdWorkerOutput)
+  )
+  progress$ = this.workerEvent$.pipe(tap(e => console.log(e)), map(e => e.progress), tap(e => console.log(e)))
 
-  constructor(public service: MdCoreService, public plotly: PlotlyService) {}
+  constructor(public service: MdCoreService, public plotly: PlotlyService) { }
 
-  ngOnInit(): void {
-    return;
-    const constants: ExperimentConstant = { k: 1, g: 4, a: 4, b: 4 };
+  ngOnInit() {
+
+  }
+
+  start(): void {
+    const constant: ExperimentConstant = { k: 1, g: 4, a: 4, b: 4 };
     const dxStart = 0;
     const dxEnd = 1;
 
-    const particleCount = 40;
-    const dt = 1;
-    const dtStart = 0;
-    const dtEnd = 20;
-
-    const particleArray = new Array(particleCount).fill(0); // mock array used for particle mappings
-    const massMatrix = createArrayWithRandomNumbers(particleCount, 1, 1, false); // mass for each particle
-    const displacementInitialMatrix = createArrayWithRandomNumbers(
-      particleCount,
-      dxStart,
-      dxEnd,
-      true
-    ); // initial displacement values for each particle
-    const velocityInitialMatrix = createArrayWithRandomNumbers(
-      particleCount,
-      -0.1,
-      0.1,
-      true
-    ); // initial velocity values for each particle
-    // console.table('displacementInitialMatrix', displacementInitialMatrix)
-    // console.table('velocityInitialMatrix', velocityInitialMatrix)
-
-    // Map that pairs dt with particles' displacement.
-    const displacementTimeline: Map<number, number[]> = new Map();
-    displacementTimeline.set(dtStart, displacementInitialMatrix);
-
-    // Map that pairs dt with particles' velocity.
-    const velocityTimeline: Map<number, number[]> = new Map();
-    velocityTimeline.set(dtStart, velocityInitialMatrix);
-
-    // Map that pairs dt with particles' acceleration.
-    const accelerationTimeline: Map<number, number[]> = new Map();
-    const dtStartAcceleration = particleArray.map((e, i) => {
+    const particleArray = new Array(this.particleCount).fill(0); // mock array used for particle mappings
+    const mass = createArrayWithRandomNumbers(this.particleCount, 1, 1, false); // mass for each particle
+    const initialDisplacement = createArrayWithRandomNumbers(this.particleCount, dxStart, dxEnd, true); // initial displacement values for each particle
+    const initialVelocity = createArrayWithRandomNumbers(this.particleCount, -0.1, 0.1, true); // initial velocity values for each particle
+    const initialAcceleration = particleArray.map((e, particle) => {
       const particleDisplacement = {
-        previousParticle:
-          displacementInitialMatrix[i - 1] ||
-          displacementInitialMatrix[particleCount - 1],
-        currentParticle: displacementInitialMatrix[i],
-        nextParticle:
-          displacementInitialMatrix[i + 1] || displacementInitialMatrix[0],
+        previousParticle: initialDisplacement[particle - 1] || initialDisplacement[this.particleCount - 1],
+        currentParticle: initialDisplacement[particle],
+        nextParticle: initialDisplacement[particle + 1] || initialDisplacement[0],
       };
-      return acceleration(particleDisplacement, massMatrix[i], constants);
-    });
+      return calculateAcceleration(particleDisplacement, mass[particle], constant);
+    })
 
-    accelerationTimeline.set(dtStart, dtStartAcceleration);
+    const initialKineticEnergy = particleArray.map((e, particle) => calculateKineticEnergy(mass[particle], initialVelocity[particle]));
+    const initialPotentialEnergy = particleArray.map((e, particle) => calculatePotentialEnergy({
+      currentParticle: initialDisplacement[particle],
+      nextParticle:
+        initialDisplacement[particle + 1] || initialDisplacement[0],
+    }, constant));
 
-    //  Map that pairs dt with particles' kinetic energy.
-    const kineticEnergyTimeline: Map<number, number[]> = new Map();
-    const dtStartKineticEnergy = particleArray.map((e, i) =>
-      kineticEnergy(massMatrix[i], velocityInitialMatrix[i])
-    );
-    kineticEnergyTimeline.set(dtStart, dtStartKineticEnergy);
 
-    //  Map that pairs dt with particles' potential energy.
-    const potentialEnergyTimeline: Map<number, number[]> = new Map();
-    const dtStartpotentialEnergy = particleArray.map((e, i) =>
-      potentialEnergy(
-        {
-          currentParticle: displacementInitialMatrix[i],
-          nextParticle:
-            displacementInitialMatrix[i + 1] || displacementInitialMatrix[0],
-        },
-        constants
-      )
-    );
-    potentialEnergyTimeline.set(dtStart, dtStartpotentialEnergy);
-
-    // start of timelines' calculation
-    for (let t = dtStart; t < dtEnd; t += dt) {
-      // javascript decimal addition adds points... normalizing
-      t = roundDecimal(t);
-      const dtNext = roundDecimal(t + dt);
-      ///
-      console.log("%c times! ", "background: #222; color: #bada55", t, dtNext);
-      // calculate t + dt displacement for all particles
-      const _displacementNextDt = particleArray.map((e, i) => {
-        const displacementNextDtForParticle_i = displacementNextDt(
-          displacementTimeline.get(t)[i],
-          velocityTimeline.get(t)[i],
-          accelerationTimeline.get(t)[i],
-          dt
-        );
-        return displacementNextDtForParticle_i;
-      });
-
-      displacementTimeline.set(dtNext, _displacementNextDt);
-      // calculate t + dt acceleration for all particles
-      const _accelerationNextDt = particleArray.map((e, i) => {
-        const displacementTimelineNextDt = displacementTimeline.get(dtNext);
-        const particleDisplacement = {
-          previousParticle:
-          displacementTimelineNextDt[i - 1] ||
-          displacementTimelineNextDt[particleCount - 1],
-          currentParticle: displacementTimelineNextDt[i],
-          nextParticle:
-          displacementTimelineNextDt[i + 1] ||
-            displacementTimelineNextDt[0],
-        };
-        const accelerationNextDtForParticle_i = acceleration(
-          particleDisplacement,
-          massMatrix[i],
-          constants
-        );
-        return accelerationNextDtForParticle_i;
-      });
-
-      accelerationTimeline.set(dtNext, _accelerationNextDt);
-
-      // calculate t + dt velocity for all particles
-      const _velocityNextDt = particleArray.map((e, i) => {
-        const velocityNextDtForParticle_i = velocityNextDt(
-          velocityTimeline.get(t)[i],
-          accelerationTimeline.get(t)[i],
-          accelerationTimeline.get(dtNext)[i],
-          dt
-        );
-        return velocityNextDtForParticle_i;
-      });
-
-      velocityTimeline.set(dtNext, _velocityNextDt);
-
-      // calculate t + dt kinetic energy for all particles
-      const _kineticEnergyNextDt = particleArray.map((e, i) => {
-        const kineticEnergyNextDtForParticle_i = kineticEnergy(
-          massMatrix[i],
-          velocityTimeline.get(dtNext)[i]
-        );
-        return kineticEnergyNextDtForParticle_i;
-      });
-
-      kineticEnergyTimeline.set(dtNext, _kineticEnergyNextDt);
-
-      // console.log('displacementTimelineNextDt', displacementTimeline.get(dtNext))
-      // calculate t + dt potential energy for all particles
-      const _potentialEnergyNextDt = particleArray.map((e, i) => {
-        const potentialEnergyNextDtForParticle_i = potentialEnergy(
-          {
-            currentParticle: displacementTimeline.get(dtNext)[i],
-            nextParticle:
-              displacementTimeline.get(dtNext)[i + 1] ||
-              displacementTimeline.get(dtNext)[0],
-          },
-          constants
-        );
-        return potentialEnergyNextDtForParticle_i;
-      });
-
-      potentialEnergyTimeline.set(dtNext, _potentialEnergyNextDt);
-      console.log(_displacementNextDt);
-
-      console.log(_accelerationNextDt);
-      console.log(_velocityNextDt);
+    const workerInput: MdWorkerInput = {
+      constant,
+      dt: this.dt,
+      dtEnd: this.dtEnd,
+      dtStart: this.dtStart,
+      initialDisplacement,
+      initialVelocity,
+      initialAcceleration,
+      initialKineticEnergy,
+      initialPotentialEnergy,
+      mass
     }
 
-    for (let t = dtStart; t < dtEnd; t += dt) {
-      t = roundDecimal(t);
-      const totalKineticEnergyForDt = kineticEnergyTimeline
-        .get(t)
-        .reduce((a, b) => a + b);
-      const totalPotentialEnergyForDt = potentialEnergyTimeline
-        .get(t)
-        .reduce((a, b) => a + b);
-      // console.log(t, 'kinetic', totalKineticEnergyForDt, 'potential ', totalPotentialEnergyForDt, 'total energy', totalKineticEnergyForDt + totalPotentialEnergyForDt)
-      console.log(
-        "total energy",
-        totalKineticEnergyForDt + totalPotentialEnergyForDt
-      );
-    }
+    this.workerEvent$
+      .pipe(
+        filter(e => e.progress === 100),
+        tap(e => {
+          console.log(e)
 
-    console.log(
-      "displacementTimeline",
-      Array.from(displacementTimeline.values())
-    );
-    console.log("velocityTimeline", Array.from(velocityTimeline.values()));
-    console.log(
-      "accelerationTimeline",
-      Array.from(accelerationTimeline.values())
-    );
-    console.log(
-      "kineticEnergyTimeline",
-      Array.from(kineticEnergyTimeline.values())
-    );
-    console.log(
-      "potentialEnergyTimeline",
-      Array.from(potentialEnergyTimeline.values())
-    );
+          // let dtIndex = 0;
+          // for (let t = this.dtStart; t < this.dtEnd; t += this.dt) {
 
-    console.log(kineticEnergyTimeline);
+          //   const totalKineticEnergyForDt = e.kineticEnergy[dtIndex].reduce((a, b) => a + b);
+          //   const totalPotentialEnergyForDt = e.potentialEnergy[dtIndex].reduce((a, b) => a + b);
+          //   console.log(t, 'kinetic', totalKineticEnergyForDt, 'potential ', totalPotentialEnergyForDt, 'total energy', totalKineticEnergyForDt + totalPotentialEnergyForDt)
+
+          //   dtIndex++
+          // }
+
+        })
+      ).subscribe()
+
+    this.worker.postMessage(JSON.stringify(workerInput))
+
   }
 }

@@ -1,6 +1,6 @@
 import { ExperimentConstant } from "../interface";
 
-export function acceleration(
+export function calculateAcceleration(
   displacement: {
     previousParticle: number;
     currentParticle: number;
@@ -54,12 +54,12 @@ export function displacementNextDt(
   return term1 + term2 + term3;
 }
 
-export function kineticEnergy(mass: number, velocity: number) {
+export function calculateKineticEnergy(mass: number, velocity: number) {
   const term1 = 0.5 * mass * Math.pow(velocity, 2);
   return term1;
 }
 
-export function potentialEnergy(
+export function calculatePotentialEnergy(
   displacement: { currentParticle: number; nextParticle: number },
   constant: ExperimentConstant
 ) {

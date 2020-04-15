@@ -1,9 +1,6 @@
 import { Injectable } from "@angular/core";
 import { Subject } from "rxjs";
-import {
-  createArrayWithRandomNumbers,
-  roundDecimal,
-} from "../math-common/method";
+import { createArrayWithRandomNumbers, roundDecimal } from "../math-common/method";
 const _K = 1;
 const _G = 1;
 const _A = 1;
@@ -34,7 +31,7 @@ export class MdCoreService {
 
   constructor() {
     console.log("starting");
-    this.start();
+    // this.start();
   }
 
   start(): void {

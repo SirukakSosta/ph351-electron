@@ -9,10 +9,10 @@
           <ul nz-menu nzMode="horizontal" [nzTheme]="'dark'">
             <li nz-submenu nzTitle="Students AM" nzIcon="down-square">
               <ul>
-                <li nz-menu-item  >
+                <li nz-menu-item>
                   Ph 3131
                 </li>
-                <li nz-menu-item  >
+                <li nz-menu-item>
                   Ph 3943
                 </li>
               </ul>
@@ -21,83 +21,39 @@
         </div>
       </div>
       <div nz-row [nzGutter]="4" class="form">
-        <!-- <div nz-col [nzSpan]="24">
-          <div class="item">
-            <label for="">Start dx step</label>
-            <input nz-input type="number" placeholder="Start dx step" [(ngModel)]="startDx" />
-          </div>
-        </div>
         <div nz-col [nzSpan]="24">
           <div class="item">
-            <label for="">End dx step</label>
-            <input nz-input type="number" placeholder="End dx step" [(ngModel)]="endDx" />
-          </div>
-        </div>
-        <div nz-col [nzSpan]="24">
-          <div class="item">
-            <label for="">dx</label>
-            <input nz-input type="number" placeholder="dx" [(ngModel)]="dx" />
+            <label for="">Particle count</label>
+            <input nz-input type="number" placeholder="Particle count" [(ngModel)]="particleCount" />
           </div>
         </div>
         <div nz-col [nzSpan]="24">
           <div class="item">
             <label for="">Time start</label>
-            <input nz-input type="number" placeholder="Time Start" [(ngModel)]="timeStart" />
+            <input nz-input type="number" placeholder="Time Start" [(ngModel)]="dtStart" />
           </div>
         </div>
         <div nz-col [nzSpan]="24">
           <div class="item">
             <label for="">Time end</label>
-            <input nz-input type="number" placeholder="Time End" [(ngModel)]="timeEnd" />
+            <input nz-input type="number" placeholder="Time End" [(ngModel)]="dtEnd" />
           </div>
         </div>
         <div nz-col [nzSpan]="24">
           <div class="item">
             <label for="">Time step</label>
-            <input nz-input type="number" placeholder="Time Step" [(ngModel)]="timeStep" />
+            <input nz-input type="number" placeholder="Time Step" [(ngModel)]="dt" />
           </div>
         </div>
-        <div nz-col [nzSpan]="24">
-          <div class="item">
-            <label for="">Wave Function</label>
-            <textarea (keyup)="checkWaveFunctionStrValidity($event.target.value)"
-              (change)="checkWaveFunctionStrValidity($event.target.value)" nz-input rows="5"
-              [ngClass]="{'invalid' : !waveEquationStrValid ,'valid' : waveEquationStrValid }"
-              placeholder="Wave Function" [(ngModel)]="waveFunction"></textarea>
-          </div>
-        </div> -->
-      </div>
-      <!-- <div nz-col [nzSpan]="24">
-        <div class="item">
-          <label for="">Potential Function</label>
-          <textarea (keyup)="checkPotentialFunctionStrValidity($event.target.value)"
-            (change)="checkPotentialFunctionStrValidity($event.target.value)" nz-input rows="5"
-            [ngClass]="{'invalid' : !potentialEquationStrValid ,'valid' : potentialEquationStrValid }"
-            placeholder="Potential Function" [(ngModel)]="potentialFunction"></textarea>
-        </div>
+
       </div>
 
       <div nz-col [nzSpan]="24">
-        <button nz-button nzType="primary" [disabled]="!potentialEquationStrValid" nzBlock (click)="start();">
+        <button nz-button nzType="primary" nzBlock (click)="start();">
           Start
         </button>
-      </div> -->
-      <hr />
-      <!-- <div nz-col [nzSpan]="24">
-        <div class="item">
-          <label for="real_time_results">Results during Computation</label>
-          <input nz-input name="real_time_results" id="real_time_results" type="checkbox" placeholder="Time Step"
-            [(ngModel)]="postResultsDuringComputation" />
-        </div>
+      </div>
 
-      </div> -->
-      <!-- <div nz-col [nzSpan]="24">
-        <div class="item">
-          <label for="">Refresh Latency</label>
-          <input nz-input type="number" placeholder="Time Step" [(ngModel)]="_edCoreService.refreshLatency" />
-        </div>
-
-      </div> -->
     </div>
   </nz-sider>
   <nz-layout>
@@ -105,7 +61,9 @@
       <div class="inner-content" id="inner-content">
         <div class="p-3">
           <h3>Project in Molecular Dynamics (MD)</h3>
- 
+
+
+          Progress :{{progress$ | async}}
         </div>
       </div>
     </nz-content>
