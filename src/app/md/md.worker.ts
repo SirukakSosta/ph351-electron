@@ -102,14 +102,24 @@ addEventListener('message', ({ data }) => {
 
 
     const progress = ((dtIndex + 1) * 100 / ((input.dtEnd - input.dtStart) / input.dt))
-    if (progress % 5 === 0 && progress < 100) {
-      postMessage({ progress })
+    if (progress % 10 === 0 && progress < 100) {
+
+      const output: output = {
+        displacement,
+        velocity,
+        acceleration,
+        kineticEnergy,
+        potentialEnergy,
+        progress
+      }
+
+      postMessage(output)
     }
 
     dtIndex++;
 
   }
-  console.log('to start json out')
+
   const output: output = {
     displacement,
     velocity,
@@ -120,5 +130,4 @@ addEventListener('message', ({ data }) => {
   }
 
   postMessage(output);
-  console.log('worker end')
 }) 

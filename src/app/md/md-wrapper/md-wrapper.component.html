@@ -62,8 +62,11 @@
         <div class="p-3">
           <h3>Project in Molecular Dynamics (MD)</h3>
 
+          Progress :{{progress$ | async}} %
 
-          Progress :{{progress$ | async}}
+          <plotly-plot [data]="energyData$ | async" [layout]="displacementPlotLayout">
+          </plotly-plot>
+
         </div>
       </div>
     </nz-content>
