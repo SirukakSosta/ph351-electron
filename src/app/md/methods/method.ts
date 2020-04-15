@@ -1,3 +1,5 @@
+import * as noiseGenerator from 'png5';
+import { createArrayWithRandomNumbers } from "../../math-common/method";
 import { ExperimentConstant } from "../interface";
 
 export function calculateAcceleration(
@@ -76,4 +78,20 @@ export function calculatePotentialEnergy(
   const result = term1 + term2 + term3 + term4;
   // console.log(displacement,result)
   return result;
+}
+
+
+export function createInitialDisplacement(particleCount: number, perlin: boolean) {
+  let initialDisplacement: number[] = [];
+  if (perlin) {
+    const myNoiseMachine = new noiseGenerator({
+      lod: 2,
+      falloff: 0.25,
+      seed: 'seed'
+    })
+    initialDisplacement = new Array(particleCount).fill(0).map((e, i) => i).map((e, i) => myNoiseMachine.getPerlinNoise(e))
+  } else {
+    initialDisplacement = createArrayWithRandomNumbers(particleCount, 0, 1, true);
+  }
+  return initialDisplacement;
 }

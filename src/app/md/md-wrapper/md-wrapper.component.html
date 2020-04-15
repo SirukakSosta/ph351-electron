@@ -24,8 +24,17 @@
         <div nz-col [nzSpan]="24">
           <div class="item">
             <label for="">Particle count</label>
-            <input nz-input type="number" placeholder="Particle count" [(ngModel)]="particleCount" />
+            <input nz-input type="number" placeholder="Particle count" (ngModelChange)="onParticleCountChange()"
+              [(ngModel)]="particleCount" />
           </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="perlin">Perlin Distribution</label>
+            <input nz-input name="perlin" id="perlin" type="checkbox" placeholder="Perlin Distribution"
+              (ngModelChange)="onParticleCountChange()" [(ngModel)]="perlinDistribution" />
+          </div>
+
         </div>
         <div nz-col [nzSpan]="24">
           <div class="item">
@@ -62,7 +71,18 @@
         <div class="p-3">
           <h3>Project in Molecular Dynamics (MD)</h3>
 
-          Progress :{{progress$ | async}} %
+          Progress: {{progress$ | async}}%
+
+          <hr />
+          Initial Distribution
+          <div style="background-color: whitesmoke;">
+            <svg height="80" width="900">
+              <circle *ngFor="let particle of particleArray" [attr.cx]="initialDisplacement[particle] * 900" cy="37"
+                r="2" fill="black">
+              </circle>
+
+            </svg>
+          </div>
 
           <plotly-plot [data]="energyData$ | async" [layout]="displacementPlotLayout">
           </plotly-plot>
