@@ -23,6 +23,9 @@ type output = {
   acceleration: number[][];
   kineticEnergy: number[][];
   potentialEnergy: number[][];
+  // averageKineticEnergy: number;
+  totalEnergy: number;
+  temperature: number;
   progress: number;
 }
 
@@ -85,8 +88,8 @@ addEventListener('message', ({ data }) => {
     velocity.push(_velocityNextDt)
 
     //  next kinetic energy calculation.
-    const dtStartKineticEnergy = particleArray.map((e, i) => calculateKineticEnergy(input.mass[i], _velocityNextDt[i]));
-    kineticEnergy.push(dtStartKineticEnergy)
+    const dtNextKineticEnergy = particleArray.map((e, i) => calculateKineticEnergy(input.mass[i], _velocityNextDt[i]));
+    kineticEnergy.push(dtNextKineticEnergy)
 
     //  next potential energy calculation.
     const _potentialEnergyNextDt = particleArray.map((e, i) => {
@@ -100,9 +103,9 @@ addEventListener('message', ({ data }) => {
 
     potentialEnergy.push(_potentialEnergyNextDt)
 
-
+    // progress & output 
     const progress = ((dtIndex + 1) * 100 / ((input.dtEnd - input.dtStart) / input.dt))
-    if (progress % 10 === 0 && progress < 100) {
+    if (progress % 20 === 0 && progress < 100) {
 
       const output: output = {
         displacement,
@@ -110,6 +113,8 @@ addEventListener('message', ({ data }) => {
         acceleration,
         kineticEnergy,
         potentialEnergy,
+        totalEnergy: 0,
+        temperature: 0,
         progress
       }
 
@@ -120,12 +125,20 @@ addEventListener('message', ({ data }) => {
 
   }
 
+
+  const averageKineticEnergy = kineticEnergy.map(a => a.reduce((_a, _b) => _a + _b)).reduce((a, b) => a + b) / dtIndex;
+  const temperature = 2 * averageKineticEnergy / dtIndex;
+  const averagePotentialEnergy = potentialEnergy.map(a => a.reduce((_a, _b) => _a + _b)).reduce((a, b) => a + b) / dtIndex;
+  const totalEnergy = averageKineticEnergy + averagePotentialEnergy;
+
   const output: output = {
     displacement,
     velocity,
     acceleration,
     kineticEnergy,
     potentialEnergy,
+    totalEnergy,
+    temperature,
     progress: 100
   }
 

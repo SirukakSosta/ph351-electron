@@ -71,20 +71,29 @@
         <div class="p-3">
           <h3>Project in Molecular Dynamics (MD)</h3>
 
-          Progress: {{progress$ | async}}%
+          <span *ngIf="(progress$ | async) <100"> {{experimentDescription}} </span>
+          <span *ngIf="(progress$ | async) === 100"> Calculations Completed </span>
+          <br />
+          <span>Progress: {{progress$ | async}}%</span>
 
           <hr />
-          Initial Distribution
+          Initial Displacement Distribution
           <div style="background-color: whitesmoke;">
             <svg height="80" width="900">
               <circle *ngFor="let particle of particleArray" [attr.cx]="initialDisplacement[particle] * 900" cy="37"
                 r="2" fill="black">
               </circle>
-
             </svg>
           </div>
 
-          <plotly-plot [data]="energyData$ | async" [layout]="displacementPlotLayout">
+          <input type="range" name="points" id="points" value="selectedH$$ | async" min="0" max="19"
+            [value]="selectedEnergyTimeExperiment$$ | async" data-show-value="true" data-popup-enabled="true"
+            (change)="onSelectedEnergyTimeExperimentChange($event.target.value)" />
+
+          <plotly-plot [data]="energyTimePlotData$ | async" [layout]="energyTimePlotLayout$ | async">
+          </plotly-plot>
+
+          <plotly-plot [data]="totalEnergyTemperaturePlotData$ | async" [layout]="totalEnergyTemperaturePlotLayout">
           </plotly-plot>
 
         </div>

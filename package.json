@@ -99,7 +99,6 @@
     "@ng-bootstrap/ng-bootstrap": "6.0.0",
     "@types/mathjs": "6.0.4",
     "@types/numeric": "1.2.0",
-    "@types/p5": "0.9.0",
     "@types/sharedworker": "0.0.29",
     "angular-plotly.js": "2.0.0",
     "highcharts": "8.0.4",
@@ -108,7 +107,6 @@
     "ng-katex": "2.0.3",
     "ng-zorro-antd": "8.5.2",
     "numeric": "1.2.6",
-    "p5": "1.0.0",
     "plotly.js": "1.52.3",
     "png5": "0.1.3"
   }

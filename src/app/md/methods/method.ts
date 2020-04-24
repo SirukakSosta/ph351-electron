@@ -95,3 +95,9 @@ export function createInitialDisplacement(particleCount: number, perlin: boolean
   }
   return initialDisplacement;
 }
+
+export function getVelocityBoundsByIndex(index: number, initialVelocityStart: number, initialVelocityEnd: number, step: number) {
+  const velocityStart = initialVelocityStart - step * index;
+  const velocityEnd = initialVelocityEnd + step * index;
+  return { velocityStart, velocityEnd };
+}
