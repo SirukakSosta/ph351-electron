@@ -85,9 +85,19 @@ export class MdWrapperComponent implements OnInit {
   totalEnergyTemperaturePlotData$ = this.calculationResults$$.pipe(
     map((results) => {
 
-      let trace = {
+      let traceTotalEnergy = {
         x: results.map(result => result.temperature),
-        y: results.map(result => result.totalEnergy),
+        y: results.map(result => result.averageTotalEnergy),
+        marker: {
+          size: 1
+        },
+        mode: "lines+markers",
+        name: `Total`
+      };
+
+      let traceKineticEnergy = {
+        x: results.map(result => result.temperature),
+        y: results.map(result => result.averageKineticEnergy),
         marker: {
           size: 1
         },
@@ -95,9 +105,18 @@ export class MdWrapperComponent implements OnInit {
         name: `Kinetic`
       };
 
-      console.log('[trace]', [trace])
+      let tracePotentialEnergy = {
+        x: results.map(result => result.temperature),
+        y: results.map(result => result.averagePotentialEnergy),
+        marker: {
+          size: 1
+        },
+        mode: "lines+markers",
+        name: `Potential`
+      };
 
-      return [trace];
+
+      return [traceTotalEnergy, traceKineticEnergy, tracePotentialEnergy];
 
     })
   )

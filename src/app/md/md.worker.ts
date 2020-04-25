@@ -23,8 +23,9 @@ type output = {
   acceleration: number[][];
   kineticEnergy: number[][];
   potentialEnergy: number[][];
-  // averageKineticEnergy: number;
-  totalEnergy: number;
+  averageTotalEnergy: number;
+  averagePotentialEnergy: number;
+  averageKineticEnergy: number;
   temperature: number;
   progress: number;
 }
@@ -113,7 +114,9 @@ addEventListener('message', ({ data }) => {
         acceleration,
         kineticEnergy,
         potentialEnergy,
-        totalEnergy: 0,
+        averageKineticEnergy: 0,
+        averagePotentialEnergy: 0,
+        averageTotalEnergy: 0,
         temperature: 0,
         progress
       }
@@ -129,7 +132,7 @@ addEventListener('message', ({ data }) => {
   const averageKineticEnergy = kineticEnergy.map(a => a.reduce((_a, _b) => _a + _b)).reduce((a, b) => a + b) / dtIndex;
   const temperature = 2 * averageKineticEnergy / dtIndex;
   const averagePotentialEnergy = potentialEnergy.map(a => a.reduce((_a, _b) => _a + _b)).reduce((a, b) => a + b) / dtIndex;
-  const totalEnergy = averageKineticEnergy + averagePotentialEnergy;
+  const averageTotalEnergy = averageKineticEnergy + averagePotentialEnergy;
 
   const output: output = {
     displacement,
@@ -137,7 +140,9 @@ addEventListener('message', ({ data }) => {
     acceleration,
     kineticEnergy,
     potentialEnergy,
-    totalEnergy,
+    averageKineticEnergy,
+    averagePotentialEnergy,
+    averageTotalEnergy,
     temperature,
     progress: 100
   }

@@ -28,7 +28,8 @@ export interface MdWorkerOutput {
     acceleration: number[][];
     kineticEnergy: number[][];
     potentialEnergy: number[][];
-    totalEnergy: number;
+    averageTotalEnergy: number;
+    averagePotentialEnergy: number;
+    averageKineticEnergy: number;
     temperature: number;
-
 }
