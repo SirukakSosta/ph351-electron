@@ -13,7 +13,7 @@ export const energyTimePlotLayout = {
 export const totalEnergyTemperaturePlotLayout = {
     responsive: true,
 
-    title: `Total Energy - Temperature`,
+    title: `Energy - Temperature`,
     xaxis: {
         title: "Temperature"
     },
