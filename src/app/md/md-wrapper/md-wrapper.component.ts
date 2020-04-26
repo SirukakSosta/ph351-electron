@@ -40,7 +40,7 @@ export class MdWrapperComponent implements OnInit {
     map(([experimentResults, selectedExperimentIndex]) => experimentResults[selectedExperimentIndex]),
     map((e) => {
 
-      const kineticEnergyAxis = e.kineticEnergy.map(kineticEnergyForAllParticles => kineticEnergyForAllParticles.reduce((a, b) => a + b));
+      const kineticEnergyAxis = e.kineticEnergy.map(kineticEnergyForAllParticles => kineticEnergyForAllParticles.reduce((a, b) => a + b) / this.particleCount);
       const timeAxis = e.kineticEnergy.map((e, i) => i * this.dt)
 
       let kineticTrace = {
@@ -53,7 +53,7 @@ export class MdWrapperComponent implements OnInit {
         name: `Kinetic`
       };
 
-      const potentialEnergyAxis = e.potentialEnergy.map(potentialEnergyForAllParticles => potentialEnergyForAllParticles.reduce((a, b) => a + b));
+      const potentialEnergyAxis = e.potentialEnergy.map(potentialEnergyForAllParticles => potentialEnergyForAllParticles.reduce((a, b) => a + b) / this.particleCount);
 
       let potentialTrace = {
         x: timeAxis,
@@ -178,7 +178,8 @@ export class MdWrapperComponent implements OnInit {
   runCalculation(initialDisplacement: number[], velocityStart: number, velocityEnd: number, calculationIndex: number) {
 
 
-    const constant: ExperimentConstant = { k: 1, g: 4, a: 4, b: 4 };
+    // const constant: ExperimentConstant = { k: 1, g: 4, a: 4, b: 4 }; // non harmonic
+    const constant: ExperimentConstant = { k: 1, g: 0, a: 0, b: 0 }; // harmonic
     const mass = createArrayWithRandomNumbers(this.particleCount, 1, 1, false); // mass for each particle
 
     // const initialDisplacement = this.initialDisplacement
