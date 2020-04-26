@@ -86,7 +86,7 @@ export function createInitialDisplacement(particleCount: number, perlin: boolean
   if (perlin) {
     const myNoiseMachine = new noiseGenerator({
       lod: 2,
-      falloff: 0.25,
+      falloff: 0.5,
       seed: 'seed'
     })
     initialDisplacement = new Array(particleCount).fill(0).map((e, i) => i).map((e, i) => myNoiseMachine.getPerlinNoise(e))

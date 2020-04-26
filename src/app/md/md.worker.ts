@@ -130,7 +130,7 @@ addEventListener('message', ({ data }) => {
 
 
   const averageKineticEnergy = kineticEnergy.map(a => a.reduce((_a, _b) => _a + _b)).reduce((a, b) => a + b) / dtIndex;
-  const temperature = 2 * averageKineticEnergy / dtIndex;
+  const temperature = 2 * averageKineticEnergy / particleCount;
   const averagePotentialEnergy = potentialEnergy.map(a => a.reduce((_a, _b) => _a + _b)).reduce((a, b) => a + b) / dtIndex;
   const averageTotalEnergy = averageKineticEnergy + averagePotentialEnergy;
 
