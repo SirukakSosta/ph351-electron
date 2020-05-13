@@ -1,0 +1,57 @@
+:host {
+  .layout {
+    height: 100%;
+
+    nz-sider {
+      flex: 0 0 280px !important;
+      max-width: 280px !important;
+      padding: 10px;
+      /* min-width: 200px; */
+      // width: 221px;
+    }
+
+    .menu {
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+  }
+
+  .progress-wrapper {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+
+    nz-progress {
+      // display: inline-block;
+      transform: scale(0.7)
+    }
+  }
+
+
+}
+
+.state-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  .item {
+    display: block;
+  }
+}
+
+.selection {
+  width: 200px;
+}
+
+nz-select {
+  width: 200px !important;
+}
+
+.chart-container {
+  transform: translateX(-55px);
+}

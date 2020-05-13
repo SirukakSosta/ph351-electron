@@ -18,16 +18,18 @@ export const routes: Routes = [
                     path: 'md', loadChildren: () => import('../md/md.module').then(e => e.MdModule)
                 },
                 {
-                    path: '',
-                    redirectTo: '/core/md',
-                    pathMatch: 'full'
+                    path: 'mc', loadChildren: () => import('../mc/mc.module').then(e => e.MdModule)
                 },
-
+                {
+                    path: '',
+                    redirectTo: '/core/mc',
+                    pathMatch: 'full'
+                }
             ],
         },
         {
             path: '',
-            redirectTo: '/core/md',
+            redirectTo: '/core/mc',
             pathMatch: 'full'
         },
         ]
