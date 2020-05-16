@@ -91,10 +91,10 @@
             (change)="onSelectedEnergyTimeExperimentChange($event.target.value)" />
 
           <plotly-plot [data]="energyTimePlotData$ | async" [layout]="energyTimePlotLayout$ | async">
-          </plotly-plot>
+          </plotly-plot>-->
 
-          <plotly-plot [data]="totalEnergyTemperaturePlotData$ | async" [layout]="totalEnergyTemperaturePlotLayout">
-          </plotly-plot> -->
+          <plotly-plot [data]="heatMapData">
+          </plotly-plot>
 
         </div>
       </div>
