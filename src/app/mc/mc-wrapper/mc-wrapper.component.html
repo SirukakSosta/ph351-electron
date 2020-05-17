@@ -93,7 +93,10 @@
           <plotly-plot [data]="energyTimePlotData$ | async" [layout]="energyTimePlotLayout$ | async">
           </plotly-plot>-->
 
-          <plotly-plot [data]="heatMapData">
+          <!-- <plotly-plot [data]="heatMapData">
+          </plotly-plot> -->
+
+          <plotly-plot [data]="magData" [layout]="magLayout">
           </plotly-plot>
 
         </div>

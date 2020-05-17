@@ -1,9 +1,9 @@
 import { AfterViewInit, Component, OnInit } from "@angular/core";
 import { PlotlyService } from "angular-plotly.js";
-import { randomDecimal, randomInteger } from "../../math-common/method";
+// import { randomDecimal, randomInteger } from "../../math-common/method";
 import { McCoreService } from "../mc-core.service";
-import { calculateEnergy } from "../method";
-import { B, J, K } from "../variable";
+// import { calculateEnergy } from "../method";
+// import { B, J, K } from "../variable";
 
 @Component({
   selector: "app-mc-wrapper",
@@ -12,6 +12,24 @@ import { B, J, K } from "../variable";
 })
 export class McWrapperComponent implements OnInit, AfterViewInit {
   isCollapsed = false;
+  magLayout = {
+    responsive: true,
+
+    title: `Mag vs Temprature`,
+    xaxis: {
+      title: "Temprature",
+    },
+    yaxis: {
+      title: "Mag Per Site",
+    },
+  };
+  magData = [
+    {
+      x: [],
+      y: [],
+      type: "scatter",
+    },
+  ];
   heatMapData = [
     {
       z: [],
@@ -25,69 +43,76 @@ export class McWrapperComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     setTimeout(() => {
       // this.calculate();
+      const {
+        magnetizations,
+        tempratures,
+      } = this.service.equillibriumForSingleTemprature();
+      this.magData[0].x = tempratures;
+      this.magData[0].y = magnetizations;
+      console.log(magnetizations, tempratures);
     });
   }
 
-  calculate() {
-    const thermodynamicEquilibriumSteps = 100000;
-    const latticeLength = 40;
+  // calculate() {
+  //   const thermodynamicEquilibriumSteps = 100000;
+  //   const latticeLength = 40;
 
-    // initialize lattice
-    let lattice = [[]] as number[][];
-    for (let i = 0; i < latticeLength; i++) {
-      lattice[i] = new Array(latticeLength).fill(1);
-    }
+  //   // initialize lattice
+  //   let lattice = [[]] as number[][];
+  //   for (let i = 0; i < latticeLength; i++) {
+  //     lattice[i] = new Array(latticeLength).fill(1);
+  //   }
 
-    console.log(lattice);
+  //   console.log(lattice);
 
-    const _energy = calculateEnergy(lattice, B, J);
-    console.log(_energy);
+  //   const _energy = calculateEnergy(lattice, B, J);
+  //   console.log(_energy);
 
-    let temperature = 1;
+  //   let temperature = 1;
 
-    // iterate for each thermodynamic equilibrium step
-    for (let i = 0; i < thermodynamicEquilibriumSteps; i++) {
-      // calculate energy before spin reverse
-      const initialEnergy = calculateEnergy(lattice, B, J);
+  //   // iterate for each thermodynamic equilibrium step
+  //   for (let i = 0; i < thermodynamicEquilibriumSteps; i++) {
+  //     // calculate energy before spin reverse
+  //     const initialEnergy = calculateEnergy(lattice, B, J);
 
-      // pick two random numbers
-      const randomElement1 = randomInteger(0, latticeLength - 1);
-      const randomElement2 = randomInteger(0, latticeLength - 1);
+  //     // pick two random numbers
+  //     const randomElement1 = randomInteger(0, latticeLength - 1);
+  //     const randomElement2 = randomInteger(0, latticeLength - 1);
 
-      // reverse spin
-      lattice[randomElement1][randomElement2] *= -1;
+  //     // reverse spin
+  //     lattice[randomElement1][randomElement2] *= -1;
 
-      // calculate energy after spin reverse
-      const finalEnergy = calculateEnergy(lattice, B, J);
+  //     // calculate energy after spin reverse
+  //     const finalEnergy = calculateEnergy(lattice, B, J);
 
-      // calculate difference
-      const energyDiff = finalEnergy - initialEnergy;
-      // console.log(`iteration ${i} `, initialEnergy, finalEnergy, energyDiff);
+  //     // calculate difference
+  //     const energyDiff = finalEnergy - initialEnergy;
+  //     // console.log(`iteration ${i} `, initialEnergy, finalEnergy, energyDiff);
 
-      if (energyDiff > 0) {
-        const propability = Math.exp((-1 * energyDiff) / (K * temperature));
-        // console.log('propability', propability)
+  //     if (energyDiff > 0) {
+  //       const propability = Math.exp((-1 * energyDiff) / (K * temperature));
+  //       // console.log('propability', propability)
 
-        const random = randomDecimal(0, 1);
-        // console.log('random', random);
+  //       const random = randomDecimal(0, 1);
+  //       // console.log('random', random);
 
-        const keepChange = propability > random;
-        if (!keepChange) {
-          lattice[randomElement1][randomElement2] *= -1;
-        }
-      } else {
-      }
+  //       const keepChange = propability > random;
+  //       if (!keepChange) {
+  //         lattice[randomElement1][randomElement2] *= -1;
+  //       }
+  //     } else {
+  //     }
 
-      setTimeout(
-        () =>
-          (this.heatMapData = [
-            {
-              z: lattice,
-              type: "heatmap",
-            },
-          ])
-      );
-      // console.table(lattice)
-    }
-  }
+  //     setTimeout(
+  //       () =>
+  //         (this.heatMapData = [
+  //           {
+  //             z: lattice,
+  //             type: "heatmap",
+  //           },
+  //         ])
+  //     );
+  //     // console.table(lattice)
+  //   }
+  // }
 }
