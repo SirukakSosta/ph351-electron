@@ -1,12 +1,33 @@
 import { Component, OnInit } from "@angular/core";
 import { PlotlyService } from "angular-plotly.js";
-import { BehaviorSubject, combineLatest, concat, fromEvent, Observable, of, timer } from "rxjs";
+import {
+  BehaviorSubject,
+  combineLatest,
+  concat,
+  fromEvent,
+  Observable,
+  of,
+  timer,
+} from "rxjs";
 import { filter, map, switchMap, take, tap } from "rxjs/operators";
 import { createArrayWithRandomNumbers } from "../../math-common/method";
-import { ExperimentConstant, MdWorkerInput, MdWorkerOutput } from "../interface";
+import {
+  ExperimentConstant,
+  MdWorkerInput,
+  MdWorkerOutput,
+} from "../interface";
 import { MdCoreService } from "../md-core.service";
-import { calculateAcceleration, calculateKineticEnergy, calculatePotentialEnergy, createInitialDisplacement, getVelocityBoundsByIndex } from "../methods";
-import { energyTimePlotLayout, totalEnergyTemperaturePlotLayout } from "../variable";
+import {
+  calculateAcceleration,
+  calculateKineticEnergy,
+  calculatePotentialEnergy,
+  createInitialDisplacement,
+  getVelocityBoundsByIndex,
+} from "../methods";
+import {
+  energyTimePlotLayout,
+  totalEnergyTemperaturePlotLayout,
+} from "../variable";
 
 @Component({
   selector: "app-md-wrapper",
@@ -14,7 +35,6 @@ import { energyTimePlotLayout, totalEnergyTemperaturePlotLayout } from "../varia
   styleUrls: ["./md-wrapper.component.scss"],
 })
 export class MdWrapperComponent implements OnInit {
-
   totalEnergyTemperaturePlotLayout = totalEnergyTemperaturePlotLayout;
   energyTimePlotLayout = energyTimePlotLayout;
   isCollapsed = false;
@@ -24,121 +44,148 @@ export class MdWrapperComponent implements OnInit {
   particleCount = 20;
   initialDisplacement: number[] = [];
   perlinDistribution = true;
-  worker = new Worker('../md.worker', { type: 'module' });
-  workerEvent$ = fromEvent<MessageEvent>(this.worker, 'message').pipe(map(e => e.data as MdWorkerOutput))
+  worker = new Worker("../md.worker", { type: "module" });
+  workerEvent$ = fromEvent<MessageEvent>(this.worker, "message").pipe(
+    map((e) => e.data as MdWorkerOutput)
+  );
 
   particleArray: number[];
-  calculationResults$$: BehaviorSubject<MdWorkerOutput[]> = new BehaviorSubject([]);
+  calculationResults$$: BehaviorSubject<MdWorkerOutput[]> = new BehaviorSubject(
+    []
+  );
   selectedEnergyTimeExperiment$$ = new BehaviorSubject(0);
   velocityInitialStart = -0.1;
   velocityInitialEnd = 0.1;
   velocityStep = 0.05;
-  progress$ = this.calculationResults$$.pipe(map(e => Math.round((e.length / 20) * 100)));
+  progress$ = this.calculationResults$$.pipe(
+    map((e) => Math.round((e.length / 20) * 100))
+  );
 
-  energyTimePlotData$ = combineLatest(this.calculationResults$$, this.selectedEnergyTimeExperiment$$).pipe(
-    filter(([experimentResults, selectedExperimentIndex]) => !!experimentResults.length),
-    map(([experimentResults, selectedExperimentIndex]) => experimentResults[selectedExperimentIndex]),
+  energyTimePlotData$ = combineLatest(
+    this.calculationResults$$,
+    this.selectedEnergyTimeExperiment$$
+  ).pipe(
+    filter(
+      ([experimentResults, selectedExperimentIndex]) =>
+        !!experimentResults.length
+    ),
+    map(
+      ([experimentResults, selectedExperimentIndex]) =>
+        experimentResults[selectedExperimentIndex]
+    ),
     map((e) => {
-
-      const kineticEnergyAxis = e.kineticEnergy.map(kineticEnergyForAllParticles => kineticEnergyForAllParticles.reduce((a, b) => a + b) / this.particleCount);
-      const timeAxis = e.kineticEnergy.map((e, i) => i * this.dt)
+      const kineticEnergyAxis = e.kineticEnergy.map(
+        (kineticEnergyForAllParticles) =>
+          kineticEnergyForAllParticles.reduce((a, b) => a + b) /
+          this.particleCount
+      );
+      const timeAxis = e.kineticEnergy.map((e, i) => i * this.dt);
 
       let kineticTrace = {
         x: timeAxis,
         y: kineticEnergyAxis,
         marker: {
-          size: 1
+          size: 1,
         },
         mode: "lines+markers",
-        name: `Kinetic`
+        name: `Kinetic`,
       };
 
-      const potentialEnergyAxis = e.potentialEnergy.map(potentialEnergyForAllParticles => potentialEnergyForAllParticles.reduce((a, b) => a + b) / this.particleCount);
+      const potentialEnergyAxis = e.potentialEnergy.map(
+        (potentialEnergyForAllParticles) =>
+          potentialEnergyForAllParticles.reduce((a, b) => a + b) /
+          this.particleCount
+      );
 
       let potentialTrace = {
         x: timeAxis,
         y: potentialEnergyAxis,
         marker: {
-          size: 1
+          size: 1,
         },
         mode: "lines+markers",
-        name: `Potential`
+        name: `Potential`,
       };
 
-      const totalEnergyAxis = potentialEnergyAxis.map((potentialEnergyAxisElement, i) => potentialEnergyAxisElement + kineticEnergyAxis[i]);
+      const totalEnergyAxis = potentialEnergyAxis.map(
+        (potentialEnergyAxisElement, i) =>
+          potentialEnergyAxisElement + kineticEnergyAxis[i]
+      );
 
       let totalTrace = {
         x: timeAxis,
         y: totalEnergyAxis,
         marker: {
-          size: 1
+          size: 1,
         },
         mode: "lines+markers",
-        name: `Total`
+        name: `Total`,
       };
 
-      return [potentialTrace, kineticTrace, totalTrace]
+      return [potentialTrace, kineticTrace, totalTrace];
+    })
+  );
 
-    }));
-
-  experimentDescription = '';
+  experimentDescription = "";
   totalEnergyTemperaturePlotData$ = this.calculationResults$$.pipe(
     map((results) => {
-
       let traceTotalEnergy = {
-        x: results.map(result => result.temperature),
-        y: results.map(result => result.averageTotalEnergy),
+        x: results.map((result) => result.temperature),
+        y: results.map((result) => result.averageTotalEnergy),
         marker: {
-          size: 1
+          size: 1,
         },
         mode: "lines+markers",
-        name: `Total`
+        name: `Total`,
       };
 
       let traceKineticEnergy = {
-        x: results.map(result => result.temperature),
-        y: results.map(result => result.averageKineticEnergy),
+        x: results.map((result) => result.temperature),
+        y: results.map((result) => result.averageKineticEnergy),
         marker: {
-          size: 1
+          size: 1,
         },
         mode: "lines+markers",
-        name: `Kinetic`
+        name: `Kinetic`,
       };
 
       let tracePotentialEnergy = {
-        x: results.map(result => result.temperature),
-        y: results.map(result => result.averagePotentialEnergy),
+        x: results.map((result) => result.temperature),
+        y: results.map((result) => result.averagePotentialEnergy),
         marker: {
-          size: 1
+          size: 1,
         },
         mode: "lines+markers",
-        name: `Potential`
+        name: `Potential`,
       };
 
-
       return [traceTotalEnergy, traceKineticEnergy, tracePotentialEnergy];
-
     })
-  )
+  );
   energyTimePlotLayout$ = this.selectedEnergyTimeExperiment$$.pipe(
-    map(index => {
-
-      console.log(index)
-      const bounds = getVelocityBoundsByIndex(index, this.velocityInitialStart, this.velocityInitialEnd, this.velocityStep);
+    map((index) => {
+      console.log(index);
+      const bounds = getVelocityBoundsByIndex(
+        index,
+        this.velocityInitialStart,
+        this.velocityInitialEnd,
+        this.velocityStep
+      );
       const layout = { ...energyTimePlotLayout };
       layout.title += ` (Velocity [${bounds.velocityStart} , ${bounds.velocityEnd}])`;
       return layout;
-
     })
-  )
+  );
 
-  constructor(public service: MdCoreService, public plotly: PlotlyService) { }
+  constructor(public service: MdCoreService, public plotly: PlotlyService) {}
 
   ngOnInit() {
     this.particleArray = new Array(this.particleCount).fill(0).map((e, i) => i); // mock array used for particle mappings
-    this.initialDisplacement = createInitialDisplacement(this.particleCount, this.perlinDistribution);
-    console.log(this)
-
+    this.initialDisplacement = createInitialDisplacement(
+      this.particleCount,
+      this.perlinDistribution
+    );
+    console.log(this);
   }
 
   onSelectedEnergyTimeExperimentChange(e: number) {
@@ -146,38 +193,54 @@ export class MdWrapperComponent implements OnInit {
   }
 
   onParticleCountChange() {
-    timer(1).pipe(
-      take(1),
-      tap(() => {
-        this.particleArray = new Array(this.particleCount).fill(0).map((e, i) => i);
-        this.initialDisplacement = createInitialDisplacement(this.particleCount, this.perlinDistribution);
-      })
-    ).subscribe()
-
+    timer(1)
+      .pipe(
+        take(1),
+        tap(() => {
+          this.particleArray = new Array(this.particleCount)
+            .fill(0)
+            .map((e, i) => i);
+          this.initialDisplacement = createInitialDisplacement(
+            this.particleCount,
+            this.perlinDistribution
+          );
+        })
+      )
+      .subscribe();
   }
 
   start(): void {
-
     this.selectedEnergyTimeExperiment$$.next(0);
     this.calculationResults$$.next([]);
 
     let ops$: Observable<MdWorkerOutput>[] = [];
 
     for (let i = 1; i <= 20; i++) {
-
-      const bounds = getVelocityBoundsByIndex(i, this.velocityInitialStart, this.velocityInitialEnd, this.velocityStep);
-      ops$.push(this.runCalculation(this.initialDisplacement, bounds.velocityStart, bounds.velocityEnd, i))
-
+      const bounds = getVelocityBoundsByIndex(
+        i,
+        this.velocityInitialStart,
+        this.velocityInitialEnd,
+        this.velocityStep
+      );
+      ops$.push(
+        this.runCalculation(
+          this.initialDisplacement,
+          bounds.velocityStart,
+          bounds.velocityEnd,
+          i
+        )
+      );
     }
 
     concat(...ops$).subscribe();
-
   }
 
-
-  runCalculation(initialDisplacement: number[], velocityStart: number, velocityEnd: number, calculationIndex: number) {
-
-
+  runCalculation(
+    initialDisplacement: number[],
+    velocityStart: number,
+    velocityEnd: number,
+    calculationIndex: number
+  ) {
     // const constant: ExperimentConstant = { k: 1, g: 4, a: 4, b: 4 }; // non harmonic
     const constant: ExperimentConstant = { k: 1, g: 0, a: 0, b: 0 }; // harmonic
     const mass = createArrayWithRandomNumbers(this.particleCount, 1, 1, false); // mass for each particle
@@ -188,23 +251,41 @@ export class MdWrapperComponent implements OnInit {
     // const velocityStart = -0.1;
     // const velocityEnd = 0.1;
 
-    const initialVelocity = createArrayWithRandomNumbers(this.particleCount, velocityStart, velocityEnd, true); // initial velocity values for each particle
+    const initialVelocity = createArrayWithRandomNumbers(
+      this.particleCount,
+      velocityStart,
+      velocityEnd,
+      true
+    ); // initial velocity values for each particle
     const initialAcceleration = this.particleArray.map((e, particle) => {
       const particleDisplacement = {
-        previousParticle: initialDisplacement[particle - 1] || initialDisplacement[this.particleCount - 1],
+        previousParticle:
+          initialDisplacement[particle - 1] ||
+          initialDisplacement[this.particleCount - 1],
         currentParticle: initialDisplacement[particle],
-        nextParticle: initialDisplacement[particle + 1] || initialDisplacement[0],
+        nextParticle:
+          initialDisplacement[particle + 1] || initialDisplacement[0],
       };
-      return calculateAcceleration(particleDisplacement, mass[particle], constant);
-    })
+      return calculateAcceleration(
+        particleDisplacement,
+        mass[particle],
+        constant
+      );
+    });
 
-    const initialKineticEnergy = this.particleArray.map((e, particle) => calculateKineticEnergy(mass[particle], initialVelocity[particle]));
-    const initialPotentialEnergy = this.particleArray.map((e, particle) => calculatePotentialEnergy({
-      currentParticle: initialDisplacement[particle],
-      nextParticle:
-        initialDisplacement[particle + 1] || initialDisplacement[0],
-    }, constant));
-
+    const initialKineticEnergy = this.particleArray.map((e, particle) =>
+      calculateKineticEnergy(mass[particle], initialVelocity[particle])
+    );
+    const initialPotentialEnergy = this.particleArray.map((e, particle) =>
+      calculatePotentialEnergy(
+        {
+          currentParticle: initialDisplacement[particle],
+          nextParticle:
+            initialDisplacement[particle + 1] || initialDisplacement[0],
+        },
+        constant
+      )
+    );
 
     const workerInput: MdWorkerInput = {
       constant,
@@ -216,23 +297,22 @@ export class MdWrapperComponent implements OnInit {
       initialAcceleration,
       initialKineticEnergy,
       initialPotentialEnergy,
-      mass
-    }
-
-
-
+      mass,
+    };
 
     return of(1).pipe(
       tap(() => {
-        this.experimentDescription = `Calculation ${calculationIndex} with velocities in range [${velocityStart}, ${velocityEnd}] `
-        this.worker.postMessage(JSON.stringify(workerInput))
+        this.experimentDescription = `Calculation ${calculationIndex} with velocities in range [${velocityStart}, ${velocityEnd}] `;
+        this.worker.postMessage(JSON.stringify(workerInput));
       }),
       switchMap(() => this.workerEvent$),
-      filter(e => e.progress === 100),
+      filter((e) => e.progress === 100),
       take(1),
-      tap(e => {
-
-        this.calculationResults$$.next([...this.calculationResults$$.getValue(), e])
+      tap((e) => {
+        this.calculationResults$$.next([
+          ...this.calculationResults$$.getValue(),
+          e,
+        ]);
         // console.log('results', e)
 
         // let dtIndex = 0;
@@ -244,11 +324,7 @@ export class MdWrapperComponent implements OnInit {
 
         //   dtIndex++
         // }
-
       })
-    )
-
-
+    );
   }
-
 }

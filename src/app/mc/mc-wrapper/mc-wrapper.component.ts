@@ -11,31 +11,24 @@ import { B, J, K } from "../variable";
   styleUrls: ["./mc-wrapper.component.scss"],
 })
 export class McWrapperComponent implements OnInit, AfterViewInit {
-
   isCollapsed = false;
   heatMapData = [
     {
       z: [],
-      type: 'heatmap'
-    }
+      type: "heatmap",
+    },
   ];
-  constructor(public service: McCoreService, public plotly: PlotlyService) { }
+  constructor(public service: McCoreService, public plotly: PlotlyService) {}
 
-  ngOnInit() {
-
-
-
-  }
+  ngOnInit() {}
 
   ngAfterViewInit() {
     setTimeout(() => {
-      this.calculate();
-    })
-
+      // this.calculate();
+    });
   }
 
   calculate() {
-
     const thermodynamicEquilibriumSteps = 100000;
     const latticeLength = 40;
 
@@ -45,17 +38,15 @@ export class McWrapperComponent implements OnInit, AfterViewInit {
       lattice[i] = new Array(latticeLength).fill(1);
     }
 
-    console.log(lattice)
+    console.log(lattice);
 
     const _energy = calculateEnergy(lattice, B, J);
-    console.log(_energy)
+    console.log(_energy);
 
     let temperature = 1;
 
-
     // iterate for each thermodynamic equilibrium step
     for (let i = 0; i < thermodynamicEquilibriumSteps; i++) {
-
       // calculate energy before spin reverse
       const initialEnergy = calculateEnergy(lattice, B, J);
 
@@ -74,31 +65,29 @@ export class McWrapperComponent implements OnInit, AfterViewInit {
       // console.log(`iteration ${i} `, initialEnergy, finalEnergy, energyDiff);
 
       if (energyDiff > 0) {
-
-        const propability = Math.exp((-1) * energyDiff / (K * temperature));
+        const propability = Math.exp((-1 * energyDiff) / (K * temperature));
         // console.log('propability', propability)
 
-        const random = randomDecimal(0, 1)
+        const random = randomDecimal(0, 1);
         // console.log('random', random);
 
         const keepChange = propability > random;
         if (!keepChange) {
           lattice[randomElement1][randomElement2] *= -1;
         }
-
       } else {
-
       }
 
-      setTimeout(() => this.heatMapData = [
-        {
-          z: lattice,
-          type: 'heatmap'
-        }
-      ])
+      setTimeout(
+        () =>
+          (this.heatMapData = [
+            {
+              z: lattice,
+              type: "heatmap",
+            },
+          ])
+      );
       // console.table(lattice)
-
     }
-
   }
 }
