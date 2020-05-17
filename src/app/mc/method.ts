@@ -1,8 +1,4 @@
-export function calculateEnergy(
-  spins: number[][],
-  B: number,
-  J: number
-): number {
+export function calculateEnergy(spins: number[][], B: number, J: number) {
   const N = spins.length - 1;
   let energyAtBoundaries = 0;
 

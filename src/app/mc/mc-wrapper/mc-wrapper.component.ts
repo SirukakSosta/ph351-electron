@@ -23,13 +23,7 @@ export class McWrapperComponent implements OnInit, AfterViewInit {
       title: "Mag Per Site",
     },
   };
-  magData = [
-    {
-      x: [],
-      y: [],
-      type: "scatter",
-    },
-  ];
+  magData = [];
   heatMapData = [
     {
       z: [],
@@ -43,13 +37,26 @@ export class McWrapperComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     setTimeout(() => {
       // this.calculate();
+      // return;
       const {
         magnetizations,
         tempratures,
+        theoritical,
       } = this.service.equillibriumForSingleTemprature();
-      this.magData[0].x = tempratures;
-      this.magData[0].y = magnetizations;
-      console.log(magnetizations, tempratures);
+      let magPlotTrace = {
+        x: tempratures,
+        y: magnetizations,
+        type: "scatter",
+        name: "Expiremental",
+      };
+      let theoryPlotTrace = {
+        x: tempratures,
+        y: theoritical,
+        type: "lines+markers",
+        name: "Theory",
+      };
+      this.magData = [magPlotTrace, theoryPlotTrace];
+      console.log(magnetizations, tempratures, theoritical);
     });
   }
 

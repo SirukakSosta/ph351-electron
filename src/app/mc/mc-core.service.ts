@@ -7,7 +7,7 @@ const J = 1;
 const B = 1;
 const K = 1;
 const GRID_SIZE = 40;
-const ITERATIONS = 2000;
+const ITERATIONS = 5000;
 const T0 = 0;
 const T_MAX = 20;
 const T_STEP = 0.1;
@@ -26,17 +26,20 @@ export class McCoreService {
   equillibriumForSingleTemprature(): {
     magnetizations: number[];
     tempratures: number[];
+    theoritical: number[];
   } {
     let LATTICE = new Array(GRID_SIZE)
       .fill(1)
       .map(() => new Array(GRID_SIZE).fill(1));
     let magnetizations = [];
     let tempratures = [];
+    let theoritical = [];
     // let averageMagentization = 0;
     // let E = 0;
     // let E_sq = 0;
 
     for (let temprature = T0; temprature < T_MAX; temprature += T_STEP) {
+      // console.log(LATTICE);
       console.log("tempra", temprature);
       const { mag, lattice } = this.singleTempratureCalculation(
         LATTICE,
@@ -44,8 +47,9 @@ export class McCoreService {
       );
       /** Αφου γίνουν ολα τα iterations βρίσκουμε. Μεση μαγνητηση, ενεργεια και τετραγωνο ενεργειας */
       magnetizations.push(mag / GRID_SIZE);
-      tempratures.push(temprature);
+      tempratures.push(temprature.toFixed(1));
       LATTICE = lattice;
+      theoritical.push(this.magnetizationTheoriticalFormula(temprature));
       // magnetization = this.sum2d(LATTICE) / GRID_SIZE;
       // averageMagentization = averageMagentization + magnetization / GRID_SIZE;
       // E = E + calculateEnergy(LATTICE, B, J);
@@ -54,14 +58,19 @@ export class McCoreService {
     return {
       magnetizations,
       tempratures,
+      theoritical,
     };
   }
 
   singleTempratureCalculation(LATTICE: any, temprature: number) {
+    let magAvg = 0;
     for (let i = 0; i < ITERATIONS; i++) {
       /** Επιλέγουμε 2 τυχαιους ακέραιους για να εναλάξουμε 2 τυχαια σπιν στο συστημα μας */
-      const random1 = this.getRandomInt(0, GRID_SIZE - 1);
-      const random2 = this.getRandomInt(0, GRID_SIZE - 1);
+      const random1 = this.getRandomInt(
+        1,
+        GRID_SIZE - 1
+      ); /** Εδω για κα΄ποιο λογο στη ματλαμπ βαζω απο 2 εως Ν-1 */
+      const random2 = this.getRandomInt(1, GRID_SIZE - 1);
       /** Ενεργεια πριν απο αλλαγη σπιν */
       const energyBefore = calculateEnergy(LATTICE, B, J);
       /** ΕΝΑΛΛΑΓΗ ΣΠΙΝ- για να τσκεάρορυμε αργοτερα αν αξίζει ενεργειακα να γινει αυτη η μετάβαση */
@@ -69,21 +78,36 @@ export class McCoreService {
       /** Ενεργεια Μετα απο αλλαγη σπιν */
       const energyAfter = calculateEnergy(LATTICE, B, J);
       const deltaEnergy = energyAfter - energyBefore;
-      /** Υπολογισμος πιθανότητας μετάβασης */
+      /** Αν η διοαφορα ενεργειας ειναι μεγαλυτερη του 0 παω για MC */
       const propability = Math.exp(-deltaEnergy / (K * temprature));
-      /** Βρίσκους τυχαιο ακεραιο μεταξυ 0-1 για να τον συκγρινουμε με τη πιθανοτητα */
-      const rProb = this.getRandomInt(0, 1);
-      if (propability >= rProb) {
-        /** Αφηνω αλλαγμενο το συστημα αφου εχω αλλαξει ηδη το σπιν*/
-      } else {
-        /** Επαναφέρω το συστημα όπως ηταν. (Εχω αλλαξει το σπιν πανω) */
-        LATTICE[random1][random2] = -LATTICE[random1][random2];
+
+      /** ΣΗΜΕΙΩΣΕΙΣ ΖΩΤΟΥ */
+      if (propability < 1) {
+        const rProb = this.getRandomReal(0, 1);
+        if (propability < rProb) {
+          LATTICE[random1][random2] = -LATTICE[random1][random2];
+        }
       }
+
+      /** Απο το ISING MATLAB */
+      // if (deltaEnergy > 0) {
+      //   /** Υπολογισμος πιθανότητας μετάβασης */
+      //   const propability = Math.exp(-deltaEnergy / (K * temprature));
+      //   /** Βρίσκους τυχαιο ακεραιο μεταξυ 0-1 για να τον συκγρινουμε με τη πιθανοτητα */
+      //   const rProb = this.getRandomReal(0, 1);
+      //   if (propability >= rProb) {
+      //     /** Αφηνω αλλαγμενο το συστημα αφου εχω αλλαξει ηδη το σπιν*/
+      //   } else {
+      //     /** Επαναφέρω το συστημα όπως ηταν. (Εχω αλλαξει το σπιν πανω) */
+      //     LATTICE[random1][random2] = -LATTICE[random1][random2];
+      //   }
+      // }
+      magAvg += this.sum2d(LATTICE) / GRID_SIZE;
     }
 
     /** Αφου γίνουν ολα τα iterations βρίσκουμε. Μεση μαγνητηση, ενεργεια και τετραγωνο ενεργειας */
     return {
-      mag: this.sum2d(LATTICE),
+      mag: magAvg / ITERATIONS,
       lattice: LATTICE,
     };
     // magnetization = this.sum2d(LATTICE) / GRID_SIZE;
@@ -97,6 +121,9 @@ export class McCoreService {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+  getRandomReal(min: number, max: number) {
+    return Math.random() * (max - min) + min;
+  }
   sum2d(tmp: any): number {
     let sum = 0;
     for (let i = 0; i < tmp.length; i++) {
@@ -105,5 +132,12 @@ export class McCoreService {
       }
     }
     return sum;
+  }
+  magnetizationTheoriticalFormula(temprature: number): number {
+    let sinHPart = Math.sinh((2 * K) / temprature);
+    let mag = Math.pow(sinHPart, -4);
+    mag = Math.pow(1 - mag, 1 / 8);
+    if (isNaN(mag)) return 0;
+    return mag;
   }
 }
