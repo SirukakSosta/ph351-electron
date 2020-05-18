@@ -9,8 +9,8 @@ const K = 1;
 const GRID_SIZE = 40;
 const ITERATIONS = 5000;
 const T0 = 0;
-const T_MAX = 20;
-const T_STEP = 0.1;
+const T_MAX = 10;
+const T_STEP = 0.25;
 @Injectable({
   providedIn: "root",
 })
@@ -113,19 +113,24 @@ export class McCoreService {
       //     /** Επαναφέρω το συστημα όπως ηταν. (Εχω αλλαξει το σπιν πανω) */
       //     LATTICE[random1][random2] = -LATTICE[random1][random2];
       //   }
-      // }
+      // }293.313.492.261.613
       magAvg += this.sum2d(LATTICE) / GRID_SIZE;
       energy += calculateEnergy(LATTICE, B, J);
       energySquared += Math.pow(energy, 2);
     }
+    energy = energy / ITERATIONS;
+    energySquared = energySquared / ITERATIONS;
+    console.log("E", energy);
+    console.log("E^2", energySquared);
+    console.log("E", energy);
     /** Αφου γίνουν ολα τα iterations βρίσκουμε. Μεση μαγνητηση, ενεργεια και τετραγωνο ενεργειας */
     return {
       mag: magAvg / ITERATIONS,
       lattice: LATTICE,
-      energy: energy / ITERATIONS,
-      energySquared: energySquared / ITERATIONS,
+      energy: energy,
       eidikiTheromotita:
-        (1 / (K * temprature)) * (energySquared - Math.pow(energy, 2)),
+        (1 / (K * Math.pow(temprature, 2))) *
+        (energySquared - Math.pow(energy, 2)),
     };
     // magnetization = this.sum2d(LATTICE) / GRID_SIZE;
     // averageMagentization = averageMagentization + magnetization / GRID_SIZE;
