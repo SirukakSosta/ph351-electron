@@ -23,6 +23,30 @@ export class McWrapperComponent implements OnInit, AfterViewInit {
       title: "Mag Per Site",
     },
   };
+  energyLayout = {
+    responsive: true,
+
+    title: `Energy vs Temprature`,
+    xaxis: {
+      title: "Temprature",
+    },
+    yaxis: {
+      title: "Energy Per Site",
+    },
+  };
+  eidikhThermotitaLayout = {
+    responsive: true,
+
+    title: `Eidiki theromatita vs Temprature`,
+    xaxis: {
+      title: "Temprature",
+    },
+    yaxis: {
+      title: "Eidiki theromatita",
+    },
+  };
+  enegyData = [];
+  eidikhThermotitaData = [];
   magData = [];
   heatMapData = [
     {
@@ -42,6 +66,8 @@ export class McWrapperComponent implements OnInit, AfterViewInit {
         magnetizations,
         tempratures,
         theoritical,
+        energies,
+        eidikesThermotites,
       } = this.service.equillibriumForSingleTemprature();
       let magPlotTrace = {
         x: tempratures,
@@ -55,6 +81,20 @@ export class McWrapperComponent implements OnInit, AfterViewInit {
         type: "lines+markers",
         name: "Theory",
       };
+      const energyTrace = {
+        x: tempratures,
+        y: energies,
+        type: "lines+markers",
+        name: "Expiremental Energy",
+      };
+      const idikiThermotitaTrace = {
+        x: tempratures,
+        y: eidikesThermotites,
+        type: "lines+markers",
+        name: "Expiremental Idiki therm",
+      };
+      this.enegyData = [energyTrace];
+      this.eidikhThermotitaData = [idikiThermotitaTrace];
       this.magData = [magPlotTrace, theoryPlotTrace];
       console.log(magnetizations, tempratures, theoritical);
     });

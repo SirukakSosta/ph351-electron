@@ -4,7 +4,7 @@ import { calculateEnergy } from "./method";
 
 /** CONSTANTS */
 const J = 1;
-const B = 1;
+const B = 0;
 const K = 1;
 const GRID_SIZE = 40;
 const ITERATIONS = 5000;
@@ -27,6 +27,8 @@ export class McCoreService {
     magnetizations: number[];
     tempratures: number[];
     theoritical: number[];
+    energies: number[];
+    eidikesThermotites: number[];
   } {
     let LATTICE = new Array(GRID_SIZE)
       .fill(1)
@@ -34,19 +36,25 @@ export class McCoreService {
     let magnetizations = [];
     let tempratures = [];
     let theoritical = [];
+    let energies = [];
+    let eidikesThermotites = [];
     // let averageMagentization = 0;
     // let E = 0;
     // let E_sq = 0;
 
     for (let temprature = T0; temprature < T_MAX; temprature += T_STEP) {
       // console.log(LATTICE);
-      console.log("tempra", temprature);
-      const { mag, lattice } = this.singleTempratureCalculation(
-        LATTICE,
-        temprature
-      );
+      console.log("tempra", temprature.toFixed(1));
+      const {
+        mag,
+        lattice,
+        energy,
+        eidikiTheromotita,
+      } = this.singleTempratureCalculation(LATTICE, temprature);
       /** Αφου γίνουν ολα τα iterations βρίσκουμε. Μεση μαγνητηση, ενεργεια και τετραγωνο ενεργειας */
       magnetizations.push(mag / GRID_SIZE);
+      energies.push(energy);
+      eidikesThermotites.push(eidikiTheromotita);
       tempratures.push(temprature.toFixed(1));
       LATTICE = lattice;
       theoritical.push(this.magnetizationTheoriticalFormula(temprature));
@@ -59,11 +67,15 @@ export class McCoreService {
       magnetizations,
       tempratures,
       theoritical,
+      energies,
+      eidikesThermotites,
     };
   }
 
   singleTempratureCalculation(LATTICE: any, temprature: number) {
     let magAvg = 0;
+    let energy = 0;
+    let energySquared = 0;
     for (let i = 0; i < ITERATIONS; i++) {
       /** Επιλέγουμε 2 τυχαιους ακέραιους για να εναλάξουμε 2 τυχαια σπιν στο συστημα μας */
       const random1 = this.getRandomInt(
@@ -103,12 +115,17 @@ export class McCoreService {
       //   }
       // }
       magAvg += this.sum2d(LATTICE) / GRID_SIZE;
+      energy += calculateEnergy(LATTICE, B, J);
+      energySquared += Math.pow(energy, 2);
     }
-
     /** Αφου γίνουν ολα τα iterations βρίσκουμε. Μεση μαγνητηση, ενεργεια και τετραγωνο ενεργειας */
     return {
       mag: magAvg / ITERATIONS,
       lattice: LATTICE,
+      energy: energy / ITERATIONS,
+      energySquared: energySquared / ITERATIONS,
+      eidikiTheromotita:
+        (1 / (K * temprature)) * (energySquared - Math.pow(energy, 2)),
     };
     // magnetization = this.sum2d(LATTICE) / GRID_SIZE;
     // averageMagentization = averageMagentization + magnetization / GRID_SIZE;
