@@ -1,9 +1,9 @@
-import { AfterViewInit, Component, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { PlotlyService } from "angular-plotly.js";
+import { filter, map } from "rxjs/operators";
 // import { randomDecimal, randomInteger } from "../../math-common/method";
 import { McCoreService } from "../mc-core.service";
-import { magLayout, energyLayout, eidikhThermotitaLayout } from "../variable";
-import { tap, map, startWith, filter } from "rxjs/operators";
+import { eidikhThermotitaLayout, energyLayout, magLayout } from "../variable";
 // import { calculateEnergy } from "../method";
 // import { B, J, K } from "../variable";
 
@@ -25,15 +25,15 @@ export class McWrapperComponent implements OnInit {
   K = 1;
   B = 0;
   J = 1;
-  T0 = 0;
-  T_MAX = 20;
+  T0 = 0.5;
+  T_MAX = 7;
   T_STEP = 0.1;
   // GRID_SIZE = 10;
 
   ITERATIONS = 100000;
-  spinChangesPerIteration = 2;
-  availableGridSizes = [10, 15, 20, 25, 30];
-  selectedGridSizes = [10, 15, 20];
+  spinChangesPerIteration = 1;
+  availableGridSizes = [4, 8, 12, 16];
+  selectedGridSizes = [4, 8, 12, 16];
 
   progress$ = this.service.calculationResults$$.pipe(
     filter(e => !!e.length),
@@ -53,7 +53,7 @@ export class McWrapperComponent implements OnInit {
         x: result.tempratures,
         y: result.magnetizations,
         type: "scatter",
-        name: `Expiremental ${result.GRID_SIZE}`,
+        name: `Lattice ${result.GRID_SIZE}`,
       }))
       traces.push({
         x: results[0].tempratures,
@@ -73,7 +73,7 @@ export class McWrapperComponent implements OnInit {
         x: result.tempratures,
         y: result.energies,
         type: "lines+markers",
-        name: `Expiremental Energy ${result.GRID_SIZE}`,
+        name: `Lattice ${result.GRID_SIZE}`,
       }))
       return traces
     }),
@@ -86,7 +86,7 @@ export class McWrapperComponent implements OnInit {
         x: result.tempratures,
         y: result.eidikesThermotites,
         type: "lines+markers",
-        name: `Expiremental Idiki therm ${result.GRID_SIZE}`,
+        name: `Lattice ${result.GRID_SIZE}`,
       }))
       return traces
     }),
@@ -113,7 +113,7 @@ export class McWrapperComponent implements OnInit {
     //   x: tempratures,
     //   y: magnetizations,
     //   type: "scatter",
-    //   name: "Expiremental",
+    //   name: "Experiment -",
     // };
     // let theoryPlotTrace = {
     //   x: tempratures,
@@ -125,13 +125,13 @@ export class McWrapperComponent implements OnInit {
     //   x: tempratures,
     //   y: energies,
     //   type: "lines+markers",
-    //   name: "Expiremental Energy",
+    //   name: "Experiment - Energy",
     // };
     // const idikiThermotitaTrace = {
     //   x: tempratures,
     //   y: eidikesThermotites,
     //   type: "lines+markers",
-    //   name: "Expiremental Idiki therm",
+    //   name: "Experiment - Idiki therm",
     // };
     // this.enegyData = [energyTrace];
     // this.eidikhThermotitaData = [idikiThermotitaTrace];

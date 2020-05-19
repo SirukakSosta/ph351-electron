@@ -26,7 +26,6 @@
 
           <div class="item">
             <label for="">Grid Sizes</label>
-            <!-- <input nz-input type="number" min="2" placeholder="Grid Size" [(ngModel)]="se" /> -->
             <nz-select nzMode="tags" nzPlaceHolder="Tag Mode" [(ngModel)]="selectedGridSizes">
               <nz-option *ngFor="let option of availableGridSizes" [nzLabel]="option" [nzValue]="option"></nz-option>
             </nz-select>

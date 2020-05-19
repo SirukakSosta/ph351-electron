@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { singleTempratureCalculation, magnetizationTheoriticalFormula } from "./method";
+import { magnetizationTheoriticalFormula, singleTempratureCalculation } from "./method";
 
 type input = {
    K: number;
@@ -37,7 +37,7 @@ addEventListener('message', ({ data }) => {
    let eidikesThermotites = [];
    let LATTICE = new Array(GRID_SIZE)
       .fill(1)
-      .map(() => new Array(GRID_SIZE).fill(1));
+      .map(() => new Array(GRID_SIZE).fill(-1));
 
    for (let temprature = T0; temprature < T_MAX; temprature += T_STEP) {
       // console.log(LATTICE);
@@ -61,7 +61,7 @@ addEventListener('message', ({ data }) => {
       // E_sq = E_sq + Math.pow(E, 2);
 
 
-      const progress = Math.ceil ((temprature + 1) * 100 / (T_MAX - T0));
+      const progress = Math.ceil((temprature + 1) * 100 / (T_MAX - T0));
       // console.log('progress', progress, progress % 20 === 0)
       if (progress % 10 === 0) {
          const output: output = { eidikesThermotites, energies, GRID_SIZE, magnetizations, tempratures, theoritical };

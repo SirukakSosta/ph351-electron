@@ -1,9 +1,7 @@
 import { Injectable } from "@angular/core";
-import { Subject, BehaviorSubject, fromEvent } from "rxjs";
-import { calculateEnergy, getRandomInt, getRandomReal, sum2d, magnetizationTheoriticalFormula } from "./method";
-import { deepCopy, randomInteger } from "../math-common/method";
-import { McWorkerOutput, McWorkerInput } from "./interface";
-import { map, tap, withLatestFrom, combineLatest, takeUntil } from "rxjs/operators";
+import { BehaviorSubject, fromEvent, Subject } from "rxjs";
+import { map, takeUntil, tap, withLatestFrom } from "rxjs/operators";
+import { McWorkerInput, McWorkerOutput } from "./interface";
 
 @Injectable({
   providedIn: "root",
