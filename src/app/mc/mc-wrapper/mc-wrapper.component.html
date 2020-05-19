@@ -21,47 +21,75 @@
         </div>
       </div>
       <div nz-row [nzGutter]="4" class="form">
-        <!-- <div nz-col [nzSpan]="24">
-          <div class="item">
-            <label for="">Particle count</label>
-            <input nz-input type="number" placeholder="Particle count" (ngModelChange)="onParticleCountChange()"
-              [(ngModel)]="particleCount" />
-          </div>
-        </div>
         <div nz-col [nzSpan]="24">
-          <div class="item">
-            <label for="perlin">Perlin Distribution</label>
-            <input nz-input name="perlin" id="perlin" type="checkbox" placeholder="Perlin Distribution"
-              (ngModelChange)="onParticleCountChange()" [(ngModel)]="perlinDistribution" />
-          </div>
 
-        </div>
-        <div nz-col [nzSpan]="24">
+
           <div class="item">
-            <label for="">Time start</label>
-            <input nz-input type="number" placeholder="Time Start" [(ngModel)]="dtStart" />
+            <label for="">Grid Sizes</label>
+            <!-- <input nz-input type="number" min="2" placeholder="Grid Size" [(ngModel)]="se" /> -->
+            <nz-select nzMode="tags" nzPlaceHolder="Tag Mode" [(ngModel)]="selectedGridSizes">
+              <nz-option *ngFor="let option of availableGridSizes" [nzLabel]="option" [nzValue]="option"></nz-option>
+            </nz-select>
           </div>
         </div>
         <div nz-col [nzSpan]="24">
           <div class="item">
-            <label for="">Time end</label>
-            <input nz-input type="number" placeholder="Time End" [(ngModel)]="dtEnd" />
+            <label for="">Iterations</label>
+            <input nz-input type="number" placeholder="Iterations" [(ngModel)]="ITERATIONS" />
           </div>
         </div>
         <div nz-col [nzSpan]="24">
           <div class="item">
-            <label for="">Time step</label>
-            <input nz-input type="number" placeholder="Time Step" [(ngModel)]="dt" />
+            <label for="">T0</label>
+            <input nz-input type="number" placeholder="T0" [(ngModel)]="T0" />
           </div>
-        </div> -->
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">T_MAX</label>
+            <input nz-input type="number" placeholder="T_MAX" [(ngModel)]="T_MAX" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">T_STEP</label>
+            <input nz-input type="number" placeholder="T_STEP" [(ngModel)]="T_STEP" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">B</label>
+            <input nz-input type="number" placeholder="B" [(ngModel)]="B" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Spin Changes Per Iteration</label>
+            <input nz-input type="number" placeholder="Spin Changes Per Iteration"
+              [(ngModel)]="spinChangesPerIteration" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">J</label>
+            <input nz-input type="number" placeholder="J" [(ngModel)]="J" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">B</label>
+            <input nz-input type="number" placeholder="B" [(ngModel)]="B" />
+          </div>
+        </div>
+
 
       </div>
 
-      <!-- <div nz-col [nzSpan]="24">
+      <div nz-col [nzSpan]="24">
         <button nz-button nzType="primary" nzBlock (click)="start();">
           Start
         </button>
-      </div> -->
+      </div>
 
     </div>
   </nz-sider>
@@ -71,36 +99,13 @@
         <div class="p-3">
           <h3>Project in Monte Carlo (MC)</h3>
 
-          <!-- <span *ngIf="(progress$ | async) <100"> {{experimentDescription}} </span>
-          <span *ngIf="(progress$ | async) === 100"> Calculations Completed </span>
-          <br />
           <span>Progress: {{progress$ | async}}%</span>
 
-          <hr />
-          Initial Displacement Distribution
-          <div style="background-color: whitesmoke;">
-            <svg height="80" width="900">
-              <circle *ngFor="let particle of particleArray" [attr.cx]="initialDisplacement[particle] * 900" cy="37"
-                r="2" fill="black">
-              </circle>
-            </svg>
-          </div>
-
-          <input type="range" name="points" id="points" value="selectedH$$ | async" min="0" max="19"
-            [value]="selectedEnergyTimeExperiment$$ | async" data-show-value="true" data-popup-enabled="true"
-            (change)="onSelectedEnergyTimeExperimentChange($event.target.value)" />
-
-          <plotly-plot [data]="energyTimePlotData$ | async" [layout]="energyTimePlotLayout$ | async">
-          </plotly-plot>-->
-
-          <!-- <plotly-plot [data]="heatMapData">
-          </plotly-plot> -->
-
-          <plotly-plot [data]="magData" [layout]="magLayout">
+          <plotly-plot [data]="magPlotData$ | async" [layout]="magLayout">
           </plotly-plot>
-          <plotly-plot [data]="enegyData" [layout]="energyLayout">
+          <plotly-plot [data]="energyPlotData$ | async" [layout]="energyLayout">
           </plotly-plot>
-          <plotly-plot [data]="eidikhThermotitaData" [layout]="eidikhThermotitaLayout">
+          <plotly-plot [data]="eidikhThermotitaPlotData$ | async" [layout]="eidikhThermotitaLayout">
           </plotly-plot>
 
         </div>
