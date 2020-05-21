@@ -25,10 +25,9 @@ export class McWrapperComponent implements OnInit {
   K = 1;
   B = 0;
   J = 1;
-  T0 = 0.5;
+  T0 = 0;
   T_MAX = 7;
   T_STEP = 0.1;
-  // GRID_SIZE = 10;
 
   ITERATIONS = 100000;
   spinChangesPerIteration = 1;

@@ -43,7 +43,6 @@ import { deepCopy } from "../math-common/method";
 //   return energy;
 // }
 
-
 export function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -64,8 +63,10 @@ export function sum2d(tmp: number[][]): number {
   return sum;
 }
 
-
-export function magnetizationTheoriticalFormula(temprature: number, K: number): number {
+export function magnetizationTheoriticalFormula(
+  temprature: number,
+  K: number
+): number {
   let sinHPart = Math.sinh((2 * K) / temprature);
   let mag = Math.pow(sinHPart, -4);
   mag = Math.pow(1 - mag, 1 / 8);
@@ -124,16 +125,23 @@ export function magnetizationTheoriticalFormula(temprature: number, K: number): 
 //   };
 // }
 
-export function singleTempratureCalculation(LATTICE: number[][], temprature: number, B: number, J: number, K: number, ITERATIONS: number, GRID_SIZE: number, spinChangesPerIteration: number) {
-
+export function singleTempratureCalculation(
+  LATTICE: number[][],
+  temprature: number,
+  B: number,
+  J: number,
+  K: number,
+  ITERATIONS: number,
+  GRID_SIZE: number,
+  spinChangesPerIteration: number
+) {
   let magAvg = 0;
   let energy = 0;
   let energySquared = 0;
+  let heatCapacityAvg = 0;
+  let customEnergy = 0;
 
   for (let i = 0; i < ITERATIONS; i++) {
-
-
-
     /** Ενεργεια πριν απο αλλαγη σπιν */
     const energyBefore = calculateEnergy2(LATTICE, J);
 
@@ -142,7 +150,10 @@ export function singleTempratureCalculation(LATTICE: number[][], temprature: num
 
     for (let j = 0; j < spinChangesPerIteration; j++) {
       /** Επιλέγουμε 2 τυχαιους ακέραιους για να εναλάξουμε 2 τυχαια σπιν στο συστημα μας */
-      const random1 = getRandomInt(1, GRID_SIZE - 1); /** Εδω για κα΄ποιο λογο στη ματλαμπ βαζω απο 2 εως Ν-1 */
+      const random1 = getRandomInt(
+        1,
+        GRID_SIZE - 1
+      ); /** Εδω για κα΄ποιο λογο στη ματλαμπ βαζω απο 2 εως Ν-1 */
       const random2 = getRandomInt(1, GRID_SIZE - 1);
       /** ΕΝΑΛΛΑΓΗ ΣΠΙΝ- για να τσκεάρορυμε αργοτερα αν αξίζει ενεργειακα να γινει αυτη η μετάβαση */
       tmpLattice[random1][random2] = -tmpLattice[random1][random2];
@@ -159,7 +170,6 @@ export function singleTempratureCalculation(LATTICE: number[][], temprature: num
       /** Αν η διαφορα ενεργειας ειναι μεγαλυτερη του 0 παω για MC */
       const propability = Math.exp(-deltaEnergy / (K * temprature));
 
-
       const revertChange =
         /** Υπολογισμος πιθανότητας μετάβασης */
         propability < 1 &&
@@ -172,43 +182,29 @@ export function singleTempratureCalculation(LATTICE: number[][], temprature: num
     /** Εαν η αλλαγη σπιν περναει απο τις πιθανοτητες, το πλεγμα περνει την τιμη του προσωρινου(νεου) πλεγματος*/
     if (keepChange) {
       LATTICE = tmpLattice;
-      // const rProb = getRandomReal(0, 1);
-      // if (propability < rProb) {
-      // LATTICE[random1][random2] = -LATTICE[random1][random2];
-      // }
     }
-
-    /** Απο το ISING MATLAB */
-    // if (deltaEnergy > 0) {
-    //   /** Υπολογισμος πιθανότητας μετάβασης */
-    //   const propability = Math.exp(-deltaEnergy / (K * temprature));
-    //   /** Βρίσκους τυχαιο ακεραιο μεταξυ 0-1 για να τον συκγρινουμε με τη πιθανοτητα */
-    //   const rProb = this.getRandomReal(0, 1);
-    //   if (propability >= rProb) {
-    //     /** Αφηνω αλλαγμενο το συστημα αφου εχω αλλαξει ηδη το σπιν*/
-    //   } else {
-    //     /** Επαναφέρω το συστημα όπως ηταν. (Εχω αλλαξει το σπιν πανω) */
-    //     LATTICE[random1][random2] = -LATTICE[random1][random2];
-    //   }
-    // }
-    magAvg += sum2d(LATTICE) / GRID_SIZE;
-    energy += calculateEnergy2(LATTICE, J);
-    energySquared += Math.pow(energy, 2);
+    magAvg += sum2d(LATTICE);
+    const tmpEnergy = calculateEnergy2(LATTICE, J);
+    energy += tmpEnergy;
+    energySquared += Math.pow(tmpEnergy, 2);
   }
   /** Αφου γίνουν ολα τα iterations βρίσκουμε. Μεση μαγνητηση, ενεργεια και τετραγωνο ενεργειας */
 
+  const eidikiTheromotita =
+    (energySquared / ITERATIONS - Math.pow(energy / ITERATIONS, 2)) /
+    (Math.pow(temprature, 2) * Math.pow(GRID_SIZE, 2));
   energy /= ITERATIONS * Math.pow(GRID_SIZE, 2);
   energySquared /= ITERATIONS * Math.pow(GRID_SIZE, 2);
-  const mag = magAvg / ITERATIONS;
-
+  const mag = magAvg / (ITERATIONS * GRID_SIZE);
   return {
     mag,
     lattice: LATTICE,
     energy,
     energySquared,
-    eidikiTheromotita:
-      (1 / (K * temprature)) * (energySquared - Math.pow(energy, 2)),
+    eidikiTheromotita,
   };
+  // E-<E>
+  // <(E-<E>)^2> = E^2 -2*E*<E> + <E>^2>
   // magnetization = this.sum2d(LATTICE) / GRID_SIZE;
   // averageMagentization = averageMagentization + magnetization / GRID_SIZE;
   // E = E + calculateEnergy(LATTICE, B, J);
@@ -216,59 +212,57 @@ export function singleTempratureCalculation(LATTICE: number[][], temprature: num
 }
 
 export function calculateEnergy2(l: number[][], J: number) {
-
   // """
   //   Sum products of neighboring spin sites.  Return
   //   the energy as well as the sum of all of the spins individually.
   //   """
-  let w = 0, h = 0, spinSum = 0;
+  let w = 0,
+    h = 0,
+    spinSum = 0;
   const N = l.length - 1;
 
   while (h <= N) {
-
-    if ((h == 0) && (w == 0)) { // 'left top row'
-      spinSum += (l[0][1] + l[0][N] + l[1][0] + l[N][0]) * l[0][0]
-      w += 1
-
-    } else if ((h == 0) && (w < N)) {
+    if (h == 0 && w == 0) {
+      // 'left top row'
+      spinSum += (l[0][1] + l[0][N] + l[1][0] + l[N][0]) * l[0][0];
+      w += 1;
+    } else if (h == 0 && w < N) {
       // #print 'middle top row'
-      spinSum += (l[1][w] + l[N][w] + l[0][w - 1] + l[0][w + 1]) * l[0][w]
-      w += 1
-    } else if ((h == 0) && (w == N)) {
+      spinSum += (l[1][w] + l[N][w] + l[0][w - 1] + l[0][w + 1]) * l[0][w];
+      w += 1;
+    } else if (h == 0 && w == N) {
       // #print 'right top row'
-      spinSum += (l[1][w] + l[N][w] + l[0][0] + l[0][w - 1]) * l[0][w]
-      w = 0
-      h += 1
-    } else if ((h < N) && (w == 0)) {
+      spinSum += (l[1][w] + l[N][w] + l[0][0] + l[0][w - 1]) * l[0][w];
+      w = 0;
+      h += 1;
+    } else if (h < N && w == 0) {
       // #print 'left middle'
-      spinSum += (l[h + 1][w] + l[h - 1][w] + l[h][1] + l[h][N]) * l[h][0]
-      w += 1
-    } else if ((h < N) && (w < N)) {
+      spinSum += (l[h + 1][w] + l[h - 1][w] + l[h][1] + l[h][N]) * l[h][0];
+      w += 1;
+    } else if (h < N && w < N) {
       // #print 'middle'
-      spinSum += (l[h + 1][w] + l[h - 1][w] + l[h][w + 1] + l[h][w - 1]) * l[h][w]
-      w += 1
-    } else if ((h < N) && (w == N)) {
+      spinSum +=
+        (l[h + 1][w] + l[h - 1][w] + l[h][w + 1] + l[h][w - 1]) * l[h][w];
+      w += 1;
+    } else if (h < N && w == N) {
       // #print 'right middle'
-      spinSum += (l[h + 1][w] + l[h - 1][w] + l[h][0] + l[h][w - 1]) * l[h][w]
-      w = 0
-      h += 1
-    } else if ((h == N) && (w == 0)) {
+      spinSum += (l[h + 1][w] + l[h - 1][w] + l[h][0] + l[h][w - 1]) * l[h][w];
+      w = 0;
+      h += 1;
+    } else if (h == N && w == 0) {
       // #print 'left bottom'
-      spinSum += (l[0][w] + l[h - 1][w] + l[h][1] + l[h][N]) * l[h][w]
-      w += 1
-    } else if ((h == N) && (w < N)) {
+      spinSum += (l[0][w] + l[h - 1][w] + l[h][1] + l[h][N]) * l[h][w];
+      w += 1;
+    } else if (h == N && w < N) {
       // #print 'middle bottom row'
-      spinSum += (l[0][w] + l[h - 1][w] + l[h][w + 1] + l[h][w - 1]) * l[h][w]
-      w += 1
-    } else if ((h == N) && (w == N)) {
+      spinSum += (l[0][w] + l[h - 1][w] + l[h][w + 1] + l[h][w - 1]) * l[h][w];
+      w += 1;
+    } else if (h == N && w == N) {
       // #print 'right bottom'
-      spinSum += (l[0][w] + l[h - 1][w] + l[h][0] + l[h][w - 1]) * l[h][w]
-      break
-
+      spinSum += (l[0][w] + l[h - 1][w] + l[h][0] + l[h][w - 1]) * l[h][w];
+      break;
     }
-
-
   }
-  const E = - 0.5 * J * spinSum;
+  const E = -0.5 * J * spinSum;
   return E;
 }
