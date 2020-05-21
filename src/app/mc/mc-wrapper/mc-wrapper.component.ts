@@ -1,7 +1,9 @@
-import { AfterViewInit, Component, OnInit } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { PlotlyService } from "angular-plotly.js";
+import { filter, map } from "rxjs/operators";
 // import { randomDecimal, randomInteger } from "../../math-common/method";
 import { McCoreService } from "../mc-core.service";
+import { eidikhThermotitaLayout, energyLayout, magLayout } from "../variable";
 // import { calculateEnergy } from "../method";
 // import { B, J, K } from "../variable";
 
@@ -10,156 +12,136 @@ import { McCoreService } from "../mc-core.service";
   templateUrl: "./mc-wrapper.component.html",
   styleUrls: ["./mc-wrapper.component.scss"],
 })
-export class McWrapperComponent implements OnInit, AfterViewInit {
+export class McWrapperComponent implements OnInit {
   isCollapsed = false;
-  magLayout = {
-    responsive: true,
-
-    title: `Mag vs Temprature`,
-    xaxis: {
-      title: "Temprature",
-    },
-    yaxis: {
-      title: "Mag Per Site",
-    },
-  };
-  energyLayout = {
-    responsive: true,
-
-    title: `Energy vs Temprature`,
-    xaxis: {
-      title: "Temprature",
-    },
-    yaxis: {
-      title: "Energy Per Site",
-    },
-  };
-  eidikhThermotitaLayout = {
-    responsive: true,
-
-    title: `Eidiki theromatita vs Temprature`,
-    xaxis: {
-      title: "Temprature",
-    },
-    yaxis: {
-      title: "Eidiki theromatita",
-    },
-  };
+  magLayout = magLayout;
+  energyLayout = energyLayout;
+  eidikhThermotitaLayout = eidikhThermotitaLayout;
   enegyData = [];
   eidikhThermotitaData = [];
   magData = [];
-  heatMapData = [
-    {
-      z: [],
-      type: "heatmap",
-    },
-  ];
+
+  // experiment variables
+  K = 1;
+  B = 0;
+  J = 1;
+  T0 = 0.5;
+  T_MAX = 7;
+  T_STEP = 0.1;
+  // GRID_SIZE = 10;
+
+  ITERATIONS = 100000;
+  spinChangesPerIteration = 1;
+  availableGridSizes = [10, 20, 30];
+  selectedGridSizes = [10, 20, 30];
+
+  progress$ = this.service.calculationResults$$.pipe(
+    filter((e) => !!e.length),
+    map((results) => {
+      const temperatureSteps = (this.T_MAX - this.T0) / this.T_STEP;
+      const totalSteps = temperatureSteps * this.selectedGridSizes.length;
+      const stepsTilNow = results
+        .map((e) => e.tempratures.length)
+        .reduce((a, b) => a + b);
+      const progress =
+        (100 * (totalSteps - (totalSteps - stepsTilNow))) / totalSteps;
+      return progress.toFixed(1);
+    })
+  );
+
+  magPlotData$ = this.service.calculationResults$$.pipe(
+    filter((e) => !!e.length),
+    map((results) => {
+      let traces = results.map((result) => ({
+        x: result.tempratures,
+        y: result.magnetizations,
+        type: "scatter",
+        name: `Lattice ${result.GRID_SIZE}`,
+      }));
+      traces.push({
+        x: results[0].tempratures,
+        y: results[0].theoritical,
+        type: "lines+markers",
+        name: `Theory`,
+      });
+      // console.log(traces)
+      return traces;
+    })
+  );
+
+  energyPlotData$ = this.service.calculationResults$$.pipe(
+    filter((e) => !!e.length),
+    map((results) => {
+      let traces = results.map((result) => ({
+        x: result.tempratures,
+        y: result.energies,
+        type: "lines+markers",
+        name: `Lattice ${result.GRID_SIZE}`,
+      }));
+      return traces;
+    })
+  );
+
+  eidikhThermotitaPlotData$ = this.service.calculationResults$$.pipe(
+    filter((e) => !!e.length),
+    map((results) => {
+      let traces = results.map((result) => ({
+        x: result.tempratures,
+        y: result.eidikesThermotites,
+        type: "lines+markers",
+        name: `Lattice ${result.GRID_SIZE}`,
+      }));
+      return traces;
+    })
+  );
+
   constructor(public service: McCoreService, public plotly: PlotlyService) {}
 
   ngOnInit() {}
 
-  ngAfterViewInit() {
-    setTimeout(() => {
-      // this.calculate();
-      // return;
-      const {
-        magnetizations,
-        tempratures,
-        theoritical,
-        energies,
-        eidikesThermotites,
-      } = this.service.equillibriumForSingleTemprature();
-      let magPlotTrace = {
-        x: tempratures,
-        y: magnetizations,
-        type: "scatter",
-        name: "Expiremental",
-      };
-      let theoryPlotTrace = {
-        x: tempratures,
-        y: theoritical,
-        type: "lines+markers",
-        name: "Theory",
-      };
-      const energyTrace = {
-        x: tempratures,
-        y: energies,
-        type: "lines+markers",
-        name: "Expiremental Energy",
-      };
-      const idikiThermotitaTrace = {
-        x: tempratures,
-        y: eidikesThermotites,
-        type: "lines+markers",
-        name: "Expiremental Idiki therm",
-      };
-      this.enegyData = [energyTrace];
-      this.eidikhThermotitaData = [idikiThermotitaTrace];
-      this.magData = [magPlotTrace, theoryPlotTrace];
-      console.log(magnetizations, tempratures, theoritical);
-    });
+  start() {
+    this.service.start(
+      this.selectedGridSizes,
+      this.J,
+      this.B,
+      this.K,
+      this.ITERATIONS,
+      this.T0,
+      this.T_MAX,
+      this.T_STEP,
+      this.spinChangesPerIteration
+    );
+
+    // const { magnetizations, tempratures, theoritical, energies, eidikesThermotites } =
+    //   this.service.equillibriumForSingleTemprature([10], this.J, this.B, this.K, this.GRID_SIZE, this.ITERATIONS, this.T0, this.T_MAX, this.T_STEP, this.spinChangesPerIteration);
+
+    // let magPlotTrace = {
+    //   x: tempratures,
+    //   y: magnetizations,
+    //   type: "scatter",
+    //   name: "Experiment -",
+    // };
+    // let theoryPlotTrace = {
+    //   x: tempratures,
+    //   y: theoritical,
+    //   type: "lines+markers",
+    //   name: "Theory",
+    // };
+    // const energyTrace = {
+    //   x: tempratures,
+    //   y: energies,
+    //   type: "lines+markers",
+    //   name: "Experiment - Energy",
+    // };
+    // const idikiThermotitaTrace = {
+    //   x: tempratures,
+    //   y: eidikesThermotites,
+    //   type: "lines+markers",
+    //   name: "Experiment - Idiki therm",
+    // };
+    // this.enegyData = [energyTrace];
+    // this.eidikhThermotitaData = [idikiThermotitaTrace];
+    // this.magData = [magPlotTrace, theoryPlotTrace];
+    // console.log(magnetizations, tempratures, theoritical);
   }
-
-  // calculate() {
-  //   const thermodynamicEquilibriumSteps = 100000;
-  //   const latticeLength = 40;
-
-  //   // initialize lattice
-  //   let lattice = [[]] as number[][];
-  //   for (let i = 0; i < latticeLength; i++) {
-  //     lattice[i] = new Array(latticeLength).fill(1);
-  //   }
-
-  //   console.log(lattice);
-
-  //   const _energy = calculateEnergy(lattice, B, J);
-  //   console.log(_energy);
-
-  //   let temperature = 1;
-
-  //   // iterate for each thermodynamic equilibrium step
-  //   for (let i = 0; i < thermodynamicEquilibriumSteps; i++) {
-  //     // calculate energy before spin reverse
-  //     const initialEnergy = calculateEnergy(lattice, B, J);
-
-  //     // pick two random numbers
-  //     const randomElement1 = randomInteger(0, latticeLength - 1);
-  //     const randomElement2 = randomInteger(0, latticeLength - 1);
-
-  //     // reverse spin
-  //     lattice[randomElement1][randomElement2] *= -1;
-
-  //     // calculate energy after spin reverse
-  //     const finalEnergy = calculateEnergy(lattice, B, J);
-
-  //     // calculate difference
-  //     const energyDiff = finalEnergy - initialEnergy;
-  //     // console.log(`iteration ${i} `, initialEnergy, finalEnergy, energyDiff);
-
-  //     if (energyDiff > 0) {
-  //       const propability = Math.exp((-1 * energyDiff) / (K * temperature));
-  //       // console.log('propability', propability)
-
-  //       const random = randomDecimal(0, 1);
-  //       // console.log('random', random);
-
-  //       const keepChange = propability > random;
-  //       if (!keepChange) {
-  //         lattice[randomElement1][randomElement2] *= -1;
-  //       }
-  //     } else {
-  //     }
-
-  //     setTimeout(
-  //       () =>
-  //         (this.heatMapData = [
-  //           {
-  //             z: lattice,
-  //             type: "heatmap",
-  //           },
-  //         ])
-  //     );
-  //     // console.table(lattice)
-  //   }
-  // }
 }
