@@ -135,11 +135,12 @@ export function singleTempratureCalculation(
   GRID_SIZE: number,
   spinChangesPerIteration: number
 ) {
-  let magAvg = 0;
+  let mag = 0;
   let energy = 0;
   let energySquared = 0;
   let heatCapacityAvg = 0;
   let customEnergy = 0;
+  let magSquared = 0;
 
   for (let i = 0; i < ITERATIONS; i++) {
     /** Ενεργεια πριν απο αλλαγη σπιν */
@@ -183,25 +184,35 @@ export function singleTempratureCalculation(
     if (keepChange) {
       LATTICE = tmpLattice;
     }
-    magAvg += sum2d(LATTICE);
+
+    const tmpMag = sum2d(LATTICE)
+    mag += tmpMag;
+    magSquared += Math.pow(tmpMag, 2);
+
     const tmpEnergy = calculateEnergy2(LATTICE, J);
     energy += tmpEnergy;
     energySquared += Math.pow(tmpEnergy, 2);
+
   }
   /** Αφου γίνουν ολα τα iterations βρίσκουμε. Μεση μαγνητηση, ενεργεια και τετραγωνο ενεργειας */
 
-  const eidikiTheromotita =
-    (energySquared / ITERATIONS - Math.pow(energy / ITERATIONS, 2)) /
+  const eidikiTheromotita = (energySquared / ITERATIONS - Math.pow(energy / ITERATIONS, 2)) /
     (Math.pow(temprature, 2) * Math.pow(GRID_SIZE, 2));
+
+  const magSusceptibility = (magSquared / ITERATIONS - Math.pow(mag / ITERATIONS, 2)) /
+    (Math.pow(temprature, 2) * Math.pow(GRID_SIZE, 2));
+
   energy /= ITERATIONS * Math.pow(GRID_SIZE, 2);
   energySquared /= ITERATIONS * Math.pow(GRID_SIZE, 2);
-  const mag = magAvg / (ITERATIONS * GRID_SIZE);
+  mag = mag / (ITERATIONS * GRID_SIZE);
+
   return {
     mag,
     lattice: LATTICE,
     energy,
     energySquared,
     eidikiTheromotita,
+    magSusceptibility
   };
   // E-<E>
   // <(E-<E>)^2> = E^2 -2*E*<E> + <E>^2>

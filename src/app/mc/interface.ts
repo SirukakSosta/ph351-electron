@@ -5,6 +5,7 @@ export interface McWorkerOutput {
     theoritical: number[];
     energies: number[];
     eidikesThermotites: number[];
+    magSusceptibilities: number[];
 }
 
 export interface McWorkerInput {
@@ -18,5 +19,6 @@ export interface McWorkerInput {
     T_MAX: number;
     T_STEP: number;
     spinChangesPerIteration: number;
+
 
 }

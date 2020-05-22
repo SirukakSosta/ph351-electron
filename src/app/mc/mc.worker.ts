@@ -24,6 +24,7 @@ type output = {
   theoritical: number[];
   energies: number[];
   eidikesThermotites: number[];
+  magSusceptibilities: number[]
 };
 
 addEventListener("message", ({ data }) => {
@@ -47,6 +48,7 @@ addEventListener("message", ({ data }) => {
   let theoritical = [];
   let energies = [];
   let eidikesThermotites = [];
+  let magSusceptibilities = [];
   let LATTICE = new Array(GRID_SIZE)
     .fill(1)
     .map(() => new Array(GRID_SIZE).fill(1));
@@ -59,6 +61,7 @@ addEventListener("message", ({ data }) => {
       lattice,
       energy,
       eidikiTheromotita,
+      magSusceptibility
     } = singleTempratureCalculation(
       LATTICE,
       temprature,
@@ -76,6 +79,7 @@ addEventListener("message", ({ data }) => {
     tempratures.push(temprature.toFixed(1));
     LATTICE = lattice;
     theoritical.push(magnetizationTheoriticalFormula(temprature, K));
+    magSusceptibilities.push(magSusceptibility)
     // magnetization = this.sum2d(LATTICE) / GRID_SIZE;
     // averageMagentization = averageMagentization + magnetization / GRID_SIZE;
     // E = E + calculateEnergy(LATTICE, B, J);
@@ -91,6 +95,7 @@ addEventListener("message", ({ data }) => {
         magnetizations,
         tempratures,
         theoritical,
+        magSusceptibilities
       };
       postMessage(output);
     }
@@ -103,6 +108,7 @@ addEventListener("message", ({ data }) => {
     magnetizations,
     tempratures,
     theoritical,
+    magSusceptibilities
   };
   postMessage(output);
 });

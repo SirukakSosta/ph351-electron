@@ -3,7 +3,7 @@ import { PlotlyService } from "angular-plotly.js";
 import { filter, map } from "rxjs/operators";
 // import { randomDecimal, randomInteger } from "../../math-common/method";
 import { McCoreService } from "../mc-core.service";
-import { eidikhThermotitaLayout, energyLayout, magLayout } from "../variable";
+import { eidikhThermotitaLayout, energyLayout, magLayout, magSusceptibilityLayout } from "../variable";
 // import { calculateEnergy } from "../method";
 // import { B, J, K } from "../variable";
 
@@ -17,6 +17,7 @@ export class McWrapperComponent implements OnInit {
   magLayout = magLayout;
   energyLayout = energyLayout;
   eidikhThermotitaLayout = eidikhThermotitaLayout;
+  magSusceptibilityLayout = magSusceptibilityLayout;
   enegyData = [];
   eidikhThermotitaData = [];
   magData = [];
@@ -94,6 +95,19 @@ export class McWrapperComponent implements OnInit {
     })
   );
 
+  magSusceptibilityPlotData$ = this.service.calculationResults$$.pipe(
+    filter((e) => !!e.length),
+    map((results) => {
+      let traces = results.map((result) => ({
+        x: result.tempratures,
+        y: result.magSusceptibilities,
+        type: "lines+markers",
+        name: `Lattice ${result.GRID_SIZE}`,
+      }));
+      return traces;
+    })
+  );
+
   constructor(public service: McCoreService, public plotly: PlotlyService) {}
 
   ngOnInit() {}
@@ -111,36 +125,6 @@ export class McWrapperComponent implements OnInit {
       this.spinChangesPerIteration
     );
 
-    // const { magnetizations, tempratures, theoritical, energies, eidikesThermotites } =
-    //   this.service.equillibriumForSingleTemprature([10], this.J, this.B, this.K, this.GRID_SIZE, this.ITERATIONS, this.T0, this.T_MAX, this.T_STEP, this.spinChangesPerIteration);
-
-    // let magPlotTrace = {
-    //   x: tempratures,
-    //   y: magnetizations,
-    //   type: "scatter",
-    //   name: "Experiment -",
-    // };
-    // let theoryPlotTrace = {
-    //   x: tempratures,
-    //   y: theoritical,
-    //   type: "lines+markers",
-    //   name: "Theory",
-    // };
-    // const energyTrace = {
-    //   x: tempratures,
-    //   y: energies,
-    //   type: "lines+markers",
-    //   name: "Experiment - Energy",
-    // };
-    // const idikiThermotitaTrace = {
-    //   x: tempratures,
-    //   y: eidikesThermotites,
-    //   type: "lines+markers",
-    //   name: "Experiment - Idiki therm",
-    // };
-    // this.enegyData = [energyTrace];
-    // this.eidikhThermotitaData = [idikiThermotitaTrace];
-    // this.magData = [magPlotTrace, theoryPlotTrace];
-    // console.log(magnetizations, tempratures, theoritical);
+    
   }
 }

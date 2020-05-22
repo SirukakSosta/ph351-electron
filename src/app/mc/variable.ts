@@ -16,9 +16,9 @@ export const spinHeatMapLayout = {
 export const magLayout = {
     responsive: true,
 
-    title: `Mag vs Temprature`,
+    title: `Mag vs Temperature`,
     xaxis: {
-        title: "Temprature",
+        title: "Temperature",
     },
     yaxis: {
         title: "Mag Per Site",
@@ -28,9 +28,9 @@ export const magLayout = {
 export const energyLayout = {
     responsive: true,
 
-    title: `Energy vs Temprature`,
+    title: `Energy vs Temperature`,
     xaxis: {
-        title: "Temprature",
+        title: "Temperature",
     },
     yaxis: {
         title: "Energy Per Site",
@@ -40,11 +40,23 @@ export const energyLayout = {
 export const eidikhThermotitaLayout = {
     responsive: true,
 
-    title: `Eidiki theromatita vs Temprature`,
+    title: `Eidiki theromatita vs Temperature`,
     xaxis: {
-        title: "Temprature",
+        title: "Temperature",
     },
     yaxis: {
         title: "Eidiki theromatita",
+    },
+};
+
+export const magSusceptibilityLayout = {
+    responsive: true,
+
+    title: `Magnetic susceptibility vs Temperature`,
+    xaxis: {
+        title: "Temperature",
+    },
+    yaxis: {
+        title: "Magnetic susceptibility",
     },
 };
