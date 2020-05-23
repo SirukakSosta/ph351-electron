@@ -19,48 +19,58 @@
           </ul>
         </div>
       </div>
-      <div nz-row [nzGutter]="4" class="form">
-        <div nz-col [nzSpan]="24">
-          <div class="item">
-            <label for="">Ω</label>
-            <input nz-input placeholder="Omega Value" [(ngModel)]="OMEGA" />
+      <ng-container>
+        <div nz-row [nzGutter]="4" class="form">
+          <div nz-col [nzSpan]="24">
+            <div class="item">
+              <label for="">Ω</label>
+              <input nz-input placeholder="Omega Value" [(ngModel)]="OMEGA" />
+            </div>
+          </div>
+          <div nz-col [nzSpan]="24">
+            <div class="item">
+              <label for="">SIZE</label>
+              <input nz-input placeholder="Grid size" [(ngModel)]="SIZE" />
+            </div>
+          </div>
+          <div nz-col [nzSpan]="24">
+            <div class="item">
+              <label for="">ITERATIONS</label>
+              <input nz-input placeholder="Omega Value" [(ngModel)]="ITERATIONS" />
+            </div>
+          </div>
+          <div nz-col [nzSpan]="24">
+            <div class="item">
+              <label for="">Charge Equation</label>
+              <textarea (keyup)="checkChargeEquationStrValidity($event.target.value)"
+                (change)="checkChargeEquationStrValidity($event.target.value)" nz-input rows="5"
+                [ngClass]="{'invalid' : !chargeEquationStrValid ,'valid' : chargeEquationStrValid }"
+                placeholder="Charge Equation" [(ngModel)]="chargeEquationStr"></textarea>
+            </div>
+          </div>
+          <div nz-col [nzSpan]="24">
+            <button nz-button [disabled]="!chargeEquationStrValid" nzType="primary" nzBlock
+              (click)="start(); action = '3D'">
+              Start
+            </button>
           </div>
         </div>
-        <div nz-col [nzSpan]="24">
-          <div class="item">
-            <label for="">SIZE</label>
-            <input nz-input placeholder="Grid size" [(ngModel)]="SIZE" />
-          </div>
+        <div class="eqations">
+          <p>Relaxation method for <strong>Poisson equation</strong></p>
+          <ng-katex [equation]="poissonEquation"></ng-katex>
+          <p class="mt-2">And <strong>charge density</strong></p>
+          <ng-katex [equation]="chargeEquationLatex"></ng-katex>
         </div>
-        <div nz-col [nzSpan]="24">
-          <div class="item">
-            <label for="">ITERATIONS</label>
-            <input nz-input placeholder="Omega Value" [(ngModel)]="ITERATIONS" />
-          </div>
-        </div>
-        <div nz-col [nzSpan]="24">
-          <button nz-button nzType="primary" nzBlock (click)="start(); action = '3D'">
-            Start
-          </button>
-        </div>
-      </div>
-      <div class="eqations">
-        <p>Relaxation method for <strong>Poisson equation</strong></p>
-        <ng-katex [equation]="poissonEquation"></ng-katex>
-        <p class="mt-2">And <strong>charge density</strong></p>
-        <ng-katex [equation]="chargeEquationLatex"></ng-katex>
-      </div>
-      <div class="energy"><strong>Energy: </strong>{{ energy }}</div>
+        <div class="energy"><strong>Energy: </strong>{{ energy }}</div>
+      </ng-container>
     </div>
   </nz-sider>
   <nz-layout>
     <nz-content>
       <div class="inner-content">
-        <div class="p-3" *ngIf="!chargeEquation">
+        <!-- <div class="p-3">
           <h3>Project in Partial Differential equations (PDE)</h3>
-          <!-- <h4>
-            Επιλογή Εργασίας
-          </h4> -->
+       
           <ul>
             <li>
               <a href="#" [routerLink]="['/', 'core', 'pde', 'eq', '3943']">ph3943</a>
@@ -69,9 +79,9 @@
               <a href="#" [routerLink]="['/', 'core', 'pde', 'eq', '3131']">ph3131</a>
             </li>
           </ul>
-        </div>
+        </div> -->
 
-        <div class="container1 d-flex h-100" *ngIf="!!chargeEquation">
+        <div class="container1 d-flex h-100">
           <div class="plotly-container h-100 d-flex flex-column h-100" *ngIf="voltageMatrixHasBeenCalculated | async">
             <div class="graph-btns" *ngIf="ready">
               <div nz-row [nzGutter]="4" class="form">

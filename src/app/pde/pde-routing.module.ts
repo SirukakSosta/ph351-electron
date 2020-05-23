@@ -47,6 +47,6 @@ const routes: Routes = [
 @NgModule({
   declarations: [],
   imports: [CommonModule, RouterModule.forChild(routes)],
-  exports: []
+  exports: [RouterModule]
 })
 export class PdeRoutingModule { }

@@ -50,14 +50,17 @@
  *
  *  (window as any).__Zone_enable_cross_context_check = true;
  *
- */ 
+ */
 
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
 import '@angular/localize/init';
+import * as numeric from 'numeric';
 import 'zone.js/dist/zone'; // Included with Angular CLI.
 
 /***************************************************************************************************
  * APPLICATION IMPORTS
  */
+
+window['numeric'] = numeric

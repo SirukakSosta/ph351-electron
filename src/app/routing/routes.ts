@@ -12,27 +12,45 @@ export const routes: Routes = [
         canActivate: [],
         children: [
           {
-            path: "pde",
-            loadChildren: () =>
-              import("../pde/pde.module").then(e => e.PdeModule)
-          },
-          {
-            path: "ed",
-            loadChildren: () => import("../ed/ed.module").then(e => e.EdModule)
+            path: "core",
+            component: CoreComponent,
+            canActivate: [],
+            children: [
+              {
+                path: "pde",
+                loadChildren: () =>
+                  import("../pde/pde.module").then((e) => e.PdeModule),
+              },
+              {
+                path: "ed",
+                loadChildren: () =>
+                  import("../ed/ed.module").then((e) => e.EdModule),
+              },
+              {
+                path: "md",
+                loadChildren: () =>
+                  import("../md/md.module").then((e) => e.MdModule),
+              },
+              {
+                path: "",
+                redirectTo: "/core/md",
+                pathMatch: "full",
+              },
+            ],
           },
           {
             path: "",
-            redirectTo: "/core/pde",
-            pathMatch: "full"
-          }
-        ]
+            redirectTo: "/core/md",
+            pathMatch: "full",
+          },
+        ],
       },
       {
         path: "",
         redirectTo: "/core/pde",
-        pathMatch: "full"
-      }
-    ]
+        pathMatch: "full",
+      },
+    ],
   },
-  { path: "**", redirectTo: "/core" }
+  { path: "**", redirectTo: "/core" },
 ];

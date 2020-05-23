@@ -17,3 +17,12 @@ body {
 .cp {
   cursor: pointer;
 }
+
+.valid {
+  border: 3px solid rgba(4, 248, 17, 0.596)!important;
+}
+
+.invalid {
+  border: 3px solid rgba(230, 13, 13, 0.589)!important;
+
+}

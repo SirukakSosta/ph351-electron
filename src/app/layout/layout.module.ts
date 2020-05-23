@@ -1,15 +1,15 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
-// import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
-import { LoadingComponent } from "./loading/loading.component";
 import { NgZorroAntdModule } from "ng-zorro-antd";
-import { NzGridModule } from "ng-zorro-antd/grid";
-import { NzLayoutModule } from "ng-zorro-antd/layout";
-import { NzInputModule } from "ng-zorro-antd/input";
 import { NzButtonModule } from "ng-zorro-antd/button";
+import { NzGridModule } from "ng-zorro-antd/grid";
+import { NzInputModule } from "ng-zorro-antd/input";
+import { NzLayoutModule } from "ng-zorro-antd/layout";
+import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzRadioModule } from "ng-zorro-antd/radio";
 import { NzSliderModule } from "ng-zorro-antd/slider";
-
+// import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
+import { LoadingComponent } from "./loading/loading.component";
 @NgModule({
   imports: [
     CommonModule,
@@ -27,7 +27,8 @@ import { NzSliderModule } from "ng-zorro-antd/slider";
     NzInputModule,
     NzButtonModule,
     NzRadioModule,
-    NzSliderModule
+    NzSliderModule,
+    NzProgressModule
   ]
 })
-export class LayoutModule {}
+export class LayoutModule { }

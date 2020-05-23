@@ -1,24 +1,23 @@
 import { CommonModule } from "@angular/common";
 import { NgModule } from "@angular/core";
+import { PlotlyModule } from "angular-plotly.js";
+import { NzSelectModule } from "ng-zorro-antd/select";
 import { LayoutModule } from "../layout/layout.module";
 import { MathCommonModule } from "../math-common/math-common.module";
 import { SharedModule } from "../shared/shared.module";
-import { EdRoutingModule } from "./ed-routing.module";
-import { EdWrapperComponent } from "./ed-wrapper/ed-wrapper.component";
-import { PlotlyModule } from "angular-plotly.js";
-import { NzSelectModule } from "ng-zorro-antd/select";
+import { MdRoutingModule } from "./md-routing.module";
+import { MdWrapperComponent } from "./md-wrapper/md-wrapper.component";
 
 @NgModule({
-  declarations: [EdWrapperComponent],
+  declarations: [MdWrapperComponent],
   imports: [
     CommonModule,
     SharedModule,
     PlotlyModule,
     NzSelectModule,
-    EdRoutingModule,
-
+    MdRoutingModule,
     LayoutModule,
     MathCommonModule
   ]
 })
-export class EdModule {}
+export class MdModule {}

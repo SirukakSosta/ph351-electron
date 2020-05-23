@@ -1,0 +1,106 @@
+<nz-layout class="layout">
+
+  <!-- <app-loading *ngIf="loading"></app-loading> -->
+  <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzBreakpoint]="'lg'" [nzCollapsedWidth]="0"
+    [nzZeroTrigger]="zeroTrigger">
+    <div class="menu">
+      <div nz-row [nzGutter]="4" class="form">
+        <div nz-col [nzSpan]="24">
+          <ul nz-menu nzMode="horizontal" [nzTheme]="'dark'">
+            <li nz-submenu nzTitle="Students AM" nzIcon="down-square">
+              <ul>
+                <li nz-menu-item>
+                  Ph 3131
+                </li>
+                <li nz-menu-item>
+                  Ph 3943
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div nz-row [nzGutter]="4" class="form">
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Particle count</label>
+            <input nz-input type="number" placeholder="Particle count" (ngModelChange)="onParticleCountChange()"
+              [(ngModel)]="particleCount" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="perlin">Perlin Distribution</label>
+            <input nz-input name="perlin" id="perlin" type="checkbox" placeholder="Perlin Distribution"
+              (ngModelChange)="onParticleCountChange()" [(ngModel)]="perlinDistribution" />
+          </div>
+
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Time start</label>
+            <input nz-input type="number" placeholder="Time Start" [(ngModel)]="dtStart" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Time end</label>
+            <input nz-input type="number" placeholder="Time End" [(ngModel)]="dtEnd" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">Time step</label>
+            <input nz-input type="number" placeholder="Time Step" [(ngModel)]="dt" />
+          </div>
+        </div>
+
+      </div>
+
+      <div nz-col [nzSpan]="24">
+        <button nz-button nzType="primary" nzBlock (click)="start();">
+          Start
+        </button>
+      </div>
+
+    </div>
+  </nz-sider>
+  <nz-layout>
+    <nz-content>
+      <div class="inner-content" id="inner-content">
+        <div class="p-3">
+          <h3>Project in Molecular Dynamics (MD)</h3>
+
+          <span *ngIf="(progress$ | async) <100"> {{experimentDescription}} </span>
+          <span *ngIf="(progress$ | async) === 100"> Calculations Completed </span>
+          <br />
+          <span>Progress: {{progress$ | async}}%</span>
+
+          <hr />
+          Initial Displacement Distribution
+          <div style="background-color: whitesmoke;">
+            <svg height="80" width="900">
+              <circle *ngFor="let particle of particleArray" [attr.cx]="initialDisplacement[particle] * 900" cy="37"
+                r="2" fill="black">
+              </circle>
+            </svg>
+          </div>
+
+          <input type="range" name="points" id="points" value="selectedH$$ | async" min="0" max="19"
+            [value]="selectedEnergyTimeExperiment$$ | async" data-show-value="true" data-popup-enabled="true"
+            (change)="onSelectedEnergyTimeExperimentChange($event.target.value)" />
+
+          <plotly-plot [data]="energyTimePlotData$ | async" [layout]="energyTimePlotLayout$ | async">
+          </plotly-plot>
+
+          <plotly-plot [data]="totalEnergyTemperaturePlotData$ | async" [layout]="totalEnergyTemperaturePlotLayout">
+          </plotly-plot>
+
+        </div>
+      </div>
+    </nz-content>
+  </nz-layout>
+</nz-layout>
+<ng-template #zeroTrigger>
+  <i nz-icon nzType="menu-fold" nzTheme="outline"></i>
+</ng-template>

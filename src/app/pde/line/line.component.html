@@ -18,26 +18,12 @@
   <form class="p-2">
     <div class="form-group">
       <label for="exampleFormControlSelect1" class="mr-3">
-        H index ({{ selectedH$$ | async }})</label
-      >
-      <input
-        type="range"
-        name="points"
-        id="points"
-        value="selectedH$$ | async"
-        min="0"
-        [max]="hMaxValue | async"
-        [value]="selectedH$$ | async"
-        data-show-value="true"
-        data-popup-enabled="true"
-        (change)="selectH($event.target.value)"
-      />
+        H index ({{ selectedH$$ | async }})</label>
+      <input type="range" name="points" id="points" value="selectedH$$ | async" min="0" [max]="hMaxValue | async"
+        [value]="selectedH$$ | async" data-show-value="true" data-popup-enabled="true"
+        (change)="selectH($event.target.value)" />
     </div>
   </form>
 
-  <plotly-plot
-    class="flex-grow"
-    [data]="data$ | async"
-    [layout]="graph.layout"
-  ></plotly-plot>
+  <plotly-plot class="flex-grow" [data]="data$ | async" [layout]="graph.layout"></plotly-plot>
 </div>
