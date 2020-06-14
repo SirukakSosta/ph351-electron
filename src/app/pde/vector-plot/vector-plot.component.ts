@@ -10,7 +10,7 @@ import { Subscription } from "rxjs";
   styleUrls: ["./vector-plot.component.css"]
 })
 export class VectorPlotComponent implements OnInit, OnDestroy {
-  // @Input() vectorData: any;
+
   public options: Options = {
     chart: {
       height: 600,
@@ -63,12 +63,11 @@ export class VectorPlotComponent implements OnInit, OnDestroy {
   }
   public onLoad(evt) {
     this.chart = evt.chart;
-
     this.chart.series = [];
 
     this.sub = this.lab.electricField$
       .pipe(
-        tap((electricField: any[]) => {
+        tap((electricField) => {
           console.log("electricField", electricField);
 
           if (this.chart.get("series-a")) {

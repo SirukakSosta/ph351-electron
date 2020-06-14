@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { debounceTime, map } from "rxjs/operators";
 import { ElectricField } from "./electricField";
-import { getHFromSize } from "./method";
+import { getHFromSize, getRealXY, magnitude, radians } from "./method";
 
 @Injectable({
   providedIn: "root"
@@ -20,45 +20,25 @@ export class PdeLabService {
     })),
     map(({ xVector, yVector, voltageMatrix }) => {
       const SIZE = voltageMatrix.length;
-      const derivtionForPlot = [];
+      let derivtionForPlot: [number, number, number, number][] = [];
       // TODO: we need constant i or j (ask zotos)
       for (let i = 0; i < SIZE; i++) {
         for (let j = 0; j < SIZE; j++) {
-          let x = getRealXY(i);
-          let y = getRealXY(j);
+
+          let x = getRealXY(i, SIZE);
+          let y = getRealXY(j, SIZE);
 
           const eX = xVector[i][j];
           const eY = yVector[i][j];
-          derivtionForPlot.push([x, y, magnitude(eX, eY), radians(eX, eY)]);
+          const mag = magnitude(eX, eY);
+          const rad = radians(eX, eY);
+          derivtionForPlot.push([x, y, mag, rad]);
         }
       }
       console.log(derivtionForPlot);
       return derivtionForPlot;
 
-      function magnitude(i, j) {
-        const sum = Math.pow(i, 2) + Math.pow(j, 2);
-        return Math.sqrt(sum);
-      }
-      function radians(i, j) {
-        let p = j / i;
 
-        let rads: number;
-        if ((i <= 0 && j >= 0) || (i <= 0 && j <= 0)) {
-          rads = (Math.atan(p) * 180) / Math.PI + 180;
-        } else {
-          rads = (Math.atan(p) * 180) / Math.PI;
-        }
-        //becouse atan dont know about the (+-) of xy we need
-        // to map it atan 's angle run from -p/2 to p/2 means -90 to 90
-        let mapToChats = (-1 * rads + 270) % 360;
-
-        // if (rads < 0) return -1 * rads;
-        return mapToChats;
-      }
-
-      function getRealXY(i: number) {
-        return i / (SIZE - 1);
-      }
     })
   );
 
@@ -95,4 +75,5 @@ export class PdeLabService {
     this.voltageMatrix$$.next([])
     this.axis$$.next([])
   }
+
 }

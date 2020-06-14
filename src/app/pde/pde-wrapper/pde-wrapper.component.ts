@@ -20,12 +20,12 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   ITERATIONS: number = 3000;
   ready: boolean = false;
   energy = 0;
-  action: string;
+  // action: string;
   chargeMatrix: number[][];
   loading = false;
   poissonEquation: string = "\\nabla^2\\Phi(x,y) = S(x,y)";
   chargeEquationLatex: string;
-  constantY = 0;
+  // constantY = 0;
   exerciseSubscription: Subscription;
   voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(map(e => !!e[0] && !!e[0].length));
   chargeEquationStr: string;
@@ -59,43 +59,42 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
             const exercise = paramMap.get("am") as AM;
             this.lab.resetVariables();
             this.chargeEquationStr = exerciseChargeEquationMap[exercise]
-            this.chargeEquationStrValid = true
+            this.chargeEquationStrValid = true;
           } else {
             this.router.navigate(['eq', '3943'], { relativeTo: this.route })
           }
-
-
         })
       )
       .subscribe();
 
-    this.H = 1 / 10;
+    // this.H = 1 / 10;
   }
   public start() {
     this.ready = false;
     this.loading = true;
     setTimeout(() => {
+
       this.SIZE = Number(this.SIZE);
       this.ITERATIONS = Number(this.ITERATIONS);
       this.H = Number(1 / (this.SIZE - 1));
       console.log("Size - 1", this.H);
       this.OMEGA = Number(this.OMEGA);
-      this.constantY = this.SIZE / 2;
+      // this.constantY = this.SIZE / 2;
+      this.energy = 0;
+
       this.initializeMatrices();
-      this.emptyMainArrays();
       this.initialiseVoltageMatrixWithRandomValues();
       this.fillChargeMatrixWithValues();
-      //
-      //
-      // return;
+
       this.startIteration();
-      // this.derivativesMatrix = this.calculateDerivative(this.lab.voltageMatrix);
 
       this.ready = true;
       this.loading = false;
     }, 4000);
   }
   private startIteration() {
+
+    // 
     for (let k = 0; k < this.ITERATIONS; k++) {
       for (let i = 0; i < this.SIZE; i++) {
         for (let j = 0; j < this.SIZE; j++) {
@@ -105,16 +104,19 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       }
     }
 
-    this.energy =
-      Math.round(
-        (this.calculateTotalEnergy(this.lab.voltageMatrix) + Number.EPSILON) *
-        10000
-      ) / 10000;
+    this.energy = Math.round((this.calculateTotalEnergy() + Number.EPSILON) * 10000) / 10000;
 
   }
   private getRealXY(i: number) {
     return i / (this.SIZE - 1);
   }
+
+  /**
+   * Create a new 2d voltage matrix and fill with value 0
+   * 
+   * Create a new 2d charge matrix and fill with value 0
+   
+  */
   private initializeMatrices(): void {
     for (let i = 0; i < this.SIZE; i++) {
       this.lab.axis.push(this.getRealXY(i));
@@ -128,6 +130,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       }
     }
   }
+
   private initialiseVoltageMatrixWithRandomValues(): void {
     for (let i = 0; i < this.SIZE; i++) {
       for (let j = 0; j < this.SIZE; j++) {
@@ -142,7 +145,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     }
   }
 
-  private calculateTotalEnergy(a: any): number {
+  private calculateTotalEnergy(): number {
     let sumOne = 0.0;
     let sumTwo = 0.0;
     for (let i = 0; i < this.SIZE; i++) {
@@ -194,15 +197,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     const random = Math.floor(Math.random() * (1000 - 100) + 100) / 10000;
     return random;
   }
-  private emptyMainArrays(): void {
-    for (let i = 0; i < this.SIZE; i++) {
-      this.energy = 0;
-      for (let j = 0; j < this.SIZE; j++) {
-        this.chargeMatrix[i][j] = 0;
-        this.lab.voltageMatrix[i][j] = 0;
-      }
-    }
-  }
+ 
   private isAtBoundaries(i: number, j: number): boolean {
     if (
       i == 0 ||
