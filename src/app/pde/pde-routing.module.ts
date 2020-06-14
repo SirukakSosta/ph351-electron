@@ -6,7 +6,6 @@ import { PdeWrapperComponent } from './pde-wrapper/pde-wrapper.component';
 import { ThreeDSurfaceComponent } from './three-d-surface/three-d-surface.component';
 import { VectorPlotComponent } from './vector-plot/vector-plot.component';
 
-
 const routes: Routes = [
   {
     path: 'eq/:am',

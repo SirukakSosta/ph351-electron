@@ -4,17 +4,7 @@
     <label nz-radio nzValue="x" (click)="selectConstantAxis('x')">x</label>
     <label nz-radio nzValue="y" (click)="selectConstantAxis('y')">y</label>
   </nz-radio-group>
-  <!-- <div>
-    <label for="exampleFormControlSelect1" class="mr-3">
-      H index ({{ selectedH$$ | async }})</label
-    >
-    <nz-slider
-      [(ngModel)]="selectedH$$"
-      [nzMin]="0"
-      [nzMax]="hMaxValue | async"
-      (change)="selectH($event.target.value)"
-    ></nz-slider>
-  </div> -->
+  
   <form class="p-2">
     <div class="form-group">
       <label for="exampleFormControlSelect1" class="mr-3">

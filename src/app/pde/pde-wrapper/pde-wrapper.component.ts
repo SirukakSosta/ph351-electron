@@ -21,23 +21,15 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   ready: boolean = false;
   energy = 0;
   action: string;
-  // voltageMatrix: number[][];
   chargeMatrix: number[][];
-  // axis: number[] = [];
-  // yDerivativesMatrix: number[][]; /**oritontio */
-  // xDerivativesMatrix: number[][]; /** katheto */
   loading = false;
   poissonEquation: string = "\\nabla^2\\Phi(x,y) = S(x,y)";
   chargeEquationLatex: string;
   constantY = 0;
-  // derivtionForPlot = [];
-  // chargeEquation: (i: number, j: number, h: number) => number;
   exerciseSubscription: Subscription;
-  voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(
-    map(e => !!e[0] && !!e[0].length)
-  );
+  voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(map(e => !!e[0] && !!e[0].length));
   chargeEquationStr: string;
-  chargeEquationStrValid: boolean
+  chargeEquationStrValid: boolean;
 
   constructor(private route: ActivatedRoute, private lab: PdeLabService, private router: Router) { }
 
@@ -59,21 +51,13 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
-
-    console.log(this)
-
     this.exerciseSubscription = this.route.paramMap
       .pipe(
-        // filter(paramMap => paramMap.has("am")),
         tap(paramMap => {
-
-          console.log(this)
 
           if (paramMap.has("am")) {
             const exercise = paramMap.get("am") as AM;
             this.lab.resetVariables();
-            // this.chargeEquation = exerciseChargeEquationMap[exercise].chargeEquation;
-            // this.chargeEquationLatex = exerciseChargeEquationMap[exercise].latex;
             this.chargeEquationStr = exerciseChargeEquationMap[exercise]
             this.chargeEquationStrValid = true
           } else {
@@ -116,12 +100,9 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       for (let i = 0; i < this.SIZE; i++) {
         for (let j = 0; j < this.SIZE; j++) {
           const prevVoltageValue = this.calculatePotential(i, j);
-          //
           this.lab.voltageMatrix[i][j] = prevVoltageValue;
         }
       }
-      ///fml
-      //
     }
 
     this.energy =
@@ -130,12 +111,6 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
         10000
       ) / 10000;
 
-    // this.calculateDerivativeMatrices();
-    // console.log("voltage", this.lab.voltageMatrix);
-    // console.log("difx", this.xDerivativesMatrix);
-    // console.log("dify", this.yDerivativesMatrix);
-    // this.createElectricFieldData();
-    // console.log(this.derivtionForPlot);
   }
   private getRealXY(i: number) {
     return i / (this.SIZE - 1);
@@ -150,12 +125,6 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
         this.chargeMatrix = new Array(this.SIZE)
           .fill(0)
           .map(() => new Array(this.SIZE).fill(0));
-        // this.xDerivativesMatrix = new Array(this.SIZE)
-        //   .fill(0)
-        //   .map(() => new Array(this.SIZE).fill(0));
-        // this.yDerivativesMatrix = new Array(this.SIZE)
-        //   .fill(0)
-        //   .map(() => new Array(this.SIZE).fill(0));
       }
     }
   }

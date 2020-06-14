@@ -1,14 +1,15 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Chart, Options } from "highcharts";
 import { tap } from "rxjs/operators";
 import { PdeLabService } from "../pde-lab.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-vector-plot",
   templateUrl: "./vector-plot.component.html",
   styleUrls: ["./vector-plot.component.css"]
 })
-export class VectorPlotComponent implements OnInit {
+export class VectorPlotComponent implements OnInit, OnDestroy {
   // @Input() vectorData: any;
   public options: Options = {
     chart: {
@@ -53,19 +54,19 @@ export class VectorPlotComponent implements OnInit {
     },
     series: []
   };
+  sub: Subscription;
 
-  constructor(private lab: PdeLabService) {}
+  constructor(private lab: PdeLabService) { }
 
   public chart: Chart;
   ngOnInit() {
-    console.log("data to plot");
   }
   public onLoad(evt) {
     this.chart = evt.chart;
 
     this.chart.series = [];
 
-    this.lab.electricField$
+    this.sub = this.lab.electricField$
       .pipe(
         tap((electricField: any[]) => {
           console.log("electricField", electricField);
@@ -88,23 +89,9 @@ export class VectorPlotComponent implements OnInit {
       )
       .subscribe();
 
-    // function generateData() {
-    //   var data = [],
-    //     x,
-    //     y,
-    //     length,
-    //     direction;
+  }
 
-    //   for (x = 5; x < 100; x += 5) {
-    //     for (y = 5; y < 100; y += 5) {
-    //       length = Math.round(200 - (x + y));
-    //       direction = Math.round(((x + y) / 200) * 360);
-    //       data.push([x, y, length, direction].join(", "));
-    //     }
-    //   }
-    //   console.log("[\n    [" + data.join("],\n    [") + "]\n]");
-    // }
-    // generateData();
-    console.log("data to plot", this.chart);
+  ngOnDestroy() {
+    this.sub.unsubscribe();
   }
 }

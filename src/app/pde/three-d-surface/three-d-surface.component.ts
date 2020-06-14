@@ -10,7 +10,7 @@ import { PdeLabService } from "../pde-lab.service";
 })
 export class ThreeDSurfaceComponent implements OnInit, OnDestroy {
 
-  @Input() title: any;
+  @Input() title: string;
   voltageSubscription: Subscription;
   axisSubscription: Subscription;
 

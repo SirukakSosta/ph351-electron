@@ -12,9 +12,6 @@ export function radians(i: number, j: number) {
         return 0;
     } else {
         let rads = Math.atan2(j, i) * 180 / Math.PI;
-        // let mapToChats = (-1 * rads + 270) % 360;
-
-        // if (rads < 0) return -1 * rads;
         return rads;
     }
 }

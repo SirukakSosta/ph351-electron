@@ -23,11 +23,7 @@ import { VectorPlotComponent } from "./vector-plot/vector-plot.component";
     PlotlyModule,
     PdeRoutingModule,
     MathCommonModule,
-    // HighchartsModule,
-    // KatexModule,
-    // RouterModule,
     LayoutModule
   ],
-  // providers: [{ provide: HighchartsConfig, useValue: config }]
 })
 export class PdeModule { }

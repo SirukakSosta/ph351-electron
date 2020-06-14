@@ -12,15 +12,9 @@ import { PdeLabService } from "../pde-lab.service";
 export class LineComponent implements OnInit {
   radioValue = "x";
   selectedAxis: any = "x";
-  // @Input() potentialMatrix: any;
-  // @Input() axis: any;
   @Input() title: any;
-  // @Input() type: any;
-  // cX = 0;
   public graph = {
     layout: {
-      // width: 1200,
-      // height: 800,
       autosize: stripSummaryForJitFileSuffix
     },
     data: {}
@@ -31,7 +25,7 @@ export class LineComponent implements OnInit {
   selectedH$$ = new BehaviorSubject<number>(undefined);
   hMaxValue = this.lab.voltageMatrix$.pipe(map(e => e.length));
 
-  constructor(private lab: PdeLabService) {}
+  constructor(private lab: PdeLabService) { }
 
   ngOnInit(): void {
     console.log("AXIS", this.lab.axis);
@@ -90,36 +84,6 @@ export class LineComponent implements OnInit {
       })
     );
 
-    // this.cX = this.lab.axis.length / 2;
-    // let y = [];
-    // if (this.type === "ENERGY") {
-    //   for (let i = 0; i < this.lab.axis.length; i++) {
-    //     y.push(
-    //       Math.round((this.lab.voltageMatrix[this.cX] [i] + Number.EPSILON) * 100) / 100
-    //     );
-    //   }
-    //   console.log("DEr", y);
-    // } else {
-    // for (let i = 0; i < this.lab.axis.length; i++) {
-    //   y.push(this.lab.voltageMatrix[this.cX][i]);
-    // }
-    // // }
-    // var trace1 = {
-    //   x: this.lab.axis,
-    //   y,
-    //   mode: "lines+markers",
-    //   name: `x = ${this.cX}`
-    // };
-
-    // this.lab.voltageMatrix$.pipe(
-    //   tap(e => trace1.y = e)
-    // ).subscribe()
-
-    // var data = [trace1];
-    // this.graph["data"] = data;
-    // this.graph.layout["yaxis"] = {
-    //   title: `${this.title} - Φ(${this.cX / this.lab.axis.length}, y)`
-    // };
   }
 
   selectH(h: number) {
