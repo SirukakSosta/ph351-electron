@@ -68,7 +68,7 @@ export class VectorPlotComponent implements OnInit, OnDestroy {
     this.sub = this.lab.electricField$
       .pipe(
         tap((electricField) => {
-          console.log("electricField", electricField);
+          // console.log("electricField", electricField);
 
           if (this.chart.get("series-a")) {
             this.chart.get("series-a").remove();
@@ -78,7 +78,7 @@ export class VectorPlotComponent implements OnInit, OnDestroy {
             id: "series-a",
             type: "vector",
             name: "Electric vector field",
-            turboThreshold: 0,
+            // turboThreshold: 0,
             rotationOrigin: "start",
             color: "red",
             data: electricField

@@ -27,6 +27,6 @@ export function radians(i, j) {
     return mapToChats;
 }
 
-export function getRealXY(i: number, SIZE: number) {
-    return i / (SIZE - 1);
+export function getRealXYByIndexLatticeSizeBoundaryLength(i: number, latticeSize: number, boundaryLength: number) {
+    return i / (latticeSize - 1) * boundaryLength;
 }

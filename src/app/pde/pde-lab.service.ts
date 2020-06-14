@@ -2,12 +2,14 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject } from "rxjs";
 import { debounceTime, map } from "rxjs/operators";
 import { ElectricField } from "./electricField";
-import { getHFromSize, getRealXY, magnitude, radians } from "./method";
+import { getHFromSize, magnitude, radians } from "./method";
 
 @Injectable({
   providedIn: "root"
 })
 export class PdeLabService {
+
+  public boundaryLength = 1;
   private voltageMatrix$$ = new BehaviorSubject([] as number[][]);
   public voltageMatrix$ = this.voltageMatrix$$.asObservable();
   private axis$$ = new BehaviorSubject([] as number[]);
@@ -25,17 +27,18 @@ export class PdeLabService {
       for (let i = 0; i < SIZE; i++) {
         for (let j = 0; j < SIZE; j++) {
 
-          let x = getRealXY(i, SIZE);
-          let y = getRealXY(j, SIZE);
+          let x = this.axis[i];// getRealXY(i, SIZE, this.boundaryLength);
+          let y = this.axis[j]; // getRealXY(j, SIZE, this.boundaryLength);
 
           const eX = xVector[i][j];
           const eY = yVector[i][j];
           const mag = magnitude(eX, eY);
           const rad = radians(eX, eY);
           derivtionForPlot.push([x, y, mag, rad]);
+
         }
       }
-      console.log(derivtionForPlot);
+      // console.log('derivtionForPlot', derivtionForPlot);
       return derivtionForPlot;
 
 
@@ -59,6 +62,7 @@ export class PdeLabService {
   set axis(e: number[]) {
     this.axis$$.next(e);
   }
+  
 
   private getVoltageMatrixDerivatives() {
 
@@ -66,7 +70,6 @@ export class PdeLabService {
       this.voltageMatrix,
       getHFromSize(this.voltageMatrix.length)
     );
-    console.log(k);
     const { xVector, yVector } = k;
     return { xVector, yVector };
   }

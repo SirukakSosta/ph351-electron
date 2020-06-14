@@ -5,6 +5,7 @@ import { map, tap } from "rxjs/operators";
 import { AM } from "../interface";
 import { PdeLabService } from "../pde-lab.service";
 import { exerciseChargeEquationMap, _chargeEquation } from "../variable";
+import { getRealXYByIndexLatticeSizeBoundaryLength } from "../method";
 
 // constants
 @Component({
@@ -20,18 +21,16 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   ITERATIONS: number = 3000;
   ready: boolean = false;
   energy = 0;
-  // action: string;
   chargeMatrix: number[][];
   loading = false;
   poissonEquation: string = "\\nabla^2\\Phi(x,y) = S(x,y)";
   chargeEquationLatex: string;
-  // constantY = 0;
   exerciseSubscription: Subscription;
   voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(map(e => !!e[0] && !!e[0].length));
   chargeEquationStr: string;
   chargeEquationStrValid: boolean;
 
-  constructor(private route: ActivatedRoute, private lab: PdeLabService, private router: Router) { }
+  constructor(private route: ActivatedRoute, public lab: PdeLabService, private router: Router) { }
 
   checkChargeEquationStrValidity(val: string) {
 
@@ -67,6 +66,10 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
+    this.lab.axis$.subscribe(e => {
+      console.log(e)
+    })
+
     // this.H = 1 / 10;
   }
   public start() {
@@ -82,6 +85,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       // this.constantY = this.SIZE / 2;
       this.energy = 0;
 
+      this.lab.resetVariables();
       this.initializeMatrices();
       this.initialiseVoltageMatrixWithRandomValues();
       this.fillChargeMatrixWithValues();
@@ -107,19 +111,20 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     this.energy = Math.round((this.calculateTotalEnergy() + Number.EPSILON) * 10000) / 10000;
 
   }
-  private getRealXY(i: number) {
-    return i / (this.SIZE - 1);
-  }
 
   /**
    * Create a new 2d voltage matrix and fill with value 0
    * 
    * Create a new 2d charge matrix and fill with value 0
+   * 
+   *  Create a new 2d axis matrix and fill with the axis real position values
    
   */
   private initializeMatrices(): void {
+    const axis: number[] = [];
     for (let i = 0; i < this.SIZE; i++) {
-      this.lab.axis.push(this.getRealXY(i));
+      axis.push(getRealXYByIndexLatticeSizeBoundaryLength(i, this.SIZE, this.lab.boundaryLength));
+
       for (let j = 0; j < this.SIZE; j++) {
         this.lab.voltageMatrix = new Array(this.SIZE)
           .fill(0)
@@ -129,6 +134,9 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
           .map(() => new Array(this.SIZE).fill(0));
       }
     }
+
+    this.lab.axis = axis;
+
   }
 
   private initialiseVoltageMatrixWithRandomValues(): void {
@@ -188,8 +196,9 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     return p;
   }
   private calculateCharge(i: number, j: number): number {
-    const x = this.getRealXY(i);
-    const y = this.getRealXY(j);
+    const x = this.lab.axis[i]; //getRealXY(i, this.SIZE, this.lab.boundaryLength);
+    const y = this.lab.axis[j];// getRealXY(j, this.SIZE, this.lab.boundaryLength);
+    // console.log(x,y)
     const result = _chargeEquation(this.chargeEquationStr, x, y, this.H) // this.chargeEquation(x, y, this.H);
     return result;
   }
@@ -197,7 +206,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     const random = Math.floor(Math.random() * (1000 - 100) + 100) / 10000;
     return random;
   }
- 
+
   private isAtBoundaries(i: number, j: number): boolean {
     if (
       i == 0 ||
