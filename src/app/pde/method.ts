@@ -27,6 +27,10 @@ export function radians(i, j) {
     return mapToChats;
 }
 
-export function getRealXYByIndexLatticeSizeBoundaryLength(i: number, latticeSize: number, boundaryLength: number) {
-    return i / (latticeSize - 1) * boundaryLength;
+export function getRealXYByIndexLatticeSizeBoundaryLength(i: number, latticeSize: number, xStart: number, xEnd: number) {
+    const diasthma = xEnd - xStart;
+    const step = diasthma / (latticeSize - 1);
+    let realPos = xStart + (step * i);
+    realPos = Math.round(realPos * 100) / 100;
+    return realPos;
 }

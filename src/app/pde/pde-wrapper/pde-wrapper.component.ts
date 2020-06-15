@@ -27,8 +27,14 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   chargeEquationLatex: string;
   exerciseSubscription: Subscription;
   voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(map(e => !!e[0] && !!e[0].length));
-  chargeEquationStr: string;
-  chargeEquationStrValid: boolean;
+  chargeEquationStr = 'Math.sin(2 * Math.PI * x / 8) * Math.exp(-1 * Math.pow(y,2) /10)';
+  chargeEquationStrValid: boolean = true;
+  boundaryCharge = {
+    top: 0,
+    bottom: 0,
+    left: -1,
+    right: 1
+  }
 
   constructor(private route: ActivatedRoute, public lab: PdeLabService, private router: Router) { }
 
@@ -123,7 +129,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   private initializeMatrices(): void {
     const axis: number[] = [];
     for (let i = 0; i < this.SIZE; i++) {
-      axis.push(getRealXYByIndexLatticeSizeBoundaryLength(i, this.SIZE, this.lab.boundaryLength));
+      axis.push(getRealXYByIndexLatticeSizeBoundaryLength(i, this.SIZE, this.lab.xStart, this.lab.xEnd));
 
       for (let j = 0; j < this.SIZE; j++) {
         this.lab.voltageMatrix = new Array(this.SIZE)
@@ -144,7 +150,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       for (let j = 0; j < this.SIZE; j++) {
         const atBounds = this.isAtBoundaries(i, j);
         if (atBounds) {
-          this.lab.voltageMatrix[i][j] = 0.0;
+          this.lab.voltageMatrix[i][j] = this.getBoundaryChargeBySide(atBounds);
         } else {
           const random = this.getRandomValues();
           this.lab.voltageMatrix[i][j] = random;
@@ -173,7 +179,9 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
 
   private getVoltage(i: number, j: number) {
     const isBound = this.isAtBoundaries(i, j);
-    if (isBound) return 0.0;
+    if (isBound) {
+      return this.getBoundaryChargeBySide(isBound);
+    };
     return this.lab.voltageMatrix[i][j];
   }
   private fillChargeMatrixWithValues(): void {
@@ -184,7 +192,10 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     }
   }
   private calculatePotential(i: number, j: number): number {
-    if (this.isAtBoundaries(i, j)) return 0.0;
+    const isBound = this.isAtBoundaries(i, j);
+    if (isBound) {
+      return this.getBoundaryChargeBySide(isBound);
+    };
     let p =
       (1 - this.OMEGA) * this.lab.voltageMatrix[i][j] +
       (this.OMEGA / 4.0) *
@@ -207,23 +218,48 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     return random;
   }
 
-  private isAtBoundaries(i: number, j: number): boolean {
-    if (
-      i == 0 ||
-      j == 0 ||
-      i == this.SIZE - 1 ||
-      j == this.SIZE - 1 ||
-      i < 0 ||
-      j < 0 ||
-      i > this.SIZE - 1 ||
-      j > this.SIZE - 1
-    ) {
-      return true;
+  private isAtBoundaries(j: number, i: number) {
+
+    const left = i === 0 || i > this.SIZE - 1;
+    if (left) {
+      return 'left';
     }
-    return false;
+    const right = i === (this.SIZE - 1) || i < 0;
+    if (right) {
+      return 'right';
+    }
+    const bottom = j === 0 || j > this.SIZE - 1;
+    if (bottom) {
+      return 'bottom';
+    }
+    const top = j === (this.SIZE - 1) || j < 0;
+    if (top) {
+      return 'top';
+    }
+
+
+    return null;
+    // if (
+    //   i == 0 ||
+    //   j == 0 ||
+    //   i == this.SIZE - 1 ||
+    //   j == this.SIZE - 1 ||
+    //   i < 0 ||
+    //   j < 0 ||
+    //   i > this.SIZE - 1 ||
+    //   j > this.SIZE - 1
+    // ) {
+    //   return true;
+    // }
+    // return false;
   }
 
   ngOnDestroy() {
     this.exerciseSubscription.unsubscribe();
+  }
+
+  getBoundaryChargeBySide(e: 'top' | 'left' | 'right' | 'bottom') {
+    // return 0
+    return this.boundaryCharge[e]
   }
 }

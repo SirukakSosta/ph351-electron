@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
-import { Chart, Options } from "highcharts";
+import { Chart, Options, SeriesOptionsType } from "highcharts";
 import { tap } from "rxjs/operators";
 import { PdeLabService } from "../pde-lab.service";
 import { Subscription } from "rxjs";
@@ -68,7 +68,7 @@ export class VectorPlotComponent implements OnInit, OnDestroy {
     this.sub = this.lab.electricField$
       .pipe(
         tap((electricField) => {
-          // console.log("electricField", electricField);
+          console.log("electricField", electricField);
 
           if (this.chart.get("series-a")) {
             this.chart.get("series-a").remove();
@@ -78,12 +78,17 @@ export class VectorPlotComponent implements OnInit, OnDestroy {
             id: "series-a",
             type: "vector",
             name: "Electric vector field",
-            // turboThreshold: 0,
+            turboThreshold: 0,
             rotationOrigin: "start",
             color: "red",
-            data: electricField
+            data: electricField,
+            allAreas: true
           });
-          // this.chart.redraw()
+
+          const min = electricField[0][0];
+          const max = electricField[electricField.length - 1][0];
+          this.chart.axes.forEach(a => a.update({ max, min }, true));
+
         })
       )
       .subscribe();

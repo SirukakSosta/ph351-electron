@@ -9,7 +9,8 @@ import { getHFromSize, magnitude, radians } from "./method";
 })
 export class PdeLabService {
 
-  public boundaryLength = 1;
+  public xStart = -4;
+  public xEnd = 4;
   private voltageMatrix$$ = new BehaviorSubject([] as number[][]);
   public voltageMatrix$ = this.voltageMatrix$$.asObservable();
   private axis$$ = new BehaviorSubject([] as number[]);
@@ -38,7 +39,7 @@ export class PdeLabService {
 
         }
       }
-      // console.log('derivtionForPlot', derivtionForPlot);
+      console.log('derivtionForPlot', derivtionForPlot);
       return derivtionForPlot;
 
 
@@ -62,7 +63,7 @@ export class PdeLabService {
   set axis(e: number[]) {
     this.axis$$.next(e);
   }
-  
+
 
   private getVoltageMatrixDerivatives() {
 
