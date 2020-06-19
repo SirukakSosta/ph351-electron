@@ -16,7 +16,7 @@ export const totalEnergyTemperaturePlotLayout = {
     title: `Energy Per Particle - Temperature`,
     xaxis: {
         title: "Temperature"
-    }, 
+    },
     yaxis: {
         title: "Energy Per Particle",
     },

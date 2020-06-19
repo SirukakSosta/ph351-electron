@@ -1,6 +1,5 @@
 <nz-layout class="layout">
 
-  <!-- <app-loading *ngIf="loading"></app-loading> -->
   <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" [nzBreakpoint]="'lg'" [nzCollapsedWidth]="0"
     [nzZeroTrigger]="zeroTrigger">
     <div class="menu">
@@ -54,6 +53,31 @@
             <input nz-input type="number" placeholder="Time Step" [(ngModel)]="dt" />
           </div>
         </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">a (ω)</label>
+            <input nz-input type="number" placeholder="a" [(ngModel)]="constant.a" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">k</label>
+            <input nz-input type="number" placeholder="k" [(ngModel)]="constant.k" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">b</label>
+            <input nz-input type="number" placeholder="b" [(ngModel)]="constant.b" />
+          </div>
+        </div>
+        <div nz-col [nzSpan]="24">
+          <div class="item">
+            <label for="">g</label>
+            <input nz-input type="number" placeholder="g" [(ngModel)]="constant.g" />
+          </div>
+        </div>
+
 
       </div>
 

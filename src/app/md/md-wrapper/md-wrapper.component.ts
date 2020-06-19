@@ -1,33 +1,11 @@
 import { Component, OnInit } from "@angular/core";
 import { PlotlyService } from "angular-plotly.js";
-import {
-  BehaviorSubject,
-  combineLatest,
-  concat,
-  fromEvent,
-  Observable,
-  of,
-  timer,
-} from "rxjs";
+import { BehaviorSubject, combineLatest, concat, fromEvent, Observable, of, timer } from "rxjs";
 import { filter, map, switchMap, take, tap } from "rxjs/operators";
 import { createArrayWithRandomNumbers } from "../../math-common/method";
-import {
-  ExperimentConstant,
-  MdWorkerInput,
-  MdWorkerOutput,
-} from "../interface";
-import { MdCoreService } from "../md-core.service";
-import {
-  calculateAcceleration,
-  calculateKineticEnergy,
-  calculatePotentialEnergy,
-  createInitialDisplacement,
-  getVelocityBoundsByIndex,
-} from "../methods";
-import {
-  energyTimePlotLayout,
-  totalEnergyTemperaturePlotLayout,
-} from "../variable";
+import { ExperimentConstant, MdWorkerInput, MdWorkerOutput } from "../interface";
+import { calculateAcceleration, calculateKineticEnergy, calculatePotentialEnergy, createInitialDisplacement, getVelocityBoundsByIndex } from "../method";
+import { energyTimePlotLayout, totalEnergyTemperaturePlotLayout } from "../variable";
 
 @Component({
   selector: "app-md-wrapper",
@@ -38,6 +16,7 @@ export class MdWrapperComponent implements OnInit {
   totalEnergyTemperaturePlotLayout = totalEnergyTemperaturePlotLayout;
   energyTimePlotLayout = energyTimePlotLayout;
   isCollapsed = false;
+  constant: ExperimentConstant = { k: 1, g: 0, a: 0, b: 0 }; // harmonic
   dt = 0.1;
   dtStart = 0;
   dtEnd = 70;
@@ -177,7 +156,7 @@ export class MdWrapperComponent implements OnInit {
     })
   );
 
-  constructor(public service: MdCoreService, public plotly: PlotlyService) {}
+  constructor(public plotly: PlotlyService) { }
 
   ngOnInit() {
     this.particleArray = new Array(this.particleCount).fill(0).map((e, i) => i); // mock array used for particle mappings
@@ -216,47 +195,19 @@ export class MdWrapperComponent implements OnInit {
     let ops$: Observable<MdWorkerOutput>[] = [];
 
     for (let i = 1; i <= 20; i++) {
-      const bounds = getVelocityBoundsByIndex(
-        i,
-        this.velocityInitialStart,
-        this.velocityInitialEnd,
-        this.velocityStep
-      );
-      ops$.push(
-        this.runCalculation(
-          this.initialDisplacement,
-          bounds.velocityStart,
-          bounds.velocityEnd,
-          i
-        )
-      );
+      const bounds = getVelocityBoundsByIndex(i, this.velocityInitialStart, this.velocityInitialEnd, this.velocityStep);
+      ops$.push(this.runCalculation(this.initialDisplacement, bounds.velocityStart, bounds.velocityEnd, i));
     }
 
     concat(...ops$).subscribe();
   }
 
-  runCalculation(
-    initialDisplacement: number[],
-    velocityStart: number,
-    velocityEnd: number,
-    calculationIndex: number
-  ) {
-    // const constant: ExperimentConstant = { k: 1, g: 4, a: 4, b: 4 }; // non harmonic
-    const constant: ExperimentConstant = { k: 1, g: 0, a: 0, b: 0 }; // harmonic
+  runCalculation(initialDisplacement: number[], velocityStart: number, velocityEnd: number, calculationIndex: number) {
+
+    const constant = this.constant;
     const mass = createArrayWithRandomNumbers(this.particleCount, 1, 1, false); // mass for each particle
 
-    // const initialDisplacement = this.initialDisplacement
-    // console.log('initialDisplacement', initialDisplacement)
-
-    // const velocityStart = -0.1;
-    // const velocityEnd = 0.1;
-
-    const initialVelocity = createArrayWithRandomNumbers(
-      this.particleCount,
-      velocityStart,
-      velocityEnd,
-      true
-    ); // initial velocity values for each particle
+    const initialVelocity = createArrayWithRandomNumbers(this.particleCount, velocityStart, velocityEnd, true);    // initial velocity values for each particle
     const initialAcceleration = this.particleArray.map((e, particle) => {
       const particleDisplacement = {
         previousParticle:
@@ -266,11 +217,7 @@ export class MdWrapperComponent implements OnInit {
         nextParticle:
           initialDisplacement[particle + 1] || initialDisplacement[0],
       };
-      return calculateAcceleration(
-        particleDisplacement,
-        mass[particle],
-        constant
-      );
+      return calculateAcceleration(particleDisplacement, mass[particle], constant);
     });
 
     const initialKineticEnergy = this.particleArray.map((e, particle) =>
@@ -313,17 +260,6 @@ export class MdWrapperComponent implements OnInit {
           ...this.calculationResults$$.getValue(),
           e,
         ]);
-        // console.log('results', e)
-
-        // let dtIndex = 0;
-        // for (let t = this.dtStart; t < this.dtEnd; t += this.dt) {
-
-        //   const totalKineticEnergyForDt = e.kineticEnergy[dtIndex].reduce((a, b) => a + b);
-        //   const totalPotentialEnergyForDt = e.potentialEnergy[dtIndex].reduce((a, b) => a + b);
-        //   console.log(t, 'kinetic', totalKineticEnergyForDt, 'potential ', totalPotentialEnergyForDt, 'total energy', totalKineticEnergyForDt + totalPotentialEnergyForDt)
-
-        //   dtIndex++
-        // }
       })
     );
   }

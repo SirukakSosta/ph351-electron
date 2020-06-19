@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { calculateAcceleration, calculateKineticEnergy, calculatePotentialEnergy, displacementNextDt, velocityNextDt } from "./methods";
+import { calculateAcceleration, calculateKineticEnergy, calculatePotentialEnergy, displacementNextDt, velocityNextDt } from "./method";
 
 type input = {
 
@@ -46,7 +46,11 @@ addEventListener('message', ({ data }) => {
   let potentialEnergy = [input.initialPotentialEnergy];
 
   let dtIndex = 0;
-  for (let t = input.dtStart; t < input.dtEnd; t += input.dt) {
+  // let dt= input.dtStart;
+
+  // let _temperature = 0;
+  // while (_temperature < 6) {
+    for (let t = input.dtStart; t < input.dtEnd; t += input.dt) {
 
     // next displacement calculation
     const _displacementNextDt = particleArray.map((e, particle) => {
@@ -105,8 +109,9 @@ addEventListener('message', ({ data }) => {
     potentialEnergy.push(_potentialEnergyNextDt)
 
     // progress & output 
-    const progress = ((dtIndex + 1) * 100 / ((input.dtEnd - input.dtStart) / input.dt))
-    if (progress % 20 === 0 && progress < 100) {
+    const progress =     ((dtIndex + 1) * 100 / ((input.dtEnd - input.dtStart) / input.dt))
+    // (_temperature/6) * 100
+    if (progress % 5 === 0 && progress < 100) {
 
       const output: output = {
         displacement,
@@ -125,6 +130,11 @@ addEventListener('message', ({ data }) => {
     }
 
     dtIndex++;
+    // dtStart
+
+    // const averageKineticEnergy = (kineticEnergy.map(a => a.reduce((_a, _b) => _a + _b)).reduce((a, b) => a + b) / dtIndex) / particleCount;
+    // console.log( 2 * averageKineticEnergy)
+    // console.log(_temperature)
 
   }
 
