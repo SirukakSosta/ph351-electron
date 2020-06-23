@@ -57,15 +57,15 @@ export class McWrapperComponent implements OnInit {
 
       results[0].magnetizations.forEach((m, i) => {
 
-        let b = 0;
-        if (i === 1) { b = 0.8 }
-        if (i === 2) { b = 1.3 }
+
+
+        const dd = [0, 0.9, 1.5];
 
         const t = {
           x: results[0].tempratures,
           y: m,
           type: "scatter",
-          name: `Lattice ${results[0].GRID_SIZE} -  B ${b}`
+          name: `Lattice ${results[0].GRID_SIZE} -  B ${dd[i]}`
         }
 
         traces.push(t)

@@ -144,7 +144,7 @@ export function singleTempratureCalculation(
 
   for (let i = 0; i < ITERATIONS; i++) {
     /** Ενεργεια πριν απο αλλαγη σπιν */
-    const energyBefore = calculateEnergy2(LATTICE, J);
+    const energyBefore = calculateEnergy2(LATTICE, J, B);
 
     /** Δημιουργουμε ενα προσωρινο πλεγμα */
     let tmpLattice = deepCopy(LATTICE);
@@ -161,7 +161,7 @@ export function singleTempratureCalculation(
     }
 
     /** Ενεργεια Μετα απο αλλαγη σπιν */
-    const energyAfter = calculateEnergy2(tmpLattice, J);
+    const energyAfter = calculateEnergy2(tmpLattice, J, B);
     const deltaEnergy = energyAfter - energyBefore;
 
     let keepChange: boolean;
@@ -189,7 +189,7 @@ export function singleTempratureCalculation(
     mag += tmpMag;
     magSquared += Math.pow(tmpMag, 2);
 
-    const tmpEnergy = calculateEnergy2(LATTICE, J);
+    const tmpEnergy = calculateEnergy2(LATTICE, J, B);
     energy += tmpEnergy;
     energySquared += Math.pow(tmpEnergy, 2);
 
@@ -222,7 +222,7 @@ export function singleTempratureCalculation(
   // E_sq = E_sq + Math.pow(E, 2);
 }
 
-export function calculateEnergy2(l: number[][], J: number) {
+export function calculateEnergy2(l: number[][], J: number, B: number) {
   // """
   //   Sum products of neighboring spin sites.  Return
   //   the energy as well as the sum of all of the spins individually.
@@ -274,6 +274,17 @@ export function calculateEnergy2(l: number[][], J: number) {
       break;
     }
   }
-  const E = -0.5 * J * spinSum;
+
+  let f = 0;
+  for (let i = 0; i < N; i++) {
+    for (let j = 0; j < N; j++) {
+      f += l[i][j];
+    }
+  }
+
+  f *= B;
+
+  const E = -0.5 * J * spinSum - f;
+
   return E;
 }
