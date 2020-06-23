@@ -74,12 +74,12 @@
             <input nz-input type="number" placeholder="J" [(ngModel)]="J" />
           </div>
         </div>
-        <div nz-col [nzSpan]="24">
+        <!-- <div nz-col [nzSpan]="24">
           <div class="item">
             <label for="">B</label>
             <input nz-input type="number" placeholder="B" [(ngModel)]="B" />
           </div>
-        </div>
+        </div> -->
 
 
       </div>
@@ -102,12 +102,12 @@
 
           <plotly-plot [data]="magPlotData$ | async" [layout]="magLayout">
           </plotly-plot>
-          <plotly-plot [data]="energyPlotData$ | async" [layout]="energyLayout">
+          <!-- <plotly-plot [data]="energyPlotData$ | async" [layout]="energyLayout">
           </plotly-plot>
           <plotly-plot [data]="eidikhThermotitaPlotData$ | async" [layout]="eidikhThermotitaLayout">
           </plotly-plot>
           <plotly-plot [data]="magSusceptibilityPlotData$ | async" [layout]="magSusceptibilityLayout">
-          </plotly-plot>
+          </plotly-plot> -->
 
         </div>
       </div>

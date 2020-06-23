@@ -52,65 +52,88 @@ export class McWrapperComponent implements OnInit {
   magPlotData$ = this.service.calculationResults$$.pipe(
     filter((e) => !!e.length),
     map((results) => {
-      let traces = results.map((result) => ({
-        x: result.tempratures,
-        y: result.magnetizations,
-        type: "scatter",
-        name: `Lattice ${result.GRID_SIZE}`,
-      }));
-      traces.push({
-        x: results[0].tempratures,
-        y: results[0].theoritical,
-        type: "lines+markers",
-        name: `Theory`,
-      });
+      console.log(results)
+      let traces = []
+
+      results[0].magnetizations.forEach((m, i) => {
+
+        let b = 0;
+        if (i === 1) { b = 0.8 }
+        if (i === 2) { b = 1.3 }
+
+        const t = {
+          x: results[0].tempratures,
+          y: m,
+          type: "scatter",
+          name: `Lattice ${results[0].GRID_SIZE} -  B ${b}`
+        }
+
+        traces.push(t)
+
+
+      })
+      // })
+      // let traces = results.map((result) => ({
+      //   x: result.tempratures,
+      //   y: result.magnetizations,
+      //   type: "scatter",
+      //   name: `Lattice ${result.GRID_SIZE}`,
+      // }));
+
+
+      // traces.push({
+      //   x: results[0].tempratures,
+      //   y: results[0].theoritical,
+      //   type: "lines+markers",
+      //   name: `Theory`,
+      // });
       // console.log(traces)
       return traces;
     })
   );
 
-  energyPlotData$ = this.service.calculationResults$$.pipe(
-    filter((e) => !!e.length),
-    map((results) => {
-      let traces = results.map((result) => ({
-        x: result.tempratures,
-        y: result.energies,
-        type: "lines+markers",
-        name: `Lattice ${result.GRID_SIZE}`,
-      }));
-      return traces;
-    })
-  );
+  // energyPlotData$ = this.service.calculationResults$$.pipe(
+  //   filter((e) => !!e.length),
+  //   map((results) => {
+  //     let traces = results.map((result) => ({
+  //       x: result.tempratures,
+  //       y: result.energies,
+  //       type: "lines+markers",
+  //       name: `Lattice ${result.GRID_SIZE}`,
+  //     }));
+  //     return traces;
+  //   })
+  // );
 
-  eidikhThermotitaPlotData$ = this.service.calculationResults$$.pipe(
-    filter((e) => !!e.length),
-    map((results) => {
-      let traces = results.map((result) => ({
-        x: result.tempratures,
-        y: result.eidikesThermotites,
-        type: "lines+markers",
-        name: `Lattice ${result.GRID_SIZE}`,
-      }));
-      return traces;
-    })
-  );
+  // eidikhThermotitaPlotData$ = this.service.calculationResults$$.pipe(
+  //   filter((e) => !!e.length),
+  //   map((results) => {
+  //     let traces = results.map((result) => ({
+  //       x: result.tempratures,
+  //       y: result.eidikesThermotites,
+  //       type: "lines+markers",
+  //       name: `Lattice ${result.GRID_SIZE}`,
+  //     }));
+  //     return traces;
+  //   })
+  // );
 
-  magSusceptibilityPlotData$ = this.service.calculationResults$$.pipe(
-    filter((e) => !!e.length),
-    map((results) => {
-      let traces = results.map((result) => ({
-        x: result.tempratures,
-        y: result.magSusceptibilities,
-        type: "lines+markers",
-        name: `Lattice ${result.GRID_SIZE}`,
-      }));
-      return traces;
-    })
-  );
+  // magSusceptibilityPlotData$ = this.service.calculationResults$$.pipe(
+  //   filter((e) => !!e.length),
+  //   map((results) => {
+  //     let traces = results.map((result) => ({
+  //       x: result.tempratures,
+  //       y: result.magSusceptibilities,
+  //       type: "lines+markers",
+  //       name: `Lattice ${result.GRID_SIZE}`,
+  //     }));
+  //     return traces;
+  //   })
+  // );
 
-  constructor(public service: McCoreService, public plotly: PlotlyService) {}
+  constructor(public service: McCoreService, public plotly: PlotlyService) { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   start() {
     this.service.start(
@@ -125,6 +148,6 @@ export class McWrapperComponent implements OnInit {
       this.spinChangesPerIteration
     );
 
-    
+
   }
 }

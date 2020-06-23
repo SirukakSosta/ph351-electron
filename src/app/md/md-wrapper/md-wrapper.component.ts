@@ -20,7 +20,7 @@ export class MdWrapperComponent implements OnInit {
   dt = 0.1;
   dtStart = 0;
   dtEnd = 70;
-  particleCount = 20;
+  particleCount = 100;
   initialDisplacement: number[] = [];
   perlinDistribution = true;
   worker = new Worker("../md.worker", { type: "module" });
@@ -33,8 +33,8 @@ export class MdWrapperComponent implements OnInit {
     []
   );
   selectedEnergyTimeExperiment$$ = new BehaviorSubject(0);
-  velocityInitialStart = -0.1;
-  velocityInitialEnd = 0.1;
+  velocityInitialStart = -2;
+  velocityInitialEnd = 2;
   velocityStep = 0.05;
   progress$ = this.calculationResults$$.pipe(
     map((e) => Math.round((e.length / 20) * 100))

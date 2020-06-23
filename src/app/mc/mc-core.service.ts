@@ -12,7 +12,7 @@ export class McCoreService {
     []
   );
 
-  constructor() {}
+  constructor() { }
 
   start(
     gridSizes: number[],
@@ -56,14 +56,17 @@ export class McCoreService {
         T0,
         T_MAX,
         T_STEP,
-        B,
+        B: [0, 0.8, 1.3],
         J,
         K,
         spinChangesPerIteration,
       };
       worker.postMessage(JSON.stringify(workerInput));
 
+
       workerEvent$.subscribe();
+
+
     }
   }
 }
