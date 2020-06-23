@@ -5,12 +5,17 @@ import { LineComponent } from './line/line.component';
 import { PdeWrapperComponent } from './pde-wrapper/pde-wrapper.component';
 import { ThreeDSurfaceComponent } from './three-d-surface/three-d-surface.component';
 import { VectorPlotComponent } from './vector-plot/vector-plot.component';
+import { ChargeEquationComponent } from './charge-equation/charge-equation.component';
 
 const routes: Routes = [
   {
     path: 'eq/:am',
     component: PdeWrapperComponent,
     children: [
+      {
+        path: 'charge-equation',
+        component: ChargeEquationComponent,
+      },
       {
         path: 'potential-3d',
         component: ThreeDSurfaceComponent,

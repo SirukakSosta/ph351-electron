@@ -56,6 +56,8 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+    this.lab.chargeEquationStr = this.chargeEquationStr;
+
     this.exerciseSubscription = this.route.paramMap
       .pipe(
         tap(paramMap => {
@@ -79,6 +81,8 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
     // this.H = 1 / 10;
   }
   public start() {
+
+    this.lab.chargeEquationStr = this.chargeEquationStr;
     this.ready = false;
     this.loading = true;
     setTimeout(() => {
@@ -96,6 +100,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       this.initialiseVoltageMatrixWithRandomValues();
       this.fillChargeMatrixWithValues();
 
+     
       this.startIteration();
 
       this.ready = true;

@@ -19,6 +19,8 @@
           </ul>
         </div>
       </div>
+
+
       <ng-container>
         <div nz-row [nzGutter]="4" class="form">
           <div nz-col [nzSpan]="24">
@@ -110,6 +112,12 @@
           <div class="plotly-container h-100 d-flex flex-column h-100" *ngIf="voltageMatrixHasBeenCalculated | async">
             <div class="graph-btns" *ngIf="ready">
               <div nz-row [nzGutter]="4" class="form">
+                <div nz-col [nzSpan]="8">
+                  <button nz-button nzType="primary" routerLinkActive="active-chart" [routerLink]="['charge-equation']"
+                    nzBlock>
+                    Charge Equation
+                  </button>
+                </div>
                 <div nz-col [nzSpan]="8">
                   <button nz-button nzType="primary" routerLinkActive="active-chart" [routerLink]="['potential-3d']"
                     nzBlock>

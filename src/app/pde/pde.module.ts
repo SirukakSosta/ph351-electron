@@ -9,13 +9,15 @@ import { PdeRoutingModule } from "./pde-routing.module";
 import { PdeWrapperComponent } from "./pde-wrapper/pde-wrapper.component";
 import { ThreeDSurfaceComponent } from "./three-d-surface/three-d-surface.component";
 import { VectorPlotComponent } from "./vector-plot/vector-plot.component";
+import { ChargeEquationComponent } from "./charge-equation/charge-equation.component";
 
 @NgModule({
   declarations: [
     PdeWrapperComponent,
     ThreeDSurfaceComponent,
     LineComponent,
-    VectorPlotComponent
+    VectorPlotComponent,
+    ChargeEquationComponent
   ],
   imports: [
     CommonModule,

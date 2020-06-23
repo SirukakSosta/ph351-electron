@@ -9,6 +9,7 @@ import { getHFromSize, magnitude, radians } from "./method";
 })
 export class PdeLabService {
 
+  public chargeEquationStr: string;
   public xStart = -4;
   public xEnd = 4;
   private voltageMatrix$$ = new BehaviorSubject([] as number[][]);
