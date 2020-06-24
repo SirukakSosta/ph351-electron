@@ -34,7 +34,7 @@ export class MdWrapperComponent implements OnInit {
   );
   selectedEnergyTimeExperiment$$ = new BehaviorSubject(0);
   velocityInitialStart = -0.1;
-  velocityInitialEnd = 0.1;
+  velocityInitialEnd = 4;
   velocityStep = 0.05;
   progress$ = this.calculationResults$$.pipe(
     map((e) => Math.round((e.length / 20) * 100))
@@ -101,7 +101,7 @@ export class MdWrapperComponent implements OnInit {
         name: `Total`,
       };
 
-      return [potentialTrace, kineticTrace, totalTrace];
+      return [totalTrace];
     })
   );
 
@@ -138,7 +138,7 @@ export class MdWrapperComponent implements OnInit {
         name: `Potential`,
       };
 
-      return [traceTotalEnergy, traceKineticEnergy, tracePotentialEnergy];
+      return [traceTotalEnergy];
     })
   );
   energyTimePlotLayout$ = this.selectedEnergyTimeExperiment$$.pipe(
@@ -194,7 +194,7 @@ export class MdWrapperComponent implements OnInit {
 
     let ops$: Observable<MdWorkerOutput>[] = [];
 
-    for (let i = 1; i <= 20; i++) {
+    for (let i = 1; i <= this.particleCount; i++) {
       const bounds = getVelocityBoundsByIndex(i, this.velocityInitialStart, this.velocityInitialEnd, this.velocityStep);
       ops$.push(this.runCalculation(this.initialDisplacement, bounds.velocityStart, bounds.velocityEnd, i));
     }

@@ -61,13 +61,14 @@ export function calculateKineticEnergy(mass: number, velocity: number) {
 export function calculatePotentialEnergy(displacement: { currentParticle: number; nextParticle: number }, constant: ExperimentConstant) {
   const displacementCurrent = displacement.currentParticle;
   const displacementNext = displacement.nextParticle;
+  const term1 = 4 * Math.exp((-(displacementNext - displacementCurrent)) - 1);
+  // const term1 = 0.5 * constant.k * Math.pow(displacementNext - displacementCurrent, 2);
+  // const term2 = 0.25 * constant.g * Math.pow(displacementNext - displacementCurrent, 4);
+  // const term3 = 0.5 * constant.a * Math.pow(displacementCurrent, 2);
+  // const term4 = 0.25 * constant.b * Math.pow(displacementCurrent, 4);
 
-  const term1 = 0.5 * constant.k * Math.pow(displacementNext - displacementCurrent, 2);
-  const term2 = 0.25 * constant.g * Math.pow(displacementNext - displacementCurrent, 4);
-  const term3 = 0.5 * constant.a * Math.pow(displacementCurrent, 2);
-  const term4 = 0.25 * constant.b * Math.pow(displacementCurrent, 4);
-
-  const result = term1 + term2 + term3 + term4;
+  const result = term1
+  // + term2 + term3 + term4;
   return result;
 }
 

@@ -43,7 +43,7 @@ export class HamiltonianService {
         for (let col = 0; col < N; col++) {
           tmp[row][col] = firstPart[row][col] + secondPart[row][col];
           hamiltonian[row][col] =
-            hamiltonian[row][col] + firstPart[row][col] + secondPart[row][col];
+            hamiltonian[row][col] + (Math.pow(k, -1)) * (firstPart[row][col] + secondPart[row][col]);
         }
       }
     }
