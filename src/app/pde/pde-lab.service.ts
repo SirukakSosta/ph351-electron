@@ -10,8 +10,8 @@ import { getHFromSize, magnitude, radians } from "./method";
 export class PdeLabService {
 
   public chargeEquationStr: string;
-  public xStart = -4;
-  public xEnd = 4;
+  public xStart = -4 * Math.PI;
+  public xEnd = 4 * Math.PI;
   private voltageMatrix$$ = new BehaviorSubject([] as number[][]);
   public voltageMatrix$ = this.voltageMatrix$$.asObservable();
   private axis$$ = new BehaviorSubject([] as number[]);

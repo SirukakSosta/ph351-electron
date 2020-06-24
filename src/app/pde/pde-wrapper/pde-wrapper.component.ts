@@ -27,13 +27,13 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
   chargeEquationLatex: string;
   exerciseSubscription: Subscription;
   voltageMatrixHasBeenCalculated = this.lab.voltageMatrix$.pipe(map(e => !!e[0] && !!e[0].length));
-  chargeEquationStr = 'Math.sin(2 * Math.PI * x / 8) * Math.exp(-1 * Math.pow(y,2) /10)';
+  chargeEquationStr = 'Math.pow(Math.sin(x),2) + Math.pow(Math.sin(y),2)';
   chargeEquationStrValid: boolean = true;
   boundaryCharge = {
     top: 0,
     bottom: 0,
-    left: -1,
-    right: 1
+    left: -10,
+    right: 10
   }
 
   constructor(private route: ActivatedRoute, public lab: PdeLabService, private router: Router) { }
@@ -100,7 +100,7 @@ export class PdeWrapperComponent implements OnInit, OnDestroy {
       this.initialiseVoltageMatrixWithRandomValues();
       this.fillChargeMatrixWithValues();
 
-     
+
       this.startIteration();
 
       this.ready = true;

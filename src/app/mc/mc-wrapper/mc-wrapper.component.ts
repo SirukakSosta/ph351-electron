@@ -27,13 +27,13 @@ export class McWrapperComponent implements OnInit {
   B = 0;
   J = 1;
   T0 = 0;
-  T_MAX = 7;
-  T_STEP = 0.1;
+  T_MAX = 6;
+  T_STEP = 0.05;
 
   ITERATIONS = 100000;
   spinChangesPerIteration = 1;
   availableGridSizes = [10, 20, 30];
-  selectedGridSizes = [10, 20, 30];
+  selectedGridSizes = [20];
 
   progress$ = this.service.calculationResults$$.pipe(
     filter((e) => !!e.length),
@@ -57,15 +57,13 @@ export class McWrapperComponent implements OnInit {
 
       results[0].magnetizations.forEach((m, i) => {
 
-
-
-        const dd = [0, 0.9, 1.5];
+        const dd = [0];
 
         const t = {
           x: results[0].tempratures,
           y: m,
           type: "scatter",
-          name: `Lattice ${results[0].GRID_SIZE} -  B ${dd[i]}`
+          name: `Lattice ${results[0].GRID_SIZE}`
         }
 
         traces.push(t)

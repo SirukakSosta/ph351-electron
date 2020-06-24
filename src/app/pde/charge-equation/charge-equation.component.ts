@@ -35,8 +35,8 @@ export class ChargeEquationComponent implements OnInit, OnDestroy {
     ],
     layout: {
       autosize: true,
-      // width: 1200,
-      height: 900,
+      width: 1700,
+      height: 1000,
       title: this.title,
       scene: {
         xaxis: { title: "X - Distance unit" },

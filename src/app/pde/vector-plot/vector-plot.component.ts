@@ -64,12 +64,14 @@ export class VectorPlotComponent implements OnInit, OnDestroy {
   public onLoad(evt) {
     this.chart = evt.chart;
     this.chart.series = [];
+    this.chart.plotHeight = 1000
 
     this.sub = this.lab.electricField$
       .pipe(
         tap((electricField) => {
           console.log("electricField", electricField);
 
+        
           if (this.chart.get("series-a")) {
             this.chart.get("series-a").remove();
           }

@@ -1,7 +1,7 @@
 import { AM } from "./interface";
 
 export const exerciseChargeEquationMap: Record<AM, string> = {
-  "3943":  'Math.sin(2 * Math.PI * x / 8) * Math.exp(-1 * Math.pow(y,2) /10)' ,// 'x*(1-x)*y*(1-y)',
+  "3943":  'Math.pow(Math.sin(x),2) + Math.pow(Math.sin(y),2)' ,// 'x*(1-x)*y*(1-y)',
   "3131": 'Math.cos(x * Math.PI) + Math.pow(x,2) + Math.pow(y,2) * Math.sin(y * Math.PI)'
 };
 

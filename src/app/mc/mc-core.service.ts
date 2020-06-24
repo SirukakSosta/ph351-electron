@@ -56,7 +56,7 @@ export class McCoreService {
         T0,
         T_MAX,
         T_STEP,
-        B: [0, 0.9, 1.5],
+        B: [0],
         J,
         K,
         spinChangesPerIteration,
