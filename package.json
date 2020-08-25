@@ -101,7 +101,7 @@
     "@types/numeric": "1.2.0",
     "@types/sharedworker": "0.0.29",
     "angular-plotly.js": "2.0.0",
-    "highcharts": "8.0.4",
+    "highcharts": "8.2.0",
     "mathjax": "3.0.1",
     "mathjs": "6.6.2",
     "ng-katex": "2.0.3",
